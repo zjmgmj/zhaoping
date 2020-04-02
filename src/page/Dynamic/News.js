@@ -6,57 +6,16 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  InteractionManager,
   TextInput,
 } from 'react-native';
 import {baseStyle} from '../../components/baseStyle';
-import {TopviewGetInstance, Input} from 'beeshell';
+import {TopviewGetInstance} from 'beeshell';
 
 class Item extends Component {
   constructor(props) {
     super(props);
-    this.focus = this.focus.bind(this);
-    this.state = {
-      commentId: '',
-    };
   }
-  focus() {
-    // 直接使用原生 API 使 text 输入框获得焦点
-    this.textInput.focus();
-  }
-  openComment = () => {
-    console.log('openComment');
-    TopviewGetInstance()
-      .add(
-        // <TouchableOpacity
-        //   onPress={() => {
-        //     TopviewGetInstance.remove(this.state.commentId);
-        //   }}>
-        // </TouchableOpacity>,
-        <View style={sty.fullScreenMask}>
-          <TextInput
-            ref={input => {
-              this.textInput = input;
-            }}
-            style={{position: 'absolute', flex: 1, bottom: 0}}
-            // value={''}
-            placeholder="请输入地址"
-            onChange={value => {
-              console.log(value);
-            }}
-          />
-        </View>,
-      )
-      .then(id => {
-        this.setState({
-          commentId: id,
-        });
-      });
-    InteractionManager.runAfterInteractions(() => {
-      console.log('this', this);
-      this.focus;
-    });
-  };
+
   render() {
     return (
       <View style={sty.itemBox}>
@@ -103,7 +62,11 @@ class Item extends Component {
               <Text>23</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={this.openComment}>
+          <TouchableOpacity
+            onPress={() => {
+              // this._modal.open();
+              this.props.openModal();
+            }}>
             <View style={{marginRight: 10}}>
               <Image
                 source={require('../../images/pl_icon.png')}
@@ -121,22 +84,71 @@ class Item extends Component {
 }
 
 export default class News extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      commentId: '',
+    };
+  }
   componentDidMount() {
     TopviewGetInstance().add(
-      <View style={{position: 'absolute', bottom: 60, right: 20}}>
+      <TouchableOpacity
+        onPress={() => {
+          this.props.openRelease();
+        }}
+        style={{position: 'absolute', bottom: 60, right: 20}}>
         <Image
           source={require('../../images/add_icon.png')}
           style={sty.addIcon}
         />
-      </View>,
+      </TouchableOpacity>,
     );
+  }
+  openComment() {
+    TopviewGetInstance()
+      .add(
+        <TouchableOpacity
+          style={sty.fullScreenMask}
+          onPress={() => {
+            this.textInput.blur();
+          }}>
+          <View style={sty.commentInputBox}>
+            <TextInput
+              ref={input => {
+                this.textInput = input;
+              }}
+              style={sty.commentInputSty}
+              placeholder="评论"
+              onChange={value => {
+                console.log(value);
+              }}
+              onBlur={() => {
+                TopviewGetInstance().remove(this.state.commentId);
+              }}
+            />
+          </View>
+        </TouchableOpacity>,
+      )
+      .then(id => {
+        this.setState({
+          commentId: id,
+        });
+        this.textInput.focus();
+      });
   }
   render() {
     const list = [1, 2, 3, 4];
     return (
       <ScrollView>
         {list.map(item => {
-          return <Item key={item} />;
+          return (
+            <Item
+              key={item}
+              openModal={() => {
+                this.openComment();
+              }}
+            />
+          );
         })}
       </ScrollView>
     );
@@ -184,5 +196,18 @@ const sty = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, .3)',
     alignItems: 'center',
+  },
+  commentInputBox: {
+    position: 'absolute',
+    bottom: 0,
+    width: baseStyle.screenWidth,
+    backgroundColor: '#fff',
+    padding: 10,
+  },
+  commentInputSty: {
+    borderColor: '#ccc',
+    borderWidth: 0.5,
+    borderRadius: 0.5,
+    height: 40,
   },
 });

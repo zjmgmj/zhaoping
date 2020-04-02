@@ -3,7 +3,6 @@ import {Text, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import TabBar from '../../components/TabBar';
 import News from './News';
-import {baseStyle} from '../../components/baseStyle';
 
 export default class Dynamic extends Component {
   render() {
@@ -14,7 +13,12 @@ export default class Dynamic extends Component {
         tabBarActiveTextColor="#fff"
         tabBarInactiveTextColor="#fff">
         <View tabLabel="最新动态">
-          <News />
+          <News
+            openRelease={() => {
+              debugger;
+              this.props.navigation.navigate('ReleaseDynamic');
+            }}
+          />
         </View>
         <View tabLabel="热门社群">
           <Text>热门社群</Text>

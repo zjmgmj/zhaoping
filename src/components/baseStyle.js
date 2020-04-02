@@ -3,6 +3,7 @@ import {commonStyle} from './commonStyle';
 const screenWidth = Dimensions.get('window').width;
 export const baseStyle = StyleSheet.create({
   /** 背景 **/
+  screenWidth: screenWidth,
   relation: {
     position: 'relative',
   },

@@ -9,30 +9,7 @@ import Mine from './Mine';
 import Dynamic from './Dynamic';
 import Position from './Position';
 import Login from './Login';
-
-const StackRouteConfigs = createStackNavigator(
-  {
-    Login: {
-      screen: Login,
-    },
-    Home: {
-      screen: Home,
-    },
-    Position: {
-      screen: Position,
-    },
-    Dynamic: {
-      screen: Dynamic,
-    },
-    Mine: {
-      screen: Mine,
-    },
-  },
-  {
-    initialRouteName: 'Home',
-    // initialRouteName: 'Login',
-  },
-);
+import ReleaseDynamic from './ReleaseDynamic';
 
 const TabNavigator = createBottomTabNavigator(
   {
@@ -89,6 +66,18 @@ const TabNavigator = createBottomTabNavigator(
     },
   },
   {
+    // defaultNavigationOptions: ({ navigation }) => ({
+    //   tabBarIcon: ({ focused, horizontal, tintColor }) => {
+    //     const { routeName } = navigation.state;
+    //     let iconName;
+    //     if (routeName === 'Home') {
+    //       iconName = 'home'
+    //     } else if (routeName === 'Settings') {
+    //       iconName = `gear`;
+    //     }
+    //     return <Icon name={iconName} size={25} color={tintColor} />;
+    //   },
+    // }),
     tabBarOptions: {
       activeTintColor: '#D9B06F',
       inactiveTintColor: '#333333',
@@ -99,6 +88,38 @@ const TabNavigator = createBottomTabNavigator(
   },
 );
 
-const MainComponent = createAppContainer(TabNavigator, StackRouteConfigs);
+const StackRouteConfigs = createStackNavigator(
+  {
+    ReleaseDynamic: {
+      screen: ReleaseDynamic,
+    },
+    Main: {
+      screen: TabNavigator,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    Login: {
+      screen: Login,
+    },
+    Home: {
+      screen: Home,
+    },
+    Position: {
+      screen: Position,
+    },
+    Dynamic: {
+      screen: Dynamic,
+    },
+    Mine: {
+      screen: Mine,
+    },
+  },
+  {
+    initialRouteName: 'Main',
+    // initialRouteName: 'Login',
+  },
+);
+const MainComponent = createAppContainer(StackRouteConfigs);
 
 export default MainComponent;
