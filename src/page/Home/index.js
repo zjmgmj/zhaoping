@@ -3,6 +3,8 @@ import {Image, Text, View, ScrollView} from 'react-native';
 import {Tab} from 'beeshell';
 import {baseStyle} from '../../components/baseStyle';
 import {sty} from './sty';
+import {setStatusBar} from '../../components/setStatusBar';
+import Header from '../../components/Header';
 
 class Banner extends Component {
   render() {
@@ -236,6 +238,11 @@ class PositionList extends Component {
   }
 }
 
+@setStatusBar({
+  barStyle: 'light-content',
+  translucent: true,
+  backgroundColor: 'transparent',
+})
 class Home extends Component {
   constructor() {
     super();
@@ -243,6 +250,7 @@ class Home extends Component {
   render() {
     return (
       <ScrollView>
+        <Header isHeader={false} />
         <Banner />
         <View style={{backgroundColor: '#fff'}}>
           <Notice />
@@ -253,5 +261,4 @@ class Home extends Component {
     );
   }
 }
-
 export default Home;

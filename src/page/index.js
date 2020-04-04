@@ -3,7 +3,7 @@ import {Image} from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
-
+import TabBarIcon from '../components/TabBarIcon';
 import Home from './Home';
 import Mine from './Mine';
 import Dynamic from './Dynamic';
@@ -15,69 +15,38 @@ const TabNavigator = createBottomTabNavigator(
   {
     Home: {
       screen: Home,
-      navigationOptions: ({navigation}) => ({
+      navigationOptions: () => ({
         tabBarLabel: '首页',
-        tabBarIcon: focused => {
-          console.log('navigation', navigation);
-          console.log('focused', focused);
-          const imgPath = focused
-            ? require('../images/home_active_icon.png')
-            : require('../images/home_icon.png');
-          return <Image source={imgPath} />;
-        },
       }),
     },
     Position: {
       screen: Position,
-      navigationOptions: ({navigation}) => ({
+      navigationOptions: () => ({
         tabBarLabel: '职位',
-        tabBarIcon: focused => {
-          const imgPath = focused
-            ? require('../images/position_active_icon.png')
-            : require('../images/position_icon.png');
-          return <Image source={imgPath} />;
-        },
       }),
     },
     Dynamic: {
       screen: Dynamic,
-      navigationOptions: ({navigation}) => ({
+      navigationOptions: () => ({
         tabBarLabel: '动态',
-        tabBarIcon: focused => {
-          const imgPath = focused
-            ? require('../images/dynamic_active_icon.png')
-            : require('../images/dynamic_icon.png');
-          return <Image source={imgPath} />;
-        },
       }),
     },
     Mine: {
       screen: Mine,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: '我的',
-        tabBarIcon: focused => {
-          // const {routeName} = navigation.state;
-          const imgPath = focused
-            ? require('../images/mine_active_icon.png')
-            : require('../images/mine_icon.png');
-          return <Image source={imgPath} />;
-        },
       }),
     },
   },
   {
-    // defaultNavigationOptions: ({ navigation }) => ({
-    //   tabBarIcon: ({ focused, horizontal, tintColor }) => {
-    //     const { routeName } = navigation.state;
-    //     let iconName;
-    //     if (routeName === 'Home') {
-    //       iconName = 'home'
-    //     } else if (routeName === 'Settings') {
-    //       iconName = `gear`;
-    //     }
-    //     return <Icon name={iconName} size={25} color={tintColor} />;
-    //   },
-    // }),
+    defaultNavigationOptions: ({navigation}) => {
+      const {routeName} = navigation.state;
+      return {
+        tabBarIcon: ({focused}) => (
+          <TabBarIcon focused={focused} routeName={routeName} />
+        ),
+      };
+    },
     tabBarOptions: {
       activeTintColor: '#D9B06F',
       inactiveTintColor: '#333333',
@@ -92,11 +61,14 @@ const StackRouteConfigs = createStackNavigator(
   {
     ReleaseDynamic: {
       screen: ReleaseDynamic,
+      navigationOptions: {
+        headerShown: false,
+      },
     },
     Main: {
       screen: TabNavigator,
       navigationOptions: {
-        header: null,
+        headerShown: false,
       },
     },
     Login: {

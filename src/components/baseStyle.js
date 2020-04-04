@@ -1,9 +1,11 @@
 import {Platform, StyleSheet, Dimensions} from 'react-native';
 import {commonStyle} from './commonStyle';
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 export const baseStyle = StyleSheet.create({
   /** 背景 **/
   screenWidth: screenWidth,
+  screenHeight: screenHeight,
   relation: {
     position: 'relative',
   },
@@ -24,6 +26,9 @@ export const baseStyle = StyleSheet.create({
   flex: {
     flexDirection: 'row',
   },
+  ft16: {
+    fontSize: 16,
+  },
   ft13: {
     fontSize: commonStyle.titleFont,
   },
@@ -35,6 +40,9 @@ export const baseStyle = StyleSheet.create({
   },
   fontBold: {
     fontWeight: 'bold',
+  },
+  textWhite: {
+    color: '#fff',
   },
   textGray: {
     color: '#333333',
@@ -63,5 +71,8 @@ export const baseStyle = StyleSheet.create({
   },
   width_3: {
     width: screenWidth,
+  },
+  content: {
+    padding: 15,
   },
 });
