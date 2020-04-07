@@ -16,7 +16,7 @@ class ChallengePosition extends Component {
     return (
       <View style={[{flex: 1, backgroundColor: '#fff'}]}>
         <Header
-          title="挑战职位"
+          title="推荐职位"
           onPressBack={() => {
             this.props.navigation.goBack();
           }}
@@ -28,7 +28,7 @@ class ChallengePosition extends Component {
           tabBarBackgroundColor="#3671ff"
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
-          <View tabLabel="挑战职位">
+          <View tabLabel="普通职位">
             <PositionList />
             {/* <Text>挑战职位</Text> */}
           </View>

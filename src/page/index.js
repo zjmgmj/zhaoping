@@ -20,6 +20,8 @@ import ResumeEducationalExperience from './Resume/educationalExperience';
 import ResumeJobStatus from './Resume/jobStatus';
 import ResumePrivacySet from './Resume/privacySet';
 import ChallengePosition from './Home/challengePosition';
+import RecommendPosition from './Home/recommendPosition';
+import PositionDetail from './Position/detail';
 
 const TabNavigator = createBottomTabNavigator(
   {
@@ -85,6 +87,8 @@ const StackRouteConfigs = createStackNavigator(
     ResumeJobStatus,
     ResumePrivacySet,
     ChallengePosition,
+    RecommendPosition,
+    PositionDetail,
   },
   {
     defaultNavigationOptions: {

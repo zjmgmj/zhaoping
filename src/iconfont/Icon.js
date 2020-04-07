@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import IconShare from './IconShare';
 import Icontick from './Icontick';
 import Iconedit from './Iconedit';
 import Iconadd from './Iconadd';
@@ -12,6 +13,8 @@ import Iconright from './Iconright';
 
 export const Icon = ({ name, ...rest }) => {
   switch (name) {
+    case 'Share':
+      return <IconShare {...rest} />;
     case 'tick':
       return <Icontick {...rest} />;
     case 'edit':

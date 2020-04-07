@@ -6,11 +6,10 @@ import { ViewProps } from 'react-native';
 import { GProps } from 'react-native-svg';
 
 interface Props extends GProps, ViewProps {
-  name: 'Share' | 'tick' | 'edit' | 'add' | 'circleAdd' | 'search' | 'back' | 'right';
   size?: number;
   color?: string | string[];
 }
 
-export declare const Icon: FunctionComponent<Props>;
+export declare const IconShare: FunctionComponent<Props>;
 
-export default Icon;
+export default IconShare;

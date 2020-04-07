@@ -132,42 +132,76 @@ class TabContent extends Component {
   }
 }
 
-class TabList extends Component {
-  render() {
-    return (
-      <View style={{padding: 15, paddingBottom: 0}}>
-        <View style={[baseStyle.row, sty.positionTab, baseStyle.borderBottom]}>
-          <View style={baseStyle.row}>
-            <View style={[sty.tabNameActive, sty.tabName]}>
-              <Text style={baseStyle.textBlack}>挑战职位</Text>
-            </View>
-            <View style={sty.tabName}>
-              <Text style={baseStyle.textGray}>推荐职位</Text>
-            </View>
-          </View>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.onPressMore();
-            }}>
-            <Text style={baseStyle.textYellow}>更多</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-}
-
 class PositionList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      cardNum: 1,
+    };
+  }
   render() {
+    const navigate = this.props.navigate.navigate;
     return (
       <View>
-        <TabList
-          onPressMore={() => {
-            this.props.onPressMore();
-          }}
-        />
+        <View style={{padding: 15, paddingBottom: 0}}>
+          <View
+            style={[baseStyle.row, sty.positionTab, baseStyle.borderBottom]}>
+            <View style={baseStyle.row}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({
+                    cardNum: 1,
+                  });
+                }}
+                style={[
+                  sty.tabName,
+                  this.state.cardNum === 1 ? sty.tabNameActive : '',
+                ]}>
+                <Text
+                  style={
+                    this.state.cardNum === 1
+                      ? baseStyle.textBlack
+                      : baseStyle.textGray
+                  }>
+                  挑战职位
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({
+                    cardNum: 2,
+                  });
+                }}
+                style={[
+                  sty.tabName,
+                  this.state.cardNum === 2 ? sty.tabNameActive : '',
+                ]}>
+                <Text
+                  style={
+                    this.state.cardNum === 2
+                      ? baseStyle.textBlack
+                      : baseStyle.textGray
+                  }>
+                  推荐职位
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                debugger;
+                this.state.cardNum === 1
+                  ? navigate('ChallengePosition')
+                  : navigate('RecommendPosition');
+              }}>
+              <Text style={baseStyle.textYellow}>更多</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <View>
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              navigate('PositionDetail');
+            }}
             style={[
               baseStyle.borderBottom,
               sty.positionItem,
@@ -202,43 +236,7 @@ class PositionList extends Component {
                 18-20K
               </Text>
             </View>
-          </View>
-          <View
-            style={[
-              baseStyle.borderBottom,
-              sty.positionItem,
-              baseStyle.flex,
-              baseStyle.justifyBetween,
-            ]}>
-            <View style={[baseStyle.row, {flex: 1}]}>
-              <Image
-                style={sty.positionImg}
-                source={require('../../images/position_1.png')}
-              />
-              <View style={{paddingLeft: 15}}>
-                <Text style={baseStyle.positionTitle}>人力资源主管</Text>
-                <Text style={[baseStyle.ft13, baseStyle.textGray]}>
-                  上海汇之余服饰有限公司
-                </Text>
-                <View style={[baseStyle.row, {marginTop: 3}]}>
-                  <View style={sty.positionTag}>
-                    <Text style={sty.textGray}>上海宝山区</Text>
-                  </View>
-                  <View style={sty.positionTag}>
-                    <Text style={sty.textGray}>1-3年</Text>
-                  </View>
-                  <View style={sty.positionTag}>
-                    <Text style={sty.textGray}>本科</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-            <View>
-              <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
-                18-20K
-              </Text>
-            </View>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -262,11 +260,7 @@ class Home extends Component {
         <View style={{backgroundColor: '#fff'}}>
           <Notice />
           <TabContent />
-          <PositionList
-            onPressMore={() => {
-              this.props.navigation.navigate('ChallengePosition');
-            }}
-          />
+          <PositionList navigate={this.props.navigation} />
         </View>
       </ScrollView>
     );

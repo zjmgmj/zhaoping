@@ -37,7 +37,7 @@ const Header = ({
     },
     style,
   ];
-  const back = <Iconback />;
+  const back = <Iconback color={color} />;
   const headBox = isHeader ? (
     <View style={[headerStyle, isBorder ? styles.headBottomSolid : '']}>
       <TouchableOpacity

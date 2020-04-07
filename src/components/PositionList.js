@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, Image, StyleSheet} from 'react-native';
+import {Text, View, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {baseStyle} from './baseStyle';
 
 const sty = StyleSheet.create({

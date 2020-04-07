@@ -56,6 +56,9 @@ export const baseStyle = StyleSheet.create({
   textBlack: {
     color: '#000',
   },
+  textRed: {
+    color: '#AC3E40',
+  },
   textYellow: {
     color: commonStyle.textYellowColor,
   },
