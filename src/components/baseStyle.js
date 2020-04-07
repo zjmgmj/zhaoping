@@ -15,6 +15,9 @@ export const baseStyle = StyleSheet.create({
   bgWhite: {
     backgroundColor: '#FFF',
   },
+  bgYellow: {
+    backgroundColor: '#D9B06F',
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -28,6 +31,9 @@ export const baseStyle = StyleSheet.create({
   },
   ft16: {
     fontSize: 16,
+  },
+  ft15: {
+    fontSize: 15,
   },
   ft13: {
     fontSize: commonStyle.titleFont,
@@ -45,7 +51,7 @@ export const baseStyle = StyleSheet.create({
     color: '#fff',
   },
   textGray: {
-    color: '#333333',
+    color: '#999999',
   },
   textBlack: {
     color: '#000',
@@ -59,6 +65,9 @@ export const baseStyle = StyleSheet.create({
   },
   justifyBetween: {
     justifyContent: 'space-between',
+  },
+  paddingRight: {
+    paddingRight: 10,
   },
   paddingLeft: {
     paddingLeft: 10,

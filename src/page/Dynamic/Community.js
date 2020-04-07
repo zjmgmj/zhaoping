@@ -106,7 +106,7 @@ const sty = StyleSheet.create({
     marginTop: 20,
   },
   hotCommunityItem: {
-    width: 182,
+    width: baseStyle.screenWidth / 2 - 25,
     height: 68,
     padding: 12,
     flexDirection: 'column',

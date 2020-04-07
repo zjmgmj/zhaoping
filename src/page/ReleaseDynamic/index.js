@@ -13,7 +13,7 @@ import {setStatusBar} from '../../components/setStatusBar';
 import ImagePicker from 'react-native-image-picker';
 import {baseStyle} from '../../components/baseStyle';
 @setStatusBar({
-  barStyle: 'light-content',
+  // barStyle: 'light-content',
   translucent: true,
   backgroundColor: 'transparent',
 })

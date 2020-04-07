@@ -1,35 +1,32 @@
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, Image} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import TabBar from '../../components/TabBar';
-import News from './News';
-import Community from './Community';
 import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
+import PositionList from '../../components/PositionList';
+import {baseStyle} from '../../components/baseStyle';
+
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
 })
-class Dynamic extends Component {
+class ChallengePosition extends Component {
   render() {
     return (
       <View style={[{flex: 1, backgroundColor: '#fff'}]}>
-        <Header isHeader={false} />
+        <Header title="挑战职位" fullScreen isBorder={false} />
         <ScrollableTabView
           renderTabBar={() => <TabBar />}
           tabBarBackgroundColor="#3671ff"
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
-          <View tabLabel="最新动态">
-            <News
-              openRelease={() => {
-                this.props.navigation.navigate('ReleaseDynamic');
-              }}
-            />
+          <View tabLabel="挑战职位">
+            <PositionList />
+            {/* <Text>挑战职位</Text> */}
           </View>
-          <View tabLabel="热门社群">
-            {/* <Text>热门社群</Text> */}
-            <Community />
+          <View tabLabel="内推职位">
+            <PositionList />
           </View>
         </ScrollableTabView>
       </View>
@@ -37,4 +34,4 @@ class Dynamic extends Component {
   }
 }
 
-export default Dynamic;
+export default ChallengePosition;

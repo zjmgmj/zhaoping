@@ -46,7 +46,7 @@ class MineList extends Component {
   }
 }
 @setStatusBar({
-  barStyle: 'light-content',
+  // barStyle: 'light-content',
   translucent: true,
   backgroundColor: 'transparent',
 })
@@ -94,6 +94,19 @@ class Mine extends Component {
               <Text style={baseStyle.textYellow}>点击切换</Text>
             </TouchableOpacity>
           ),
+        },
+      ],
+      cardList: [
+        {title: '账户', icon: require('../../images/jianli_icon.png'), url: ''},
+        {
+          title: '简历',
+          icon: require('../../images/jianli_icon.png'),
+          url: 'Resume',
+        },
+        {
+          title: '求职进展',
+          icon: require('../../images/jinzhan_icon.png'),
+          url: '',
         },
       ],
     };
@@ -144,27 +157,19 @@ class Mine extends Component {
           </ImageBackground>
           <View style={sty.tabBoxSty}>
             <Card style={sty.tabContentSty}>
-              <View style={sty.cardItem}>
-                <Image
-                  style={sty.tabImg}
-                  source={require('../../images/jianli_icon.png')}
-                />
-                <Text style={sty.cardItemTitle}>账户</Text>
-              </View>
-              <View style={[sty.cardItem, {marginLeft: 20, marginRight: 20}]}>
-                <Image
-                  style={sty.tabImg}
-                  source={require('../../images/jianli_icon.png')}
-                />
-                <Text style={sty.cardItemTitle}>简历</Text>
-              </View>
-              <View style={sty.cardItem}>
-                <Image
-                  style={sty.tabImg}
-                  source={require('../../images/jinzhan_icon.png')}
-                />
-                <Text style={sty.cardItemTitle}>求职进展</Text>
-              </View>
+              {this.state.cardList.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.props.navigation.navigate(item.url);
+                    }}
+                    style={sty.cardItem}
+                    key={index}>
+                    <Image style={sty.tabImg} source={item.icon} />
+                    <Text style={sty.cardItemTitle}>{item.title}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </Card>
           </View>
           <View style={{padding: 10, paddingTop: 80}}>
@@ -192,6 +197,8 @@ const sty = StyleSheet.create({
     height: 75,
     flexDirection: 'column',
     alignItems: 'center',
+    marginLeft: 10,
+    marginRight: 10,
   },
   cardItemTitle: {
     position: 'absolute',

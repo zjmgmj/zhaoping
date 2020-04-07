@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Image, Text, View, ScrollView} from 'react-native';
+import {Image, Text, View, ScrollView, TouchableOpacity} from 'react-native';
 import {Tab} from 'beeshell';
 import {baseStyle} from '../../components/baseStyle';
 import {sty} from './sty';
@@ -145,9 +145,12 @@ class TabList extends Component {
               <Text style={baseStyle.textGray}>推荐职位</Text>
             </View>
           </View>
-          <View>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.onPressMore();
+            }}>
             <Text style={baseStyle.textYellow}>更多</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -158,7 +161,11 @@ class PositionList extends Component {
   render() {
     return (
       <View>
-        <TabList />
+        <TabList
+          onPressMore={() => {
+            this.props.onPressMore();
+          }}
+        />
         <View>
           <View
             style={[
@@ -239,7 +246,7 @@ class PositionList extends Component {
 }
 
 @setStatusBar({
-  barStyle: 'light-content',
+  // barStyle: 'light-content',
   translucent: true,
   backgroundColor: 'transparent',
 })
@@ -249,13 +256,17 @@ class Home extends Component {
   }
   render() {
     return (
-      <ScrollView>
+      <ScrollView style={baseStyle.bgWhite}>
         <Header isHeader={false} />
         <Banner />
         <View style={{backgroundColor: '#fff'}}>
           <Notice />
           <TabContent />
-          <PositionList />
+          <PositionList
+            onPressMore={() => {
+              this.props.navigation.navigate('ChallengePosition');
+            }}
+          />
         </View>
       </ScrollView>
     );

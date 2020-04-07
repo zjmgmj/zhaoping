@@ -10,6 +10,16 @@ import Dynamic from './Dynamic';
 import Position from './Position';
 import Login from './Login';
 import ReleaseDynamic from './ReleaseDynamic';
+import Info from './Info';
+import Resume from './Resume';
+import ResumeAdd from './Resume/add';
+import ResumeInfo from './Resume/info';
+import ResumeWorkExperience from './Resume/workExperience';
+import ResumeProjectExperience from './Resume/projectExperience';
+import ResumeEducationalExperience from './Resume/educationalExperience';
+import ResumeJobStatus from './Resume/jobStatus';
+import ResumePrivacySet from './Resume/privacySet';
+import ChallengePosition from './Home/challengePosition';
 
 const TabNavigator = createBottomTabNavigator(
   {
@@ -29,6 +39,12 @@ const TabNavigator = createBottomTabNavigator(
       screen: Dynamic,
       navigationOptions: () => ({
         tabBarLabel: '动态',
+      }),
+    },
+    Info: {
+      screen: Info,
+      navigationOptions: () => ({
+        tabBarLabel: '消息',
       }),
     },
     Mine: {
@@ -53,43 +69,29 @@ const TabNavigator = createBottomTabNavigator(
       showIcon: true,
     },
     initialRouteName: 'Home',
-    // initialRouteName: 'Login',
   },
 );
 
 const StackRouteConfigs = createStackNavigator(
   {
-    ReleaseDynamic: {
-      screen: ReleaseDynamic,
-      navigationOptions: {
-        headerShown: false,
-      },
-    },
-    Main: {
-      screen: TabNavigator,
-      navigationOptions: {
-        headerShown: false,
-      },
-    },
-    Login: {
-      screen: Login,
-    },
-    Home: {
-      screen: Home,
-    },
-    Position: {
-      screen: Position,
-    },
-    Dynamic: {
-      screen: Dynamic,
-    },
-    Mine: {
-      screen: Mine,
-    },
+    Main: TabNavigator,
+    ReleaseDynamic,
+    Resume,
+    ResumeAdd,
+    ResumeInfo,
+    ResumeWorkExperience,
+    ResumeProjectExperience,
+    ResumeEducationalExperience,
+    ResumeJobStatus,
+    ResumePrivacySet,
+    ChallengePosition,
   },
   {
+    defaultNavigationOptions: {
+      headerShown: false,
+    },
     initialRouteName: 'Main',
-    // initialRouteName: 'Login',
+    // initialRouteName: 'ResumeJobStatus',
   },
 );
 const MainComponent = createAppContainer(StackRouteConfigs);

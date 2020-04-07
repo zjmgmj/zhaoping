@@ -17,18 +17,18 @@ const STATUS_BAR_HEIGHT = isiOS()
 const HEADER_HEIGHT = 44;
 
 const Header = ({
-  title = '666',
+  title = '',
   left,
   right,
   color = '#000',
   style,
-  rightStyle,
+  rightStyle = {color: '#D9B06F'},
   fullScreen,
   onPressBack,
   onRightPress,
   isHeader = true,
+  isBorder = true,
 }) => {
-  debugger;
   const headerStyle = [
     styles.header,
     (fullScreen || isiOS()) && {
@@ -39,7 +39,7 @@ const Header = ({
   ];
   const back = <Iconback />;
   const headBox = isHeader ? (
-    <View style={headerStyle}>
+    <View style={[headerStyle, isBorder ? styles.headBottomSolid : '']}>
       <TouchableOpacity
         style={styles.left}
         onPress={() => {
@@ -63,13 +63,12 @@ const Header = ({
 };
 
 const styles = StyleSheet.create({
+  headBottomSolid: {borderBottomColor: '#ccc', borderBottomWidth: 0.5},
   header: {
     height: HEADER_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 0.5,
   },
   title: {
     flex: 2,

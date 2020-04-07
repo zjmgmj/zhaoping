@@ -11,7 +11,7 @@ export default class TabBar extends Component {
     return (
       <TouchableOpacity onPress={() => onPressHandler(page)}>
         <View style={[isTabActive ? styles.tabNameActive : '', styles.tabName]}>
-          <Text style={baseStyle.textBlack}>挑战职位</Text>
+          <Text style={baseStyle.textBlack}>{name}</Text>
         </View>
       </TouchableOpacity>
     );

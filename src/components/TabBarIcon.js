@@ -18,6 +18,9 @@ export default ({routeName, focused}) => {
     Dynamic: focused
       ? require('../images/dynamic_active_icon.png')
       : require('../images/dynamic_icon.png'),
+    Info: focused
+      ? require('../images/info_active_icon.png')
+      : require('../images/info_icon.png'),
     Mine: focused
       ? require('../images/mine_active_icon.png')
       : require('../images/mine_icon.png'),

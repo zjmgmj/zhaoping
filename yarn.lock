@@ -5501,7 +5501,7 @@ react-timer-mixin@^0.13.3:
 
 react@16.9.0:
   version "16.9.0"
-  resolved "https://registry.npm.taobao.org/react/download/react-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
+  resolved "https://registry.npm.taobao.org/react/download/react-16.9.0.tgz?cache=0&sync_timestamp=1585595008776&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
   integrity sha1-QLovmvE7waONddvy9DWaUYXE96o=
   dependencies:
     loose-envify "^1.1.0"
@@ -5774,6 +5774,13 @@ rimraf@~2.2.6:
   version "2.2.8"
   resolved "https://registry.npm.taobao.org/rimraf/download/rimraf-2.2.8.tgz?cache=0&sync_timestamp=1581257110269&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frimraf%2Fdownload%2Frimraf-2.2.8.tgz#e439be2aaee327321952730f99a8929e4fc50582"
   integrity sha1-5Dm+Kq7jJzIZUnMPmaiSnk/FBYI=
+
+rn-textinputlayout@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npm.taobao.org/rn-textinputlayout/download/rn-textinputlayout-1.0.5.tgz#46fe3ce67acea9df977d403106203b7733b00907"
+  integrity sha1-Rv485nrOqd+XfUAxBiA7dzOwCQc=
+  dependencies:
+    prop-types "^15.6.0"
 
 rsvp@^4.8.4:
   version "4.8.5"
