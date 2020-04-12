@@ -22,6 +22,8 @@ import ResumePrivacySet from './Resume/privacySet';
 import ChallengePosition from './Home/challengePosition';
 import RecommendPosition from './Home/recommendPosition';
 import PositionDetail from './Position/detail';
+import PositionChooseBg from './Position/chooseBg';
+import InfoChat from './Info/chat';
 
 const TabNavigator = createBottomTabNavigator(
   {
@@ -89,13 +91,15 @@ const StackRouteConfigs = createStackNavigator(
     ChallengePosition,
     RecommendPosition,
     PositionDetail,
+    PositionChooseBg,
+    InfoChat,
   },
   {
     defaultNavigationOptions: {
       headerShown: false,
     },
     initialRouteName: 'Main',
-    // initialRouteName: 'ResumeJobStatus',
+    // initialRouteName: 'PositionDetail',
   },
 );
 const MainComponent = createAppContainer(StackRouteConfigs);

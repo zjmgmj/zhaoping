@@ -21,7 +21,7 @@ class Info extends Component {
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
           <View tabLabel="消息">
-            <News />
+            <News navigation={this.props.navigation} />
           </View>
           <View tabLabel="社群消息">
             <Text>社群消息</Text>

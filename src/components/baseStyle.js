@@ -78,6 +78,9 @@ export const baseStyle = StyleSheet.create({
   paddingTop: {
     paddingTop: 10,
   },
+  paddingBottom: {
+    paddingBottom: 10,
+  },
   widthCol: col => {
     return screenWidth / col;
   },

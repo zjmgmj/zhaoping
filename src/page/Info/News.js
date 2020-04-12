@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {Text, View, Image, StyleSheet, ScrollView} from 'react-native';
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import {baseStyle} from '../../components/baseStyle';
 
 class Item extends Component {
@@ -9,7 +16,11 @@ class Item extends Component {
 
   render() {
     return (
-      <View style={[baseStyle.row, sty.itemBox]}>
+      <TouchableOpacity
+        onPress={() => {
+          this.props.jumpChat();
+        }}
+        style={[baseStyle.row, sty.itemBox]}>
         <Image
           source={require('../../images/author.png')}
           style={sty.authorImg}
@@ -20,7 +31,7 @@ class Item extends Component {
         <View style={baseStyle.itemTime}>
           <Text style={[baseStyle.textGray, baseStyle.ft12]}>今天12:34</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 }
@@ -35,7 +46,14 @@ export default class News extends Component {
       <ScrollView>
         <View style={{padding: 10}}>
           {list.map(item => {
-            return <Item ket={item} />;
+            return (
+              <Item
+                key={item}
+                jumpChat={() => {
+                  this.props.navigation.navigate('InfoChat');
+                }}
+              />
+            );
           })}
         </View>
       </ScrollView>
