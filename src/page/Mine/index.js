@@ -58,10 +58,12 @@ class Mine extends Component {
         {
           icon: require('../../images/xin_icon.png'),
           title: '关注职位',
+          url: 'FollowPosition',
         },
         {
           icon: require('../../images/xinxin_icon.png'),
           title: '关注的人',
+          url: 'Followig',
         },
         {
           icon: require('../../images/success_icon.png'),
@@ -74,6 +76,7 @@ class Mine extends Component {
         {
           icon: require('../../images/qun_icon.png'),
           title: '感兴趣社群',
+          url: 'Community',
         },
         {
           icon: require('../../images/compony_icon.png'),
@@ -106,7 +109,7 @@ class Mine extends Component {
         {
           title: '求职进展',
           icon: require('../../images/jinzhan_icon.png'),
-          url: '',
+          url: 'Progress',
         },
       ],
     };
@@ -174,7 +177,15 @@ class Mine extends Component {
           </View>
           <View style={{padding: 10, paddingTop: 80}}>
             {this.state.menuList.map((item, idx) => {
-              return <MineList item={item} key={idx} />;
+              return (
+                <TouchableOpacity
+                  key={idx}
+                  onPress={() => {
+                    this.props.navigation.navigate(item.url);
+                  }}>
+                  <MineList item={item} />
+                </TouchableOpacity>
+              );
             })}
           </View>
         </View>

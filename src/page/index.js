@@ -24,6 +24,12 @@ import RecommendPosition from './Home/recommendPosition';
 import PositionDetail from './Position/detail';
 import PositionChooseBg from './Position/chooseBg';
 import InfoChat from './Info/chat';
+import PositionFilter from './Position/filter';
+import Progress from './Progress';
+import FollowPosition from './FollowPosition';
+import Followig from './Followig';
+import PersonalInfo from './PersonalInfo';
+import Community from './Community';
 
 const TabNavigator = createBottomTabNavigator(
   {
@@ -93,13 +99,19 @@ const StackRouteConfigs = createStackNavigator(
     PositionDetail,
     PositionChooseBg,
     InfoChat,
+    PositionFilter,
+    Progress,
+    FollowPosition,
+    Followig,
+    PersonalInfo,
+    Community,
   },
   {
     defaultNavigationOptions: {
       headerShown: false,
     },
     initialRouteName: 'Main',
-    // initialRouteName: 'PositionDetail',
+    // initialRouteName: 'PositionFilter',
   },
 );
 const MainComponent = createAppContainer(StackRouteConfigs);

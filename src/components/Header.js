@@ -28,7 +28,7 @@ const Header = ({
   onRightPress,
   isHeader = true,
   isBorder = true,
-  titleElement = '',
+  titleElement = false,
 }) => {
   const headerStyle = [
     styles.header,
@@ -40,6 +40,7 @@ const Header = ({
   ];
   const back = <Iconback color={color} />;
   const titleDom = <Text style={[styles.title, {color}]}>{title}</Text>;
+  const titleRender = titleElement ? <View>{titleElement}</View> : titleDom;
   const headBox = isHeader ? (
     <View style={[headerStyle, isBorder ? styles.headBottomSolid : '']}>
       <TouchableOpacity
@@ -49,7 +50,7 @@ const Header = ({
         }}>
         {left || back}
       </TouchableOpacity>
-      <View>{titleElement || titleDom}</View>
+      {titleRender}
       <TouchableOpacity
         onPress={() => {
           onRightPress();
