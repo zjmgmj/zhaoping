@@ -19,7 +19,7 @@ import Modal, {ModalContent} from 'react-native-modals';
   translucent: true,
   backgroundColor: 'transparent',
 })
-class Login extends Component {
+class Reg extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -57,7 +57,7 @@ class Login extends Component {
       });
     });
   }
-  loginHandler() {
+  regHandler() {
     const senCode = this.state.senCode;
     const code = this.state.code;
     const phone = this.state.phone;
@@ -68,22 +68,28 @@ class Login extends Component {
       });
       return false;
     }
-    // if (!code || code !== senCode) {
-    //   this.setState({
-    //     modalShow: true,
-    //     modalContent: '验证码错误',
-    //   });
-    //   return false;
-    // }
+    if (!code || code !== senCode) {
+      this.setState({
+        modalShow: true,
+        modalContent: '验证码错误',
+      });
+      return false;
+    }
     const params = {
-      phone: this.state.phone,
+      userLogin: this.state.phone,
     };
     console.log('params', params);
-    httpGet('user/login', params, res => {
+    httPost('user/save', params, res => {
       console.log('res', res);
       if (res.code === 1) {
-        this.props.navigation.navigate('Main');
-        console.log('登陆成功');
+        this.setState({
+          modalShow: true,
+          modalContent: '注册成功',
+        });
+        const me = this;
+        setTimeout(() => {
+          me.props.navigation.navigare('Login');
+        }, 500);
       }
     });
   }
@@ -137,7 +143,7 @@ class Login extends Component {
         />
         <View
           style={[baseStyle.content, {height: baseStyle.screenHeight - 80}]}>
-          <Text style={{fontSize: 35, color: '#303135'}}>登陆</Text>
+          <Text style={{fontSize: 35, color: '#303135'}}>注册</Text>
           <View
             style={{
               flex: 1,
@@ -149,7 +155,7 @@ class Login extends Component {
                 <TextInput
                   keyboardType="numeric"
                   placeholder="请输入手机号码"
-                  onChange={event => {
+                  onEndEditing={event => {
                     this.setState({
                       phone: event.nativeEvent.text,
                     });
@@ -184,17 +190,45 @@ class Login extends Component {
                     this.getSencodes();
                   }}>
                   {sencodeElem}
+                  {/* <Text style={[baseStyle.textYellow, baseStyle.paddingLeft]}>
+                    {this.state.timeShow ? this.state.time : '发送验证码'}
+                  </Text> */}
                 </TouchableOpacity>
               </View>
               <Button
-                style={[{marginTop: 40, backgroundColor: '#BAC2DB'}]}
+                style={[baseStyle.bgYellow, {marginTop: 40}]}
                 textStyle={baseStyle.textWhite}
                 onPress={() => {
-                  this.loginHandler();
+                  console.log('this.state.check', this.state.check);
+                  if (this.state.check) {
+                    this.regHandler();
+                  } else {
+                    this.setState({
+                      modalShow: true,
+                      modalContent: '请先同意协议',
+                    });
+                  }
                 }}>
-                登陆
+                注册
               </Button>
             </View>
+            <TouchableOpacity
+              activeOpacity={1}
+              style={baseStyle.row}
+              onPress={() => {
+                this.setState({
+                  check: !this.state.check,
+                });
+              }}>
+              <Image
+                style={sty.checkImg}
+                source={this.state.check ? radioCheckImg : radioNullImg}
+              />
+              <Text style={{color: '#9B9B9B', marginLeft: 10}}>同意</Text>
+              <Text style={baseStyle.textYellow}>
+                《铜雀用户服务协议》和《铜雀隐私协议》
+              </Text>
+            </TouchableOpacity>
             {this.ModalToggleBox()}
           </View>
         </View>
@@ -203,10 +237,15 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default Reg;
 const sty = StyleSheet.create({
   inputBottomSolid: {
     borderBottomColor: '#C9CFDF',
     borderBottomWidth: 0.5,
+  },
+  checkImg: {
+    width: 15,
+    height: 15,
+    resizeMode: 'contain',
   },
 });

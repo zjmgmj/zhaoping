@@ -5,8 +5,22 @@ import {baseStyle} from '../../components/baseStyle';
 import {sty} from './sty';
 import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
+import {httpGet} from '../../utils/httpUtil';
 
 class Banner extends Component {
+  UNSAFE_componentWillMount() {
+    debugger;
+    httpGet(
+      'turns/getturnslist',
+      {},
+      res => {
+        console.log('getturnslist', res);
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
     return (
       <View style={sty.banner}>
@@ -46,6 +60,18 @@ class TabContent extends Component {
       value: value,
     });
   };
+  UNSAFE_componentWillMount() {
+    httpGet(
+      'news/list',
+      {page: 1, size: 2},
+      res => {
+        console.log('newsList', res);
+      },
+      err => {
+        console.log('newsListErr', err);
+      },
+    );
+  }
   render() {
     const renderList = [];
     return (
@@ -54,7 +80,7 @@ class TabContent extends Component {
           style={sty.tabContent}
           value={this.state.value}
           scrollable={true}
-          data={[{value: 1, label: '咨询'}, {value: 2, label: '热门话题'}]}
+          data={[{value: 1, label: '原创'}, {value: 2, label: '热门话题'}]}
           activeColor="#D9B06F"
           onChange={item => this.handleChange('value', item.value)}
         />

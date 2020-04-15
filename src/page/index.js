@@ -9,6 +9,7 @@ import Mine from './Mine';
 import Dynamic from './Dynamic';
 import Position from './Position';
 import Login from './Login';
+import Reg from './Reg';
 import ReleaseDynamic from './ReleaseDynamic';
 import Info from './Info';
 import Resume from './Resume';
@@ -30,11 +31,13 @@ import FollowPosition from './FollowPosition';
 import Followig from './Followig';
 import PersonalInfo from './PersonalInfo';
 import Community from './Community';
+import HrHome from './HR/Home';
 
 const TabNavigator = createBottomTabNavigator(
   {
     Home: {
       screen: Home,
+      // screen: HrHome,
       navigationOptions: () => ({
         tabBarLabel: '首页',
       }),
@@ -105,13 +108,16 @@ const StackRouteConfigs = createStackNavigator(
     Followig,
     PersonalInfo,
     Community,
+    Login,
+    Reg,
+    // HrHome,
   },
   {
     defaultNavigationOptions: {
       headerShown: false,
     },
     initialRouteName: 'Main',
-    // initialRouteName: 'PositionFilter',
+    // initialRouteName: 'Login',
   },
 );
 const MainComponent = createAppContainer(StackRouteConfigs);
