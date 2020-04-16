@@ -1,6 +1,7 @@
 const baseUrl = 'http://114.55.169.95/yunpin_rest/';
 export const httpGet = (api, parameter = {}, success, failure) => {
   //封装请求配置： 请求方法、请求头、请求体
+  debugger;
   const params = [];
   Object.keys(parameter).forEach(key => {
     params.push(`${key}=${parameter[key]}`);

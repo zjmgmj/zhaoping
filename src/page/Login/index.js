@@ -34,28 +34,30 @@ class Login extends Component {
     };
   }
   getSencodes() {
-    httpGet('user/sencodes', {phone: this.state.phone}, res => {
-      const me = this;
-      const sencodeTimeInterval = setInterval(() => {
-        let time = me.state.time;
-        time--;
-        if (time === 0) {
-          clearInterval(me.state.sencodeInterval);
-          me.setState({
-            timeShow: false,
-          });
-          return false;
-        }
+    const me = this;
+    const sencodeTimeInterval = setInterval(() => {
+      let time = me.state.time;
+      time--;
+      if (time === 0) {
+        clearInterval(me.state.sencodeInterval);
         me.setState({
-          time: time,
+          timeShow: false,
         });
-      }, 1000);
+        return false;
+      }
       me.setState({
-        timeShow: true,
-        sencodeInterval: sencodeTimeInterval,
-        senCode: res.data,
+        time: time,
       });
+    }, 1000);
+    me.setState({
+      timeShow: true,
+      sencodeInterval: sencodeTimeInterval,
     });
+    // httpGet('user/sencodes', {phone: this.state.phone}, res => {
+    //   me.setState({
+    //     senCode: res.data,
+    //   });
+    // });
   }
   loginHandler() {
     const senCode = this.state.senCode;
@@ -82,9 +84,25 @@ class Login extends Component {
     httpGet('user/login', params, res => {
       console.log('res', res);
       if (res.code === 1) {
+        // this.getUserInfo();
+        global.localStorage.set({
+          key: 'currentUser',
+          data: {phone: this.state.phone, isLogin: true},
+          expires: null,
+        });
         this.props.navigation.navigate('Main');
-        console.log('登陆成功');
+
+        // console.log('登陆成功');
       }
+    });
+  }
+  getUserInfo() {
+    httpGet('user/detail', {id: ''}, res => {
+      console.log('res', res);
+      // if (res.code === 1) {
+      //   this.props.navigation.navigate('Main');
+      //   console.log('登陆成功');
+      // }
     });
   }
   componentDidMount() {
@@ -181,7 +199,7 @@ class Login extends Component {
                   style={{width: 100}}
                   activeOpacity={1}
                   onPress={() => {
-                    this.getSencodes();
+                    // this.getSencodes();
                   }}>
                   {sencodeElem}
                 </TouchableOpacity>

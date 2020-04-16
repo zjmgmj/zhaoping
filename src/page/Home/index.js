@@ -9,7 +9,6 @@ import {httpGet} from '../../utils/httpUtil';
 
 class Banner extends Component {
   UNSAFE_componentWillMount() {
-    debugger;
     httpGet(
       'turns/getturnslist',
       {},

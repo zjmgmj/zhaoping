@@ -189,16 +189,19 @@ class Home extends Component {
         <ScrollView>
           <Banner />
           <View style={{backgroundColor: '#fff'}}>
-            <Notice />
             <PositionList navigate={this.props.navigation} />
           </View>
         </ScrollView>
-        <View style={{position: 'absolute', bottom: 64, right: 20}}>
+        <TouchableOpacity
+          onPress={() => {
+            this.props.navigation.navigate('PostPosition');
+          }}
+          style={{position: 'absolute', bottom: 64, right: 20}}>
           <Image
             source={require('../../../images/fb_icon.png')}
             style={sty.addIcon}
           />
-        </View>
+        </TouchableOpacity>
       </View>
     );
   }

@@ -25,7 +25,12 @@ class ResumeInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: '',
+      info: {
+        userPic: '',
+        userRealname: '',
+        userSex: 0,
+        birthdate: '',
+      },
     };
   }
   renderSafeArea() {
@@ -36,6 +41,38 @@ class ResumeInfo extends Component {
         </View>
       </View>
     );
+  }
+  saveInfo() {
+    const params = {
+      birthdate: 'string',
+      cityId: 0,
+      housekeeperIs: 0,
+      housekeeperStatus: 0,
+      housekeeperTitle: 'string',
+      latitude: 0,
+      longitude: 0,
+      provinceId: 0,
+      skillDesc: 'string',
+      skillLabel: 'string',
+      userAccount: 0,
+      userCard: 'string',
+      userCardFanpic: 'string',
+      userCardPic: 'string',
+      userDate: '2020-04-16T12:00:15.698Z',
+      userId: 0,
+      userIntroduction: 'string',
+      userLogin: 'string',
+      userNickname: 'string',
+      userPassword: 'string',
+      userPic: 'string',
+      userRealname: 'string',
+      userRegion: 0,
+      userSex: 0,
+      userType: 0,
+    };
+    global.httpPost('user/update', params, res => {
+      console.log(res);
+    });
   }
   render() {
     const iconRightFontColor = '#666666';
@@ -180,11 +217,11 @@ class ResumeInfo extends Component {
               proportion={[1, 1, 1]}
               startYear={2010}
               numberOfYears={10}
-              date={this.state.date}
+              date={this.state.birthdate}
               onChange={value => {
                 console.log(value);
                 this.setState({
-                  date: value,
+                  birthdate: value,
                 });
               }}
             />
