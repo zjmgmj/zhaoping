@@ -1,5 +1,7 @@
 import localStorage from './storage';
-import {httpGet, httPost} from '../utils/httpUtil';
+import {httpGet, httpPost} from '../utils/httpUtil';
+import {gettypelist} from '../utils/mixins';
 global.localStorage = localStorage;
 global.httpGet = httpGet;
-global.httPost = httPost;
+global.httpPost = httpPost;
+global.gettypelist = gettypelist;

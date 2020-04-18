@@ -213,7 +213,6 @@ class PositionList extends Component {
             </View>
             <TouchableOpacity
               onPress={() => {
-                debugger;
                 this.state.cardNum === 1
                   ? navigate('ChallengePosition')
                   : navigate('RecommendPosition');

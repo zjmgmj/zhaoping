@@ -11,7 +11,7 @@ import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
 import {baseStyle} from '../../components/baseStyle';
 import {Button} from 'beeshell/dist/components/Button';
-import {httpGet, httPost} from '../../utils/httpUtil';
+import {httpGet, httpPost} from '../../utils/httpUtil';
 // import ZModal from '../../components/ZModal';
 import Modal, {ModalContent} from 'react-native-modals';
 
@@ -79,7 +79,7 @@ class Reg extends Component {
       userLogin: this.state.phone,
     };
     console.log('params', params);
-    httPost('user/save', params, res => {
+    httpPost('user/save', params, res => {
       console.log('res', res);
       if (res.code === 1) {
         this.setState({

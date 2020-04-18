@@ -34,7 +34,7 @@ const localStorage = {
    *
    * */
 
-  set({key, data, expires = 1555555, id}) {
+  set({key, data, expires, id}) {
     let setValue = JSON.stringify(data);
     const obj = {
       key: key,
@@ -53,7 +53,7 @@ const localStorage = {
    * @params id  可为空
    *
    * */
-  get(key, id) {
+  get({key, id}) {
     const obj = {
       key: key,
     };

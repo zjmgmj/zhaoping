@@ -55,6 +55,7 @@ class PositionList extends Component {
             <View style={baseStyle.row}>
               <TouchableOpacity
                 onPress={() => {
+                  this.props.onTab(1);
                   this.setState({
                     cardNum: 1,
                   });
@@ -74,6 +75,7 @@ class PositionList extends Component {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
+                  this.props.onTab(2);
                   this.setState({
                     cardNum: 2,
                   });
@@ -167,21 +169,37 @@ class PositionList extends Component {
 class Home extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      currentUser: null,
+    };
   }
-  // componentDidMount() {
-  //   TopviewGetInstance().add(
-  //     <TouchableOpacity
-  //       onPress={() => {
-  //         this.props.openRelease();
-  //       }}
-  //       style={{position: 'absolute', bottom: 60, right: 20}}>
-  //       <Image
-  //         source={require('../../../images/add_icon.png')}
-  //         style={sty.addIcon}
-  //       />
-  //     </TouchableOpacity>,
-  //   );
-  // }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      this.setState({
+        currentUser: res,
+        positionType: 1,
+      });
+      this.getPositiontypeList(1);
+    });
+  }
+  getPositiontypeList(type) {
+    this.setState({
+      positionType: type,
+    });
+    const currentUser = this.state.currentUser;
+    global.httpGet(
+      'position/list',
+      {
+        page: 1,
+        size: 10,
+        userId: currentUser.userId,
+        positionType: type,
+      },
+      res => {
+        console.log('getPositiontypeList', res);
+      },
+    );
+  }
   render() {
     return (
       <View style={(baseStyle.bgWhite, {height: baseStyle.screenHeight})}>
@@ -189,7 +207,12 @@ class Home extends Component {
         <ScrollView>
           <Banner />
           <View style={{backgroundColor: '#fff'}}>
-            <PositionList navigate={this.props.navigation} />
+            <PositionList
+              onTab={val => {
+                this.getPositiontypeList(val);
+              }}
+              navigate={this.props.navigation}
+            />
           </View>
         </ScrollView>
         <TouchableOpacity

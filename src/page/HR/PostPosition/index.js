@@ -13,6 +13,8 @@ import Header from '../../../components/Header';
 import {setStatusBar} from '../../../components/setStatusBar';
 import {baseStyle} from '../../../components/baseStyle';
 import {Iconright} from '../../../iconfont/Iconright';
+import Picker from '../../../components/picker';
+import {TopviewGetInstance} from 'beeshell';
 
 @setStatusBar({
   translucent: true,
@@ -23,27 +25,36 @@ class PostPosition extends Component {
     super(props);
     this.state = {
       region: [],
+      pickId: null,
+      experienceList: [],
+      educationList: [],
+      salaryList: [],
+      positionTypeList: [
+        {dvalue: '普通职位', id: 1},
+        {dvalue: '内推职位', id: 2},
+      ],
       params: {
         cityId: 0,
         cityName: '',
         companyId: 0,
         companyName: '',
-        educationId: '',
+        educationId: 0,
         educationName: '',
-        experienceId: '',
+        experienceId: 0,
         experienceName: '',
-        isrecommend: '',
+        isrecommend: 1,
         labels: '',
         positionBenefits: '',
-        positionClass: '',
+        positionClass: null,
         positionDesc: '',
         positionName: '',
         positionRequirements: '',
-        positionType: '',
-        provinceId: '',
-        regionId: '',
+        positionTypeName: '内推职位',
+        positionType: 2, // 1=普通职位 2=内推职位
+        provinceId: 0,
+        regionId: 0,
         regionName: '',
-        salaryId: '',
+        salaryId: 0,
         userId: '',
         userNickname: '',
         userPic: '',
@@ -51,6 +62,35 @@ class PostPosition extends Component {
         workAddress: '',
       },
     };
+  }
+  UNSAFE_componentWillMount() {
+    const positionParams = this.state.params;
+
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      positionParams.userId = res.userId;
+      positionParams.userNickname = res.userNickname;
+      this.setState({
+        params: positionParams,
+      });
+    });
+    global.gettypelist('experience', res => {
+      // 经验要求
+      this.setState({
+        experienceList: res.data,
+      });
+    });
+    global.gettypelist('education', res => {
+      // 学历
+      this.setState({
+        educationList: res.data,
+      });
+    });
+    global.gettypelist('salary', res => {
+      // 年薪
+      this.setState({
+        salaryList: res.data,
+      });
+    });
   }
   componentDidMount() {
     this.getRegion();
@@ -68,10 +108,53 @@ class PostPosition extends Component {
     );
   }
   savePosition() {
-    const params = {};
+    const params = this.state.params;
+    params.positionType = params.positionTypeId;
+    delete params.salaryName;
+    delete params.positionTypeName;
+    delete params.positionTypeId;
+    params.positionBenefits = params.positionBenefits.toString();
+    console.log(JSON.stringify(params));
     global.httpPost('position/save', params, res => {
       console.log(res);
     });
+  }
+  setParams(val, key) {
+    const params = this.state.params;
+    params[key] = val;
+    this.setState({
+      params: params,
+    });
+  }
+  openPicked(list, key) {
+    list.map(item => {
+      item.active = false;
+      item.label = item.dvalue;
+    });
+    TopviewGetInstance()
+      .add(
+        <Picker
+          list={list}
+          selected={this.state.params.experienceId}
+          close={() => {
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+          selectedEvent={item => {
+            const params = this.state.params;
+            params[`${key}Name`] = item.dvalue;
+            params[`${key}Id`] = item.id;
+            this.setState({
+              params: params,
+            });
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          pickId: id,
+        });
+      });
   }
   render() {
     const iconRightFontColor = '#D6D0D0';
@@ -85,16 +168,28 @@ class PostPosition extends Component {
           }}
         />
         <ScrollView style={baseStyle.content}>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          <TouchableOpacity
+            onPress={() => {
+              this.openPicked(this.state.positionTypeList, 'positionType');
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位类型</Text>
             <View style={[baseStyle.row]}>
-              <TextInput style={[baseStyle.textYellow, sty.textInputSty]}>
+              {/* <TextInput style={[baseStyle.textYellow, sty.textInputSty]}>
                 内推职位
-              </TextInput>
+              </TextInput> */}
+              <Text
+                style={
+                  this.state.params.positionTypeName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.positionTypeName || '请选择'}
+              </Text>
               {/* <Text style={baseStyle.textYellow}>内推职位</Text> */}
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>公司信息</Text>
             <View style={[baseStyle.row]}>
@@ -107,66 +202,157 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </View>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
-            <Text>职位名称</Text>
-            <View style={[baseStyle.row]}>
-              <TextInput
-                placeholder="请输入职位名称"
-                style={[baseStyle.textYellow, sty.textInputSty]}
-              />
-              <Iconright color={iconRightFontColor} style={sty.Iconright} />
-            </View>
-          </View>
           <TouchableOpacity
             onPress={() => {
-              this.props.navigation.navigate('PositionCategory');
+              this.props.navigation.navigate('PositionName', {
+                callBack: res => {
+                  this.setParams(res.positionName, 'positionName');
+                },
+              });
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
+            <Text>职位名称</Text>
+            <View style={[baseStyle.row]}>
+              <Text
+                style={
+                  this.state.params.positionName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.positionName
+                  ? this.state.params.positionName
+                  : '请选择'}
+              </Text>
+              <Iconright color={iconRightFontColor} style={sty.Iconright} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('PositionCategory', {
+                callBack: res => {
+                  const params = this.state.params;
+                  params.positionClass = res.id;
+                  this.setState({
+                    positionClassName: res.name,
+                    params: params,
+                  });
+                },
+              });
             }}
             style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位类别</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text
+                style={
+                  this.state.positionClassName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.positionClassName
+                  ? this.state.positionClassName
+                  : '请选择'}
+              </Text>
+              {/* <Text style={baseStyle.textGray}>请选择</Text> */}
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              this.props.navigation.navigate('PositionDes');
+              this.props.navigation.navigate('PositionDes', {
+                positionDesc: this.state.params.positionDesc,
+                callBack: res => {
+                  this.setParams(res.positionDesc, 'positionDesc');
+                },
+              });
             }}
             style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位描述</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text style={baseStyle.textGray}>
+                {this.state.params.positionDesc
+                  ? this.state.params.positionDesc
+                  : '请选择'}
+              </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          <TouchableOpacity
+            onPress={() => {
+              this.openPicked(this.state.salaryList, 'salary');
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位年薪</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text
+                style={
+                  this.state.params.salaryId
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.salaryName || '请选择'}
+              </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('PositionBenefits', {
+                positionBenefits: this.state.params.positionBenefits,
+                callBack: res => {
+                  this.setParams(res.positionBenefits, 'positionBenefits');
+                },
+              });
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位福利</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text
+                style={
+                  this.state.params.positionBenefits
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.positionBenefits.toString() || '请选择'}
+              </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.openPicked(this.state.educationList, 'education');
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>学历最低要求</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text
+                style={
+                  this.state.params.educationName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.educationName || '请选择'}
+              </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.openPicked(this.state.experienceList, 'experience');
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>经验要求</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text
+                style={
+                  this.state.params.experienceName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.experienceName || '请选择'}
+              </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>工作地点</Text>
             <View style={[baseStyle.row]}>

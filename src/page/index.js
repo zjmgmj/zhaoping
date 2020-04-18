@@ -35,6 +35,8 @@ import HrHome from './HR/Home';
 import PostPosition from './HR/PostPosition';
 import PositionCategory from './HR/PositionCategory';
 import PositionDes from './HR/PositionDes';
+import PositionBenefits from './HR/PositionBenefits';
+import PositionName from './HR/PositionName';
 
 const personNavigator = {
   Home: {
@@ -147,13 +149,15 @@ const StackRouteConfigs = createStackNavigator(
     PostPosition,
     PositionCategory,
     PositionDes,
+    PositionBenefits,
+    PositionName,
   },
   {
     defaultNavigationOptions: {
       headerShown: false,
     },
-    initialRouteName: 'HrMain',
-    // initialRouteName: 'Login',
+    // initialRouteName: 'HrMain',
+    initialRouteName: 'Login',
   },
 );
 const MainComponent = createAppContainer(StackRouteConfigs);

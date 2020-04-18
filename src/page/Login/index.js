@@ -11,7 +11,7 @@ import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
 import {baseStyle} from '../../components/baseStyle';
 import {Button} from 'beeshell/dist/components/Button';
-import {httpGet, httPost} from '../../utils/httpUtil';
+import {httpGet, httpPost} from '../../utils/httpUtil';
 // import ZModal from '../../components/ZModal';
 import Modal, {ModalContent} from 'react-native-modals';
 
@@ -84,13 +84,14 @@ class Login extends Component {
     httpGet('user/login', params, res => {
       console.log('res', res);
       if (res.code === 1) {
-        // this.getUserInfo();
+        const userInfo = res.data;
+        userInfo.isLogin = true;
         global.localStorage.set({
           key: 'currentUser',
-          data: {phone: this.state.phone, isLogin: true},
+          data: userInfo,
           expires: null,
         });
-        this.props.navigation.navigate('Main');
+        this.props.navigation.navigate('HrMain');
 
         // console.log('登陆成功');
       }

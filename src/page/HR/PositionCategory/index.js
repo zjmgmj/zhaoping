@@ -22,58 +22,126 @@ import {Icontick} from '../../../iconfont/Icontick';
 class PositionCategory extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      list: [],
+    };
   }
-  savePosition() {
-    const params = {};
-    global.httpPost('position/save', params, res => {
+  componentDidMount() {
+    this.getPositionType(0);
+  }
+  getPositionType(pid, idx = 0) {
+    let list = this.state.list;
+    if (pid) {
+      list[idx].active = !list[idx].active;
+      if (!list[idx].active) {
+        this.setState({
+          list: list,
+          selectd: null,
+        });
+        return false;
+      }
+    }
+    global.httpGet('positiontype/list', {pid: pid}, res => {
       console.log(res);
+      if (pid) {
+        debugger;
+        list[idx].child = res.data;
+      } else {
+        res.data.map(item => {
+          item.child = [];
+        });
+        list = res.data;
+      }
+      this.setState({
+        list: list,
+      });
     });
+  }
+  selected(pIdx, cIdx) {
+    const list = this.state.list;
+    list.map(item => {
+      item.child.map(cItem => {
+        cItem.selectd = false;
+      });
+    });
+    list[pIdx].child[cIdx].selectd = true;
+    this.setState({
+      list: list,
+      selectd: list[pIdx].child[cIdx],
+    });
+  }
+  save() {
+    if (!this.state.selectd) {
+      return false;
+    }
+    this.props.navigation.state.params.callBack(this.state.selectd);
+    this.props.navigation.goBack();
   }
   render() {
     const iconRightFontColor = '#D6D0D0';
     return (
-      <View style={[baseStyle.bgWhite, {flex: 1}]}>
+      <TouchableOpacity style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
           title="职位类别"
           fullScreen
           right="确定"
           onRightPress={() => {
             console.log('确定');
+            this.save();
           }}
           onPressBack={() => {
             this.props.navigation.goBack();
           }}
         />
         <ScrollView style={baseStyle.content}>
-          <View>
-            <View style={[baseStyle.borderBottom, sty.inputBox]}>
-              <Text>高级管理</Text>
-              <Iconright color={iconRightFontColor} style={sty.Iconright} />
-            </View>
-            <View
-              style={{
-                backgroundColor: '#FBFBFB',
-                paddingTop: 10,
-                paddingBottom: 10,
-              }}>
-              <TouchableOpacity style={sty.childItem}>
-                <Text style={baseStyle.textYellow}>人力资源主管</Text>
-                <Icontick color="#D9B06F" />
+          {this.state.list.map((item, idx) => {
+            return (
+              <TouchableOpacity
+                activeOpacity={0.5}
+                key={item.id}
+                onPress={() => {
+                  this.getPositionType(item.id, idx);
+                }}>
+                <View style={[baseStyle.borderBottom, sty.inputBox]}>
+                  <Text>{item.name}</Text>
+                  <Iconright color={iconRightFontColor} style={sty.Iconright} />
+                </View>
+                {item.child.length > 0 && item.active ? (
+                  <View
+                    style={{
+                      backgroundColor: '#FBFBFB',
+                      paddingTop: 10,
+                      paddingBottom: 10,
+                    }}>
+                    {item.child.map((childItem, childIdx) => {
+                      return (
+                        <TouchableOpacity
+                          key={childItem.id}
+                          style={sty.childItem}
+                          onPress={() => {
+                            this.selected(idx, childIdx);
+                          }}>
+                          <Text
+                            style={
+                              childItem.selectd
+                                ? baseStyle.textYellow
+                                : {color: '#666666'}
+                            }>
+                            {childItem.name}
+                          </Text>
+                          {childItem.selectd ? (
+                            <Icontick color="#D9B06F" />
+                          ) : null}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ) : null}
               </TouchableOpacity>
-              <TouchableOpacity style={sty.childItem}>
-                <Text>人力资源助理</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View>
-            <View style={[baseStyle.borderBottom, sty.inputBox]}>
-              <Text>高级管理</Text>
-              <Iconright color={iconRightFontColor} style={sty.Iconright} />
-            </View>
-          </View>
+            );
+          })}
         </ScrollView>
-      </View>
+      </TouchableOpacity>
     );
   }
 }
