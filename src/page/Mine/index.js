@@ -54,6 +54,53 @@ class Mine extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      userType: 1,
+      hrMenuList: [
+        {
+          icon: require('../../images/person_icon.png'),
+          title: '个人信息',
+          url: 'FollowPosition',
+        },
+        {
+          icon: require('../../images/qiye_icon.png'),
+          title: '企业信息',
+          url: 'FollowPosition',
+        },
+        {
+          icon: require('../../images/yun_icon.png'),
+          title: '专属管家',
+          url: 'FollowPosition',
+        },
+        {
+          icon: require('../../images/news_icon.png'),
+          title: '行业资讯',
+          url: 'FollowPosition',
+        },
+        {
+          icon: require('../../images/qiehuan_icon.png'),
+          title: '切换HR角色',
+          right: (
+            <TouchableOpacity
+              onPress={() => {
+                console.log('rightPress');
+              }}>
+              <Text style={baseStyle.textYellow}>点击切换</Text>
+            </TouchableOpacity>
+          ),
+        },
+        {
+          icon: require('../../images/share_icon.png'),
+          title: '分享APP',
+          right: (
+            <TouchableOpacity
+              onPress={() => {
+                console.log('rightPress');
+              }}>
+              <Text style={baseStyle.textYellow}>点击分享获取奖励</Text>
+            </TouchableOpacity>
+          ),
+        },
+      ],
       menuList: [
         {
           icon: require('../../images/xin_icon.png'),
@@ -115,6 +162,7 @@ class Mine extends Component {
     };
   }
   render() {
+    const list = this.state.hrMenuList;
     return (
       <ScrollView>
         <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
@@ -137,46 +185,87 @@ class Mine extends Component {
                     Lisa yang
                   </Text>
                 </View>
-                <View>
+                {this.state.userType === 1 ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      console.log('签到');
+                    }}
+                    style={sty.qiandao}>
+                    <Text style={baseStyle.textWhite}>点击签到</Text>
+                  </TouchableOpacity>
+                ) : (
                   <View>
-                    <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
-                      <Text>人力资源经理</Text>
-                      <Text style={sty.pLpr}> | </Text>
-                      <Text>深圳房多多科技公司</Text>
-                    </Text>
+                    <View>
+                      <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
+                        <Text>人力资源经理</Text>
+                        <Text style={sty.pLpr}> | </Text>
+                        <Text>深圳房多多科技公司</Text>
+                      </Text>
+                    </View>
+                    <View>
+                      <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
+                        <Text>28岁</Text>
+                        <Text style={sty.pLpr}> | </Text>
+                        <Text>工作5年</Text>
+                        <Text style={sty.pLpr}> | </Text>
+                        <Text>上海长宁区</Text>
+                      </Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
-                      <Text>28岁</Text>
-                      <Text style={sty.pLpr}> | </Text>
-                      <Text>工作5年</Text>
-                      <Text style={sty.pLpr}> | </Text>
-                      <Text>上海长宁区</Text>
-                    </Text>
-                  </View>
-                </View>
+                )}
               </View>
             </View>
           </ImageBackground>
           <View style={sty.tabBoxSty}>
             <Card style={sty.tabContentSty}>
-              {this.state.cardList.map((item, index) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.props.navigation.navigate(item.url);
-                    }}
-                    style={sty.cardItem}
-                    key={index}>
-                    <Image style={sty.tabImg} source={item.icon} />
-                    <Text style={sty.cardItemTitle}>{item.title}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+              {this.state.userType === 1 ? (
+                <View style={[baseStyle.row, sty.hrCard]}>
+                  <View
+                    style={[
+                      {borderRightColor: '#C4C4C4', borderRightWidth: 0.5},
+                      sty.hrCardItem,
+                    ]}>
+                    <Text style={baseStyle.ft16}>当前积分</Text>
+                    <Text
+                      style={[
+                        baseStyle.textRed,
+                        baseStyle.ft15,
+                        {marginTop: 5, fontWeight: 'bold'},
+                      ]}>
+                      3778
+                    </Text>
+                  </View>
+                  <View style={sty.hrCardItem}>
+                    <Text style={baseStyle.ft16}>铜币</Text>
+                    <Text
+                      style={[
+                        baseStyle.textRed,
+                        baseStyle.ft15,
+                        {marginTop: 5, fontWeight: 'bold'},
+                      ]}>
+                      3778
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                this.state.cardList.map((item, index) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.props.navigation.navigate(item.url);
+                      }}
+                      style={sty.cardItem}
+                      key={index}>
+                      <Image style={sty.tabImg} source={item.icon} />
+                      <Text style={sty.cardItemTitle}>{item.title}</Text>
+                    </TouchableOpacity>
+                  );
+                })
+              )}
             </Card>
           </View>
           <View style={{padding: 10, paddingTop: 80}}>
-            {this.state.menuList.map((item, idx) => {
+            {list.map((item, idx) => {
               return (
                 <TouchableOpacity
                   key={idx}
@@ -253,5 +342,27 @@ const sty = StyleSheet.create({
   pLpr: {
     paddingLeft: 10,
     paddingRight: 10,
+  },
+  qiandao: {
+    backgroundColor: '#FFA300',
+    width: 90,
+    paddingTop: 5,
+    paddingBottom: 5,
+    borderRadius: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  hrCardItem: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hrCard: {
+    justifyContent: 'center',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
 });

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Text, View} from 'react-native';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
 import {baseStyle} from '../../components/baseStyle';
 
 class Item extends Component {

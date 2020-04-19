@@ -33,6 +33,14 @@ class Login extends Component {
       code: '',
     };
   }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      debugger;
+      if (res.userId && res.userType === 1) {
+        this.props.navigation.navigate('HrMain');
+      }
+    });
+  }
   getSencodes() {
     const me = this;
     const sencodeTimeInterval = setInterval(() => {
@@ -86,6 +94,7 @@ class Login extends Component {
       if (res.code === 1) {
         const userInfo = res.data;
         userInfo.isLogin = true;
+        userInfo.userType = 1;
         global.localStorage.set({
           key: 'currentUser',
           data: userInfo,

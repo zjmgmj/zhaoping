@@ -37,6 +37,9 @@ import PositionCategory from './HR/PositionCategory';
 import PositionDes from './HR/PositionDes';
 import PositionBenefits from './HR/PositionBenefits';
 import PositionName from './HR/PositionName';
+import RecruitmentManagement from './HR/RecruitmentManagement';
+import RecruitmentResume from './HR/RecruitmentResume';
+import ResumeList from './HR/ResumeList';
 
 const personNavigator = {
   Home: {
@@ -77,8 +80,8 @@ const HrNavigator = {
       tabBarLabel: '首页',
     }),
   },
-  Position: {
-    screen: Position,
+  RecruitmentManagement: {
+    screen: RecruitmentManagement,
     navigationOptions: () => ({
       tabBarLabel: '招聘管理',
     }),
@@ -151,6 +154,8 @@ const StackRouteConfigs = createStackNavigator(
     PositionDes,
     PositionBenefits,
     PositionName,
+    RecruitmentResume,
+    ResumeList,
   },
   {
     defaultNavigationOptions: {

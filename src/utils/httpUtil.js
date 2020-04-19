@@ -1,4 +1,4 @@
-const baseUrl = 'http://114.55.169.95/yunpin_rest/';
+const baseUrl = 'http://114.55.169.95/yun_rest/';
 export const httpGet = (api, parameter = {}, success, failure = () => {}) => {
   //封装请求配置： 请求方法、请求头、请求体
   const params = [];
@@ -18,6 +18,7 @@ export const httpGet = (api, parameter = {}, success, failure = () => {}) => {
       'Content-Type': 'application/json',
     },
   };
+  console.log('httpGet', url);
   //发起请求
   fetch(url, opt)
     .then(data => {
@@ -25,6 +26,7 @@ export const httpGet = (api, parameter = {}, success, failure = () => {}) => {
     })
     .then(response => {
       if (response) {
+        console.log(response);
         success(response);
       }
     })
@@ -44,12 +46,15 @@ export const httpPost = (url, parameter, success, failure) => {
     },
     body: JSON.stringify(parameter),
   };
+  console.log('api', baseUrl + url);
+  console.log('body', opt);
   //发起请求
   fetch(baseUrl + url, opt)
     .then(data => {
       return data.json();
     })
     .then(response => {
+      console.log(response);
       success(response);
     })
     .catch(error => {

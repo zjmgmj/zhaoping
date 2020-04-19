@@ -36,8 +36,8 @@ class PostPosition extends Component {
       params: {
         cityId: 0,
         cityName: '',
-        companyId: 0,
-        companyName: '',
+        companyId: null,
+        companyName: '山东共展信息科技有限公司',
         educationId: 0,
         educationName: '',
         experienceId: 0,
@@ -50,6 +50,7 @@ class PostPosition extends Component {
         positionName: '',
         positionRequirements: '',
         positionTypeName: '内推职位',
+        positionTypeId: 2,
         positionType: 2, // 1=普通职位 2=内推职位
         provinceId: 0,
         regionId: 0,
