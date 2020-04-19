@@ -28,6 +28,9 @@ class Chat extends Component {
               </Text>
             </View>
           }
+          onPressBack={() => {
+            this.props.navigation.goBack();
+          }}
           fullScreen
         />
         <ScrollView style={sty.scrollView}>

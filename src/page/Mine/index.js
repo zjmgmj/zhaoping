@@ -59,7 +59,7 @@ class Mine extends Component {
         {
           icon: require('../../images/person_icon.png'),
           title: '个人信息',
-          url: 'FollowPosition',
+          url: 'PersonInfo',
         },
         {
           icon: require('../../images/qiye_icon.png'),
@@ -74,7 +74,7 @@ class Mine extends Component {
         {
           icon: require('../../images/news_icon.png'),
           title: '行业资讯',
-          url: 'FollowPosition',
+          url: 'IndustryNews',
         },
         {
           icon: require('../../images/qiehuan_icon.png'),

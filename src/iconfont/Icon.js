@@ -11,6 +11,8 @@ import Iconadd from './Iconadd';
 import IconcircleAdd from './IconcircleAdd';
 import Iconsearch from './Iconsearch';
 import Iconback from './Iconback';
+import Icondown from './Icondown';
+import Iconup from './Iconup';
 import Iconright from './Iconright';
 
 export const Icon = ({ name, ...rest }) => {
@@ -33,6 +35,10 @@ export const Icon = ({ name, ...rest }) => {
       return <Iconsearch {...rest} />;
     case 'back':
       return <Iconback {...rest} />;
+    case 'down':
+      return <Icondown {...rest} />;
+    case 'up':
+      return <Iconup {...rest} />;
     case 'right':
       return <Iconright {...rest} />;
   }

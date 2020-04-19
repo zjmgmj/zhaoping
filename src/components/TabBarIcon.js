@@ -27,6 +27,9 @@ export default ({routeName, focused}) => {
     RecruitmentManagement: focused
       ? require('../images/mine_active_icon.png')
       : require('../images/mine_icon.png'),
+    AddressBook: focused
+      ? require('../images/mine_active_icon.png')
+      : require('../images/mine_icon.png'),
   };
   return (
     <Image
