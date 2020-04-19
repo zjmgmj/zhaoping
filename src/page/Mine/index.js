@@ -64,7 +64,7 @@ class Mine extends Component {
         {
           icon: require('../../images/qiye_icon.png'),
           title: '企业信息',
-          url: 'FollowPosition',
+          url: 'CompanyList',
         },
         {
           icon: require('../../images/yun_icon.png'),

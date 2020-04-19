@@ -47,17 +47,48 @@ export const httpPost = (url, parameter, success, failure) => {
     body: JSON.stringify(parameter),
   };
   console.log('api', baseUrl + url);
-  console.log('body', opt);
   //发起请求
   fetch(baseUrl + url, opt)
     .then(data => {
+      console.log('data', data);
       return data.json();
     })
     .then(response => {
-      console.log(response);
+      console.log('response', response);
       success(response);
     })
     .catch(error => {
+      console.log('error', error);
       failure(error);
+    });
+};
+
+export const uploadFile = (url, file, success, failure) => {
+  let formData = new FormData();
+  const fileData = {
+    uri: file.uri,
+    type: file.type,
+    name: file.fileName,
+    size: file.fileSize,
+  };
+  formData.append('file', fileData);
+  fetch(baseUrl + url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    body: formData,
+  })
+    .then(data => {
+      console.log('data', data);
+      return data.json();
+    })
+    .then(res => {
+      console.log('uploadFile', res);
+      success(res);
+    })
+    .then(err => {
+      console.log('err', err);
+      failure(err);
     });
 };

@@ -40,6 +40,8 @@ import PositionName from './HR/PositionName';
 import RecruitmentManagement from './HR/RecruitmentManagement';
 import RecruitmentResume from './HR/RecruitmentResume';
 import ResumeList from './HR/ResumeList';
+import CompanyList from './HR/CompanyList';
+import AddCompany from './HR/AddCompany';
 
 const personNavigator = {
   Home: {
@@ -156,6 +158,8 @@ const StackRouteConfigs = createStackNavigator(
     PositionName,
     RecruitmentResume,
     ResumeList,
+    CompanyList,
+    AddCompany,
   },
   {
     defaultNavigationOptions: {
