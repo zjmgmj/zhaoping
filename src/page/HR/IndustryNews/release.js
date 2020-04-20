@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -7,15 +7,13 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  // SafeAreaView,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
-import {Button} from 'beeshell/dist/components/Button';
 import Header from '../../../components/Header';
 import {setStatusBar} from '../../../components/setStatusBar';
 import {baseStyle} from '../../../components/baseStyle';
-import {Iconright} from '../../../iconfont/Iconright';
-import Picker from '../../../components/picker';
-import {TopviewGetInstance} from 'beeshell';
+import Editor from '../../../components/Editor';
 
 @setStatusBar({
   translucent: true,
@@ -28,7 +26,6 @@ class IndustryRelease extends Component {
   }
   UNSAFE_componentWillMount() {}
   render() {
-    const list = this.state.newsList;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -42,20 +39,26 @@ class IndustryRelease extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView style={baseStyle.content}>
-          <View>
-            <View style={baseStyle.borderBottom}>
-              <TextInput placeholder="标题" />
-            </View>
-            <View>
-              <TextInput placeholder="正文" />
-            </View>
+        <View style={baseStyle.content}>
+          <View style={baseStyle.borderBottom}>
+            <TextInput placeholder="标题" style={{height: 50}} />
           </View>
-        </ScrollView>
+        </View>
+        <Editor
+          onChange={res => {
+            console.log('change', res);
+          }}
+        />
       </View>
     );
   }
 }
 
 export default IndustryRelease;
-const sty = StyleSheet.create({});
+const sty = StyleSheet.create({
+  editBox: {
+    width: baseStyle.screenWidth - 20,
+    paddingTop: 15,
+    minHeight: 200,
+  },
+});

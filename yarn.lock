@@ -5625,6 +5625,11 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.npm.taobao.org/react-lifecycles-compat/download/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha1-TxonOv38jzSIqMUWv9p4+HI1I2I=
 
+react-native-draftjs-editor@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npm.taobao.org/react-native-draftjs-editor/download/react-native-draftjs-editor-0.0.2.tgz#83a3d83feaefb5fb27d0ee75e47999a0cd18ec00"
+  integrity sha1-g6PYP+rvtfsn0O515HmZoM0Y7AA=
+
 react-native-gesture-handler@^1.6.0:
   version "1.6.0"
   resolved "https://registry.npm.taobao.org/react-native-gesture-handler/download/react-native-gesture-handler-1.6.0.tgz#e9a4e1d0c7ac21eb0d6b6ec013e73f9c0c33a629"
@@ -5657,6 +5662,11 @@ react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npm.taobao.org/react-native-iphone-x-helper/download/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
   integrity sha1-ZF4v+7tJ6AhEu0y740oSb9oeZ3I=
+
+react-native-keyboard-spacer@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.npm.taobao.org/react-native-keyboard-spacer/download/react-native-keyboard-spacer-0.4.1.tgz#46f18a320432098a25ea9fa89f5143dd254d332d"
+  integrity sha1-RvGKMgQyCYol6p+on1FD3SVNMy0=
 
 react-native-modals@^0.19.9:
   version "0.19.9"
