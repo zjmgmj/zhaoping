@@ -35,15 +35,14 @@ class IndustryNews extends Component {
         <Header
           title="行业资讯"
           fullScreen
-          right="发布资讯"
-          onRightPress={() => {
-            this.props.navigation.navigate('IndustryRelease', {
-              callBack: () => {
-                console.log('callBack');
-                // this.getNewList();
-              },
-            });
-          }}
+          // right="发布资讯"
+          // onRightPress={() => {
+          //   this.props.navigation.navigate('IndustryRelease', {
+          //     callBack: () => {
+          //       console.log('callBack');
+          //     },
+          //   });
+          // }}
           onPressBack={() => {
             this.props.navigation.goBack();
           }}

@@ -43,7 +43,7 @@ import ResumeList from './HR/ResumeList';
 import CompanyList from './HR/CompanyList';
 import AddCompany from './HR/AddCompany';
 import IndustryNews from './HR/IndustryNews';
-import IndustryRelease from './HR/IndustryNews/release';
+// import IndustryRelease from './HR/IndustryNews/release';
 import AddressBook from './HR/AddressBook';
 import PersonInfo from './HR/PersonInfo';
 
@@ -165,8 +165,9 @@ const StackRouteConfigs = createStackNavigator(
     CompanyList,
     AddCompany,
     IndustryNews,
-    IndustryRelease,
+    // IndustryRelease,
     PersonInfo,
+    Dynamic,
   },
   {
     defaultNavigationOptions: {

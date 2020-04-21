@@ -83,6 +83,8 @@ class Mine extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('rightPress');
+                debugger;
+                this.props.navigation.navigate('Main');
               }}>
               <Text style={baseStyle.textYellow}>点击切换</Text>
             </TouchableOpacity>
@@ -140,6 +142,7 @@ class Mine extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('rightPress');
+                this.props.navigation.navigate('HrMain');
               }}>
               <Text style={baseStyle.textYellow}>点击切换</Text>
             </TouchableOpacity>

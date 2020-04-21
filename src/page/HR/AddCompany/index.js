@@ -88,7 +88,6 @@ class PostPosition extends Component {
         unitQualificationList: res.data,
       });
     });
-    debugger;
     const id = this.props.navigation.getParam('id');
     console.log('id', id);
     if (id) {

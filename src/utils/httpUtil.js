@@ -92,3 +92,50 @@ export const uploadFile = (url, file, success, failure) => {
       failure(err);
     });
 };
+
+export const httpGetPromise = (api, parameter = {}) => {
+  //封装请求配置： 请求方法、请求头、请求体
+  const params = [];
+  Object.keys(parameter).forEach(key => {
+    params.push(`${key}=${parameter[key]}`);
+  });
+  const paramStr = params.toString().replace(/,/g, '&');
+  let url = baseUrl + api;
+  if (paramStr) {
+    url = url + '?' + paramStr;
+  }
+
+  let opt = {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  };
+  console.log('httpGet', url);
+  return new Promise(resolve => {
+    // setTimeout(() => {
+    //   resolve(dataModal)
+    // }, 2000)
+
+    //发起请求
+    fetch(url, opt)
+      .then(data => {
+        return data.json();
+      })
+      .then(response => {
+        if (response) {
+          console.log(response);
+          resolve(response);
+        }
+      })
+      .catch(error => {
+        if (error) {
+          console.log(error);
+          // failure(error);
+        }
+      });
+  }).catch(e => {
+    console.log(e);
+  });
+};

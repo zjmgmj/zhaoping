@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {baseStyle} from '../../components/baseStyle';
 import {TopviewGetInstance} from 'beeshell';
+import {Longlist} from 'beeshell/dist/components/Longlist';
 
 class Item extends Component {
   constructor(props) {
@@ -17,39 +18,27 @@ class Item extends Component {
   }
 
   render() {
+    const item = this.props.item;
+    const mainUrlList = item.mainUrl ? item.mainUrl.split() : [];
     return (
       <View style={sty.itemBox}>
         <View style={baseStyle.row}>
-          <Image
-            source={require('../../images/author.png')}
-            style={sty.authorImg}
-          />
+          <Image source={{uri: item.userPic}} style={sty.authorImg} />
           <View style={baseStyle.paddingLeft}>
-            <Text style={baseStyle.textBlack}>赵文玉</Text>
+            <Text style={baseStyle.textBlack}>
+              {item.userNickname || 'zhjm'}
+            </Text>
             <Text style={[baseStyle.textGray, baseStyle.ft12]}>
-              今天 12：30
+              {item.createDate}
             </Text>
           </View>
         </View>
         <View style={baseStyle.paddingTop}>
-          <Text>
-            没有计划，就像无头苍蝇一样，到处乱撞还没有结
-            果。学习也是一样，之前指定的学习计划，HTML
-            +CSS+JS+BOOTSTRAP+VUE+DEDE，要重新捡起来，每天学习点，积累点进步点。
-          </Text>
+          <Text>{item.describess}</Text>
           <View style={[baseStyle.row]}>
-            <Image
-              style={[sty.itemImg]}
-              source={require('../../images/md-duran-1410885-unsplash.png')}
-            />
-            <Image
-              style={[sty.itemImg]}
-              source={require('../../images/md-duran-1410885-unsplash.png')}
-            />
-            <Image
-              style={[sty.itemImg]}
-              source={require('../../images/md-duran-1410885-unsplash.png')}
-            />
+            {mainUrlList.map(imgPath => {
+              return <Image style={[sty.itemImg]} source={{uri: imgPath}} />;
+            })}
           </View>
         </View>
         <View style={sty.optionSty}>
@@ -59,12 +48,11 @@ class Item extends Component {
               style={sty.iconImg}
             />
             <View style={sty.iconNum}>
-              <Text>23</Text>
+              <Text>{item.upNum}</Text>
             </View>
           </View>
           <TouchableOpacity
             onPress={() => {
-              // this._modal.open();
               this.props.openModal();
             }}>
             <View style={{marginRight: 10}}>
@@ -73,7 +61,7 @@ class Item extends Component {
                 style={sty.iconImg}
               />
               <View style={sty.iconNum}>
-                <Text>78</Text>
+                <Text>{item.commentNum}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -88,21 +76,48 @@ export default class News extends Component {
     super(props);
     this.state = {
       commentId: '',
+      commentBtn: '',
+      currentUser: {},
+      page: 1,
+      list: [],
+      total: 0,
     };
   }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      console.log(res);
+      this.setState({
+        currentUser: res,
+      });
+      this.getDynamicList();
+    });
+  }
   componentDidMount() {
-    TopviewGetInstance().add(
-      <TouchableOpacity
-        onPress={() => {
-          this.props.openRelease();
-        }}
-        style={{position: 'absolute', bottom: 60, right: 20}}>
-        <Image
-          source={require('../../images/add_icon.png')}
-          style={sty.addIcon}
-        />
-      </TouchableOpacity>,
-    );
+    // this.addBtn();
+  }
+  addBtn() {
+    TopviewGetInstance()
+      .add(
+        <TouchableOpacity
+          onPress={() => {
+            this.props.openRelease();
+          }}
+          style={{position: 'absolute', bottom: 60, right: 20}}>
+          <Image
+            source={require('../../images/add_icon.png')}
+            style={sty.addIcon}
+          />
+        </TouchableOpacity>,
+      )
+      .then(id => {
+        this.setState({
+          commentBtn: id,
+        });
+      });
+  }
+  componentWillUnmount() {
+    TopviewGetInstance().remove(this.state.commentBtn);
+    TopviewGetInstance().remove(this.state.commentId);
   }
   openComment() {
     TopviewGetInstance()
@@ -136,21 +151,90 @@ export default class News extends Component {
         this.textInput.focus();
       });
   }
+  getDynamicList() {
+    debugger;
+    console.log('page', this.state.page);
+    global
+      .httpGetPromise('dynamic/list', {
+        page: this.state.page,
+        size: 10,
+        userId: this.state.currentUser.userId,
+      })
+      .then(res => {
+        const page = this.state.page;
+        let oldList = this.state.list;
+        const resData = res.data;
+        if (page > 1) {
+          oldList.push(...resData.result);
+        } else {
+          oldList = resData.result;
+        }
+        this.setState({
+          list: oldList,
+          total: resData.total,
+        });
+      });
+  }
+  refresh() {
+    return global
+      .httpGetPromise('dynamic/list', {
+        page: this.state.page,
+        size: 10,
+        userId: this.state.currentUser.userId,
+      })
+      .then(res => {
+        const page = this.state.page;
+        let oldList = this.state.list;
+        const resData = res.data;
+        if (page > 1) {
+          oldList.push(...resData.result);
+        } else {
+          oldList = resData.result;
+        }
+        this.setState({
+          list: oldList,
+          total: resData.total,
+        });
+      });
+  }
   render() {
-    const list = [1, 2, 3, 4];
+    const {total, list} = this.state;
     return (
-      <ScrollView>
-        {list.map(item => {
-          return (
-            <Item
-              key={item}
-              openModal={() => {
-                this.openComment();
-              }}
-            />
-          );
-        })}
-      </ScrollView>
+      <View>
+        <Longlist
+          ref={longList => {
+            this.longList = longList;
+          }}
+          total={total}
+          data={list}
+          renderItem={({item, index}) => {
+            return (
+              <Item
+                key={index}
+                item={item}
+                openModal={() => {
+                  this.openComment();
+                }}
+              />
+            );
+          }}
+          onEndReached={() => {
+            const page = this.state.page + 1;
+            this.setState({
+              page: page,
+            });
+            console.log('onEndReached');
+            // return this.getDynamicList();
+          }}
+          onRefresh={() => {
+            console.log('onRefresh');
+            this.setState({
+              page: 1,
+            });
+            return this.refresh();
+          }}
+        />
+      </View>
     );
   }
 }
