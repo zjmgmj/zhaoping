@@ -5,15 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   PixelRatio,
-  Text,
   TextInput,
 } from 'react-native';
 import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
-import ImagePicker from 'react-native-image-picker';
 import {baseStyle} from '../../components/baseStyle';
+import {selectPhotoTapped} from '../../components/SelectPhotoTapped';
 @setStatusBar({
-  // barStyle: 'light-content',
   translucent: true,
   backgroundColor: 'transparent',
 })
@@ -23,51 +21,43 @@ class ReleaseDynamic extends Component {
     this.state = {
       imgSource: [],
       videoSource: null,
+      currentUser: {},
+      content: '',
+      picUrlList: [],
     };
   }
-
-  //选择图片
-  selectPhotoTapped() {
-    const options = {
-      title: '选择图片',
-      cancelButtonTitle: '取消',
-      takePhotoButtonTitle: '拍照',
-      chooseFromLibraryButtonTitle: '从图库上传',
-      // customButtons: [{name: 'fb', title: 'Choose Photo from Facebook'}],
-      cameraType: 'back',
-      mediaType: 'photo',
-      videoQuality: 'high',
-      durationLimit: 10,
-      maxWidth: 1600,
-      maxHeight: 1200,
-      quality: 0.8,
-      angle: 0,
-      allowsEditing: false,
-      noData: false,
-      storageOptions: {
-        skipBackup: true,
-      },
-    };
-
-    ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-      if (response.didCancel) {
-        console.log('User cancelled photo picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        let source = {uri: response.uri, data: response.data};
-        // You can also display the image using data:
-        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-        const imgSourceList = this.state.imgSource;
-        imgSourceList.push(source);
-        this.setState({
-          imgSource: imgSourceList,
-        });
-      }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      this.setState({
+        currentUser: res,
+      });
     });
+  }
+
+  release() {
+    const currentUser = this.state.currentUser;
+    const params = {
+      userId: currentUser.userId,
+      userNickname: currentUser.userNickname,
+      userPic: currentUser.userPic,
+      type: 1,
+      mainUrl: this.state.picUrlList.toString(),
+      describess: this.state.content,
+    };
+    console.log('params', params);
+    global.httpPost(
+      'dynamic/save',
+      params,
+      res => {
+        if (res.code === 1) {
+          this.props.navigation.state.params.callBack();
+          this.props.navigation.goBack();
+        }
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
 
   render() {
@@ -78,8 +68,10 @@ class ReleaseDynamic extends Component {
           right="发布"
           rightStyle={baseStyle.textYellow}
           fullScreen
+          onRightPress={() => {
+            this.release();
+          }}
           onPressBack={() => {
-            // this.props.navigation.state.params.callBackData();
             this.props.navigation.goBack();
           }}
         />
@@ -93,16 +85,35 @@ class ReleaseDynamic extends Component {
               style={baseStyle.paddingLeft}
               placeholder="请输入内容"
               multiline
+              onChange={e => {
+                this.setState({
+                  content: e.nativeEvent.text,
+                });
+              }}
             />
           </View>
         </View>
-        <View style={[baseStyle.row, {paddingBottom: 20}]}>
-          {this.state.imgSource.map(item => {
-            <View style={baseStyle.paddingLeft}>
-              <Image style={[sty.itemImg]} source={{uri: item.data}} />;
-            </View>;
+        <View style={[baseStyle.row, {paddingBottom: 20, flexWrap: 'wrap'}]}>
+          {this.state.picUrlList.map((item, idx) => {
+            return (
+              <View key={idx} style={baseStyle.paddingLeft}>
+                <Image style={[sty.itemImg]} source={{uri: item}} />
+              </View>
+            );
           })}
-          <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)}>
+          <TouchableOpacity
+            onPress={() => {
+              selectPhotoTapped({
+                me: this,
+                cb: res => {
+                  const picUrlList = this.state.picUrlList;
+                  picUrlList.push(res);
+                  this.setState({
+                    picUrlList: picUrlList,
+                  });
+                },
+              });
+            }}>
             <View style={baseStyle.paddingLeft}>
               <Image
                 style={[sty.itemImg]}
@@ -131,7 +142,7 @@ const sty = StyleSheet.create({
   },
   textInputSty: {
     width: baseStyle.screenWidth - 50,
-    minHeight: 300,
+    minHeight: 200,
   },
   itemImg: {
     width: 101.5,

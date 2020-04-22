@@ -11,12 +11,40 @@ import {
 import {baseStyle} from '../../components/baseStyle';
 import {TopviewGetInstance} from 'beeshell';
 import {Longlist} from 'beeshell/dist/components/Longlist';
+import Modal, {ModalContent} from 'react-native-modals';
 
 class Item extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      zan: require('../../images/zan_icon.png'),
+      zanActive: require('../../images/zan_active_icon.png'),
+      zanImg: null,
+      modalShow: false,
+    };
   }
-
+  UNSAFE_componentWillMount() {
+    this.setState({
+      zanImg: this.props.item.isup ? this.state.zanActive : this.state.zan,
+    });
+  }
+  giveupSave() {
+    global.httpPost(
+      'giveup/save',
+      {
+        relationId: this.props.item.id,
+        type: 1,
+        userId: this.props.currentUser.userId,
+      },
+      res => {
+        console.log('giveupSave', res);
+        this.props.onModal('点赞成功');
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
     const item = this.props.item;
     const mainUrlList = item.mainUrl ? item.mainUrl.split() : [];
@@ -29,28 +57,38 @@ class Item extends Component {
               {item.userNickname || 'zhjm'}
             </Text>
             <Text style={[baseStyle.textGray, baseStyle.ft12]}>
-              {item.createDate}
+              {global.date2Str(new Date(item.createDate))}
             </Text>
           </View>
         </View>
         <View style={baseStyle.paddingTop}>
           <Text>{item.describess}</Text>
           <View style={[baseStyle.row]}>
-            {mainUrlList.map(imgPath => {
-              return <Image style={[sty.itemImg]} source={{uri: imgPath}} />;
+            {mainUrlList.map((imgPath, idx) => {
+              return (
+                <Image
+                  key={idx}
+                  style={[sty.itemImg]}
+                  source={{uri: imgPath}}
+                />
+              );
             })}
           </View>
         </View>
         <View style={sty.optionSty}>
-          <View style={[baseStyle.relation, {marginRight: 20}]}>
-            <Image
-              source={require('../../images/zan_active_icon.png')}
-              style={sty.iconImg}
-            />
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({
+                zanImg: this.state.zanActive,
+              });
+              this.giveupSave();
+            }}
+            style={[baseStyle.relation, {marginRight: 20}]}>
+            <Image source={this.state.zanImg} style={sty.iconImg} />
             <View style={sty.iconNum}>
               <Text>{item.upNum}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               this.props.openModal();
@@ -81,6 +119,7 @@ export default class News extends Component {
       page: 1,
       list: [],
       total: 0,
+      commentContent: '',
     };
   }
   UNSAFE_componentWillMount() {
@@ -95,12 +134,35 @@ export default class News extends Component {
   componentDidMount() {
     // this.addBtn();
   }
+  ModalToggleBox() {
+    return (
+      <Modal
+        visible={this.state.modalShow}
+        onTouchOutside={() => {
+          this.setState({
+            modalShow: false,
+          });
+        }}>
+        <ModalContent>
+          <Text>{this.state.modalContent}</Text>
+        </ModalContent>
+      </Modal>
+    );
+  }
   addBtn() {
+    const navigation = this.props.navigation;
     TopviewGetInstance()
       .add(
         <TouchableOpacity
           onPress={() => {
-            this.props.openRelease();
+            navigation.navigate('ReleaseDynamic', {
+              callBack: () => {
+                this.setState({
+                  page: 1,
+                });
+                this.getDynamicList();
+              },
+            });
           }}
           style={{position: 'absolute', bottom: 60, right: 20}}>
           <Image
@@ -115,11 +177,11 @@ export default class News extends Component {
         });
       });
   }
-  componentWillUnmount() {
+  getDerivedStateFromProps() {
     TopviewGetInstance().remove(this.state.commentBtn);
     TopviewGetInstance().remove(this.state.commentId);
   }
-  openComment() {
+  openComment(item) {
     TopviewGetInstance()
       .add(
         <TouchableOpacity
@@ -134,8 +196,13 @@ export default class News extends Component {
               }}
               style={sty.commentInputSty}
               placeholder="评论"
-              onChange={value => {
-                console.log(value);
+              onChange={e => {
+                this.setState({
+                  commentContent: e.nativeEvent.text,
+                });
+              }}
+              onSubmitEditing={() => {
+                this.commentSave(item);
               }}
               onBlur={() => {
                 TopviewGetInstance().remove(this.state.commentId);
@@ -152,7 +219,6 @@ export default class News extends Component {
       });
   }
   getDynamicList() {
-    debugger;
     console.log('page', this.state.page);
     global
       .httpGetPromise('dynamic/list', {
@@ -183,6 +249,7 @@ export default class News extends Component {
         userId: this.state.currentUser.userId,
       })
       .then(res => {
+        console.log('res', res);
         const page = this.state.page;
         let oldList = this.state.list;
         const resData = res.data;
@@ -197,6 +264,27 @@ export default class News extends Component {
         });
       });
   }
+  commentSave(item) {
+    const currentUser = this.state.currentUser;
+    const params = {
+      content: this.state.commentContent,
+      dynamicId: item.id,
+      userId: currentUser.userId,
+      type: 1,
+      modalContent: '',
+    };
+    global.httpPost(
+      'comment/save',
+      params,
+      res => {
+        console.log(res);
+        this.getDynamicList();
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
     const {total, list} = this.state;
     return (
@@ -209,13 +297,21 @@ export default class News extends Component {
           data={list}
           renderItem={({item, index}) => {
             return (
-              <Item
-                key={index}
-                item={item}
-                openModal={() => {
-                  this.openComment();
-                }}
-              />
+              <View key={index}>
+                <Item
+                  item={item}
+                  currentUser={this.state.currentUser}
+                  openModal={() => {
+                    this.openComment(item);
+                  }}
+                  onModal={message => {
+                    this.setState({
+                      modalShow: true,
+                      modalContent: message,
+                    });
+                  }}
+                />
+              </View>
             );
           }}
           onEndReached={() => {
@@ -224,7 +320,7 @@ export default class News extends Component {
               page: page,
             });
             console.log('onEndReached');
-            // return this.getDynamicList();
+            return this.refresh();
           }}
           onRefresh={() => {
             console.log('onRefresh');
@@ -234,6 +330,24 @@ export default class News extends Component {
             return this.refresh();
           }}
         />
+        {this.ModalToggleBox()}
+        <TouchableOpacity
+          onPress={() => {
+            this.props.navigation.navigate('ReleaseDynamic', {
+              callBack: () => {
+                this.setState({
+                  page: 1,
+                });
+                this.getDynamicList();
+              },
+            });
+          }}
+          style={{position: 'absolute', bottom: 10, right: 20}}>
+          <Image
+            source={require('../../images/add_icon.png')}
+            style={sty.addIcon}
+          />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -250,7 +364,9 @@ const sty = StyleSheet.create({
     marginBottom: 10,
   },
   itemImg: {
-    flex: 1,
+    // flex: 1,
+    width: (baseStyle.screenWidth - 40) / 3,
+    height: 75,
     resizeMode: 'contain',
     margin: 5,
   },

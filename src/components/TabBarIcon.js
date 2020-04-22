@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
 });
 
 export default ({routeName, focused}) => {
+  console.log('routeName', routeName);
   const images = {
     Home: focused
       ? require('../images/home_active_icon.png')

@@ -11,18 +11,27 @@ import {baseStyle} from '../../components/baseStyle';
 export default class Release extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      currentUser: {},
+    };
   }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      this.setState({
+        currentUser: res,
+      });
+    });
+  }
+
   render() {
+    const userAuthor = this.state.currentUser.userPic;
     return (
       <View style={baseStyle.bgWhite}>
         <View>
-          <Image
-            source={require('../../images/author.png')}
-            style={sty.authorImg}
-          />
+          <Image source={{uri: userAuthor}} style={sty.authorImg} />
           <TextInput
             style={{minHeight: 100}}
-            placeholder="请输入内容"
+            placeholder="请输入内容1"
             multiline
           />
         </View>

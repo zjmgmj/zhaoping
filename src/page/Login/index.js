@@ -12,7 +12,6 @@ import Header from '../../components/Header';
 import {baseStyle} from '../../components/baseStyle';
 import {Button} from 'beeshell/dist/components/Button';
 import {httpGet, httpPost} from '../../utils/httpUtil';
-// import ZModal from '../../components/ZModal';
 import Modal, {ModalContent} from 'react-native-modals';
 
 @setStatusBar({
@@ -119,8 +118,6 @@ class Login extends Component {
     clearInterval(this.state.sencodeInterval);
   }
   ModalToggleBox() {
-    console.log('modalShow', this.state.modalShow);
-    console.log('modalContent', this.state.modalContent);
     return (
       <Modal
         visible={this.state.modalShow}

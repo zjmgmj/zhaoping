@@ -21,11 +21,7 @@ class Dynamic extends Component {
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
           <View tabLabel="最新动态">
-            <News
-              openRelease={() => {
-                this.props.navigation.navigate('ReleaseDynamic');
-              }}
-            />
+            <News navigation={this.props.navigation} />
           </View>
           <View tabLabel="热门社群">
             {/* <Text>热门社群</Text> */}
