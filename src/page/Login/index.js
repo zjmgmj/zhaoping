@@ -34,9 +34,16 @@ class Login extends Component {
   }
   UNSAFE_componentWillMount() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
-      debugger;
-      if (res.userId && res.userType === 1) {
-        this.props.navigation.navigate('HrMain');
+      switch (res.userType) {
+        case 1:
+          this.props.navigation.navigate('HrMain');
+          break;
+        case 2:
+          this.props.navigation.navigate('Main');
+          break;
+        default:
+          console.log('登陆');
+          break;
       }
     });
   }
@@ -93,7 +100,8 @@ class Login extends Component {
       if (res.code === 1) {
         const userInfo = res.data;
         userInfo.isLogin = true;
-        userInfo.userType = 1;
+        // userInfo.userType = 1; // 招聘官
+        userInfo.userType = 2; // 智推官
         global.localStorage.set({
           key: 'currentUser',
           data: userInfo,

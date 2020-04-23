@@ -147,8 +147,6 @@ class PostPosition extends Component {
             Object.keys(objKey).forEach(key => {
               params[objKey[key]] = item[key];
             });
-            // params[`${key}Name`] = item.dvalue;
-            // params[`${key}Id`] = item.id;
             this.setState({
               params: params,
             });

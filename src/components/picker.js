@@ -15,6 +15,8 @@ export default class Picker extends Component {
   }
   render() {
     const list = this.props.list;
+    const valueKey = this.props.valueKey || 'id';
+    const labelKey = this.props.labelKey || 'dvalue';
     return (
       <TouchableOpacity
         style={baseStyle.fullScreenMask}
@@ -36,13 +38,13 @@ export default class Picker extends Component {
                 <Text
                   style={[
                     sty.label,
-                    item.id === this.props.selected
+                    item[valueKey] === this.props.selected
                       ? baseStyle.textYellow
                       : null,
                   ]}>
-                  {item.dvalue}
+                  {item[labelKey]}
                 </Text>
-                {this.selected(item.id)}
+                {this.selected(item[valueKey])}
               </TouchableOpacity>
             );
           })}

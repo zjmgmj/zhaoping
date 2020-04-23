@@ -16,9 +16,6 @@ import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 import {IconShare} from '../../iconfont/IconShare';
 import {Iconedit} from '../../iconfont/Iconedit';
-// import {Modal} from 'beeshell';
-// import {Modal} from 'beeshell/dist/components/Modal';
-// import {Share} from './Share';
 
 @setStatusBar({
   barStyle: 'light-content',
@@ -30,11 +27,32 @@ class Detail extends Component {
     super(props);
     this.state = {
       shareModal: false,
+      detail: null,
     };
   }
-  // componentDidMount() {
-  //   this.setState({shareModal: false});
-  // }
+  UNSAFE_componentWillMount() {
+    this.getDetail();
+  }
+  getDetail() {
+    const id = this.props.navigation.getParam('id');
+    console.log('id', id);
+    global.httpGet(
+      'position/detail',
+      {id: id},
+      res => {
+        console.log('positionDetail', res);
+        if (res.code === 1) {
+          this.setState({
+            detail: res.data,
+          });
+        }
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
+  positionrecord() {}
   onpenModal() {
     this.setState({
       shareModal: true,
@@ -272,8 +290,12 @@ class Detail extends Component {
           transparent={true}
           cancelable={true}>
           <TouchableOpacity
+            activeOpacity={1}
             onPress={() => {
-              this.onpenModal();
+              this.setState({
+                shareModal: false,
+              });
+              return false;
             }}
             style={sty.modalBox}>
             <View style={{flexDirection: 'column', justifyContent: 'center'}}>

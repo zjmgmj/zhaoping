@@ -15,7 +15,14 @@ import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 // import Datepicker from 'beeshell/dist/components/Datepicker';
-import {Scrollpicker, Datepicker, Button, BottomModal} from 'beeshell';
+import {
+  Scrollpicker,
+  Datepicker,
+  TopviewGetInstance,
+  BottomModal,
+} from 'beeshell';
+import {selectPhotoTapped} from '../../components/SelectPhotoTapped';
+import Picker from '../../components/picker';
 
 @setStatusBar({
   translucent: true,
@@ -25,11 +32,14 @@ class ResumeInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pickerVal: null,
+      sexList: [{label: '男', value: 1}, {label: '女', value: 2}],
       info: {
         userPic: '',
         userRealname: '',
         userSex: 0,
         birthdate: '',
+        sex: 2,
       },
     };
   }
@@ -44,7 +54,7 @@ class ResumeInfo extends Component {
   }
   saveInfo() {
     const params = {
-      birthdate: 'string',
+      birthdate: null,
       cityId: 0,
       housekeeperIs: 0,
       housekeeperStatus: 0,
@@ -74,9 +84,50 @@ class ResumeInfo extends Component {
       console.log(res);
     });
   }
+  setParams(key, value) {
+    const params = this.state.info;
+    params[key] = value;
+    this.setState({
+      info: params,
+    });
+  }
+  getSexStr() {
+    const valItem = this.state.sexList.find(item => {
+      return item.value === this.state.info.sex;
+    });
+    return valItem.label;
+  }
+  openPicked({list, key, valueKey}) {
+    TopviewGetInstance()
+      .add(
+        <Picker
+          list={list}
+          labelKey="label"
+          valueKey={valueKey}
+          selected={this.state.info[key]}
+          close={() => {
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+          selectedEvent={item => {
+            const info = this.state.info;
+            info[key] = item[valueKey];
+            this.setState({
+              info: info,
+            });
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          pickId: id,
+        });
+      });
+  }
   render() {
     const iconRightFontColor = '#666666';
     const hintColor = '#333';
+    const info = this.state.info;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -91,29 +142,50 @@ class ResumeInfo extends Component {
           }}
         />
         <ScrollView style={baseStyle.content}>
-          <View style={[sty.flexContentBetween, sty.inforItem]}>
+          <TouchableOpacity
+            onPress={() => {
+              selectPhotoTapped({
+                me: this,
+                cb: res => {
+                  this.setParams('pic', res);
+                },
+              });
+            }}
+            style={[sty.flexContentBetween, sty.inforItem]}>
             <Text>头像</Text>
-            <Image
-              style={sty.authorImg}
-              source={require('../../images/author.png')}
-            />
-          </View>
+            {info.pic ? (
+              <Image style={sty.authorImg} source={{uri: info.pic}} />
+            ) : (
+              <Image
+                style={sty.authorImg}
+                source={require('../../images/author.png')}
+              />
+            )}
+          </TouchableOpacity>
           <View style={sty.inputBox}>
             <TextInputLayout
               hintColor={hintColor}
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="李梅亭"
+                defaultValue={info.name}
+                value={info.name}
                 style={sty.textInput}
                 placeholder={'姓名'}
+                onChange={e => {
+                  this.setParams('name', e.nativeEvent.text);
+                }}
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
           <TouchableOpacity
             onPress={() => {
-              this.basicModal.open();
+              this.openPicked({
+                list: this.state.sexList,
+                key: 'sex',
+                valueKey: 'value',
+              });
             }}
             style={sty.inputBox}>
             <TextInputLayout
@@ -121,7 +193,8 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="女"
+                defaultValue={this.getSexStr()}
+                value={this.getSexStr()}
                 style={sty.textInput}
                 placeholder={'性别'}
                 editable={false}
@@ -230,16 +303,21 @@ class ResumeInfo extends Component {
         </BottomModal>
         <BottomModal
           ref={c => {
-            this.basicModal = c;
+            this.sexModal = c;
           }}
           title="请选择"
+          rightCallback={() => {
+            this.setParams('sex', this.state.pickerVal.value);
+          }}
           cancelable={true}>
           <View style={{paddingVertical: 15}}>
             <Scrollpicker
               style={{paddingHorizontal: 0}}
-              list={[['男', '女']]}
+              list={[this.state.sexList]}
               onChange={data => {
-                console.log(data);
+                this.setState({
+                  pickerVal: data,
+                });
               }}
             />
           </View>
@@ -255,6 +333,8 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 44,
     height: 44,
+    borderRadius: 100,
+    resizeMode: 'contain',
   },
   flexContentBetween: {
     flexDirection: 'row',

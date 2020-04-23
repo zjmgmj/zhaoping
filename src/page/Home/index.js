@@ -57,9 +57,13 @@ class TabContent extends Component {
   handleChange = (key, value) => {
     this.setState({
       value: value,
+      currentUser: null,
     });
   };
   UNSAFE_componentWillMount() {
+    this.getNewList();
+  }
+  getNewList() {
     httpGet(
       'news/list',
       {page: 1, size: 2},
@@ -71,6 +75,7 @@ class TabContent extends Component {
       },
     );
   }
+  getPositionList() {}
   render() {
     const renderList = [];
     return (
@@ -162,7 +167,37 @@ class PositionList extends Component {
     super(props);
     this.state = {
       cardNum: 1,
+      list: [],
     };
+  }
+  UNSAFE_componentWillMount() {
+    this.getPositiontypeList();
+  }
+  getPositiontypeList(cardActive) {
+    const currentUser = this.props.currentUser;
+    const params = {
+      page: 1,
+      size: 10,
+      userId: currentUser.userId,
+      positionType: 1,
+    };
+    if (cardActive === 2) {
+      params.isrecommend = 1;
+    }
+    console.log('params', params);
+    global.httpGet('position/list', params, res => {
+      console.log('positionList', res);
+      this.setState({
+        list: res.data.result,
+      });
+      console.log('getPositiontypeList', res);
+    });
+  }
+  cardHandler(cardNum) {
+    this.setState({
+      cardNum: cardNum,
+    });
+    this.getPositiontypeList(cardNum);
   }
   render() {
     const navigate = this.props.navigate.navigate;
@@ -174,9 +209,7 @@ class PositionList extends Component {
             <View style={baseStyle.row}>
               <TouchableOpacity
                 onPress={() => {
-                  this.setState({
-                    cardNum: 1,
-                  });
+                  this.cardHandler(1);
                 }}
                 style={[
                   sty.tabName,
@@ -193,9 +226,7 @@ class PositionList extends Component {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  this.setState({
-                    cardNum: 2,
-                  });
+                  this.cardHandler(2);
                 }}
                 style={[
                   sty.tabName,
@@ -222,45 +253,70 @@ class PositionList extends Component {
           </View>
         </View>
         <View>
-          <TouchableOpacity
-            onPress={() => {
-              navigate('PositionDetail');
-            }}
-            style={[
-              baseStyle.borderBottom,
-              sty.positionItem,
-              baseStyle.flex,
-              baseStyle.justifyBetween,
-            ]}>
-            <View style={[baseStyle.row, {flex: 1}]}>
-              <Image
-                style={sty.positionImg}
-                source={require('../../images/position_1.png')}
-              />
-              <View style={{paddingLeft: 15}}>
-                <Text style={baseStyle.positionTitle}>人力资源主管</Text>
-                <Text style={[baseStyle.ft13, baseStyle.textGray]}>
-                  上海汇之余服饰有限公司
-                </Text>
-                <View style={[baseStyle.row, {marginTop: 3}]}>
-                  <View style={sty.positionTag}>
-                    <Text style={sty.textGray}>上海宝山区</Text>
-                  </View>
-                  <View style={sty.positionTag}>
-                    <Text style={sty.textGray}>1-3年</Text>
-                  </View>
-                  <View style={sty.positionTag}>
-                    <Text style={sty.textGray}>本科</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-            <View>
-              <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
-                18-20K
-              </Text>
-            </View>
-          </TouchableOpacity>
+          {this.state.list.length > 0
+            ? this.state.list.map(item => {
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() => {
+                      navigate('PositionDetail', {id: item.id});
+                    }}
+                    style={[
+                      baseStyle.borderBottom,
+                      sty.positionItem,
+                      baseStyle.flex,
+                      baseStyle.justifyBetween,
+                    ]}>
+                    <View style={[baseStyle.row, {flex: 1}]}>
+                      <Image
+                        style={sty.positionImg}
+                        source={require('../../images/position_1.png')}
+                      />
+                      <View style={{paddingLeft: 15}}>
+                        <Text style={baseStyle.positionTitle}>
+                          {item.positionName}
+                        </Text>
+                        <Text style={[baseStyle.ft13, baseStyle.textGray]}>
+                          {item.companyName}
+                        </Text>
+                        <View style={[baseStyle.row, {marginTop: 3}]}>
+                          {item.cityName ? (
+                            <View style={sty.positionTag}>
+                              <Text style={sty.textGray}>{item.cityName}</Text>
+                            </View>
+                          ) : null}
+                          {item.experienceName ? (
+                            <View style={sty.positionTag}>
+                              <Text style={sty.textGray}>
+                                {item.experienceName}
+                              </Text>
+                            </View>
+                          ) : null}
+                          {item.educationName ? (
+                            <View style={sty.positionTag}>
+                              <Text style={sty.textGray}>
+                                {item.educationName}
+                              </Text>
+                            </View>
+                          ) : null}
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-end',
+                      }}>
+                      <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
+                        18-20K
+                      </Text>
+                      {/* <Text style={baseStyle.textYellow}>分享职位链接</Text> */}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
+            : null}
         </View>
       </View>
     );
@@ -268,13 +324,22 @@ class PositionList extends Component {
 }
 
 @setStatusBar({
-  // barStyle: 'light-content',
   translucent: true,
   backgroundColor: 'transparent',
 })
 class Home extends Component {
   constructor() {
     super();
+    this.state = {
+      currentUser: null,
+    };
+  }
+  componentDidMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      this.setState({
+        currentUser: res,
+      });
+    });
   }
   render() {
     return (
@@ -284,7 +349,12 @@ class Home extends Component {
         <View style={{backgroundColor: '#fff'}}>
           <Notice />
           <TabContent />
-          <PositionList navigate={this.props.navigation} />
+          {this.state.currentUser ? (
+            <PositionList
+              currentUser={this.state.currentUser}
+              navigate={this.props.navigation}
+            />
+          ) : null}
         </View>
       </ScrollView>
     );

@@ -46,7 +46,6 @@ class MineList extends Component {
   }
 }
 @setStatusBar({
-  // barStyle: 'light-content',
   translucent: true,
   backgroundColor: 'transparent',
 })
@@ -54,7 +53,8 @@ class Mine extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userType: 1,
+      // userType: 1,
+      currentUser: null,
       hrMenuList: [
         {
           icon: require('../../images/person_icon.png'),
@@ -79,15 +79,11 @@ class Mine extends Component {
         {
           icon: require('../../images/qiehuan_icon.png'),
           title: '切换HR角色',
+          url: 'Main',
           right: (
-            <TouchableOpacity
-              onPress={() => {
-                console.log('rightPress');
-                debugger;
-                this.props.navigation.navigate('Main');
-              }}>
+            <View>
               <Text style={baseStyle.textYellow}>点击切换</Text>
-            </TouchableOpacity>
+            </View>
           ),
         },
         {
@@ -138,14 +134,11 @@ class Mine extends Component {
         {
           icon: require('../../images/qiehuan_icon.png'),
           title: '切换HR角色',
+          url: 'HrMain',
           right: (
-            <TouchableOpacity
-              onPress={() => {
-                console.log('rightPress');
-                this.props.navigation.navigate('HrMain');
-              }}>
+            <View>
               <Text style={baseStyle.textYellow}>点击切换</Text>
-            </TouchableOpacity>
+            </View>
           ),
         },
       ],
@@ -164,8 +157,17 @@ class Mine extends Component {
       ],
     };
   }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      console.log(res);
+      this.setState({
+        currentUser: res,
+      });
+    });
+  }
   render() {
-    const list = this.state.hrMenuList;
+    const list = this.state.menuList;
+    const currentUser = this.state.currentUser;
     return (
       <ScrollView>
         <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
@@ -221,7 +223,7 @@ class Mine extends Component {
           </ImageBackground>
           <View style={sty.tabBoxSty}>
             <Card style={sty.tabContentSty}>
-              {this.state.userType === 1 ? (
+              {currentUser && currentUser.userType === 1 ? (
                 <View style={[baseStyle.row, sty.hrCard]}>
                   <View
                     style={[
