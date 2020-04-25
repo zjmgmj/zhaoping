@@ -22,6 +22,32 @@ function formatNumber(n) {
   return n[1] ? n : '0' + n;
 }
 
+export const dateMonth = date => {
+  if (date) {
+    let n = date;
+    if (typeof date === 'number') {
+      n = new Date(date);
+    }
+    const years = n.getFullYear();
+    const month = n.getMonth() + 1;
+    return [years, month].map(formatNumber).join('/');
+  } else {
+    return '';
+  }
+};
+export const date2Month = date => {
+  if (date) {
+    let n = date;
+    if (typeof date === 'number') {
+      n = new Date(date);
+    }
+    const years = n.getFullYear();
+    const month = n.getMonth() + 1;
+    return [years, month].map(formatNumber).join('.');
+  } else {
+    return '';
+  }
+};
 export const date2Str = date => {
   if (date) {
     let n = date;

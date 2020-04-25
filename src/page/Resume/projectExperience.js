@@ -15,17 +15,28 @@ import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 // import Datepicker from 'beeshell/dist/components/Datepicker';
-import {Scrollpicker, Datepicker, BottomModal} from 'beeshell';
+import {Scrollpicker, BottomModal, TopviewGetInstance} from 'beeshell';
+import DatePicker from '../../components/DatePicker';
+import Picker from '../../components/picker';
 
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
 })
-class ProjectExperience extends Component {
+class WorkExperience extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pickId: null,
       date: '',
+      salaryList: [],
+      form: {
+        projectName: '',
+        projectDesc: '',
+        projectEnd: new Date(),
+        projectStart: new Date(),
+        resumeId: this.props.navigation.getParam('id'),
+      },
     };
   }
   renderSafeArea() {
@@ -37,9 +48,61 @@ class ProjectExperience extends Component {
       </View>
     );
   }
+  setParams(key, value) {
+    const form = this.state.form;
+    form[key] = value;
+    this.setState({
+      form: form,
+    });
+  }
+  getTime(time) {
+    return global.dateMonth(new Date(time)).replace(/\//g, '.');
+  }
+  openPicked({list, key, valueKey, labelKey = 'label'}) {
+    TopviewGetInstance()
+      .add(
+        <Picker
+          list={list}
+          labelKey={labelKey}
+          valueKey={valueKey}
+          selected={this.state.form[key]}
+          close={() => {
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+          selectedEvent={item => {
+            const form = this.state.form;
+            form[key] = item[valueKey];
+            this.setState({
+              form: form,
+            });
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          pickId: id,
+        });
+      });
+  }
+  save() {
+    global.httpPost(
+      'resumeprojectexp/save',
+      this.state.form,
+      res => {
+        console.log('resumeprojectexp', res);
+        this.props.navigation.state.params.callBack(this.state.form);
+        this.props.navigation.goBack();
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
     const iconRightFontColor = '#666666';
     const hintColor = '#333';
+    const form = this.state.form;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -48,6 +111,8 @@ class ProjectExperience extends Component {
           fullScreen
           onRightPress={() => {
             console.log('保存');
+            this.save();
+            this.props.navigation.goBack();
           }}
           onPressBack={() => {
             this.props.navigation.goBack();
@@ -60,36 +125,32 @@ class ProjectExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="参与的项目名称"
+                defaultValue={form.projectName}
+                value={form.projectName}
                 style={sty.textInput}
                 placeholder={'项目名称'}
+                onChange={e => {
+                  this.setParams('projectName', e.nativeEvent.text);
+                }}
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-          <View style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
-              <TextInput
-                defaultValue="人力资源经理"
-                style={sty.textInput}
-                placeholder={'职位名称'}
-              />
-            </TextInputLayout>
-            <Iconright color={iconRightFontColor} style={sty.Iconright} />
-          </View>
-
           <View style={sty.inputBox}>
             <View>
               <Text style={[baseStyle.textGray, baseStyle.ft12]}>项目时间</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  this.dateModal.open();
-                }}
-                style={[baseStyle.row, baseStyle.paddingTop]}>
-                <Text style={baseStyle.ft15}>开始时间</Text>
+              <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.datePickerRef.open({
+                      value: form.projectStart,
+                      key: 'projectStart',
+                    });
+                  }}>
+                  <Text style={baseStyle.ft15}>
+                    {this.getTime(form.projectStart)}
+                  </Text>
+                </TouchableOpacity>
                 <Text
                   style={[
                     baseStyle.ft15,
@@ -98,8 +159,19 @@ class ProjectExperience extends Component {
                   ]}>
                   -
                 </Text>
-                <Text style={baseStyle.ft15}>结束时间</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.datePickerRef.open({
+                      value: form.projectEnd,
+                      type: 'endTime',
+                      key: 'projectEnd',
+                    });
+                  }}>
+                  <Text style={baseStyle.ft15}>
+                    {this.getTime(form.projectEnd)}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
@@ -109,11 +181,11 @@ class ProjectExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="1 我任职于该公司人力资源经理职位，在职期间负
-                责制定公司人力资源规划、组织设计、岗位职责设
-                计，并根据公司发展不断完善、优化；
-                2、建立并不断完善公司人力资源管理系统，解决
-                引进人、培养人和留人涉及的相关问题；"
+                defaultValue={form.projectDesc}
+                value={form.projectDesc}
+                onChange={e => {
+                  this.setParams('projectDesc', e.nativeEvent.text);
+                }}
                 style={sty.multiTextInput}
                 placeholder={'项目描述'}
                 multiline
@@ -122,52 +194,21 @@ class ProjectExperience extends Component {
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
         </ScrollView>
-        <BottomModal
-          ref={c => {
-            this.dateModal = c;
+        <DatePicker
+          ref={res => {
+            this.datePickerRef = res;
           }}
-          title="请选择日期"
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Datepicker
-              style={{paddingHorizontal: 50}}
-              proportion={[1, 1, 1]}
-              startYear={2010}
-              numberOfYears={10}
-              date={this.state.date}
-              onChange={value => {
-                console.log(value);
-                this.setState({
-                  date: value,
-                });
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
-        <BottomModal
-          ref={c => {
-            this.basicModal = c;
+          type="month"
+          rightCallback={({date, key}) => {
+            this.setParams(key, date);
           }}
-          title="请选择"
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Scrollpicker
-              style={{paddingHorizontal: 0}}
-              list={[['15000元/月', '10000元/月']]}
-              onChange={data => {
-                console.log(data);
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
+        />
       </View>
     );
   }
 }
 
-export default ProjectExperience;
+export default WorkExperience;
 const sty = StyleSheet.create({
   authorImg: {
     width: 44,

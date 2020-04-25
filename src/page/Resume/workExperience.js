@@ -15,7 +15,9 @@ import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 // import Datepicker from 'beeshell/dist/components/Datepicker';
-import {Scrollpicker, Datepicker, Button, BottomModal} from 'beeshell';
+import {Scrollpicker, BottomModal, TopviewGetInstance} from 'beeshell';
+import DatePicker from '../../components/DatePicker';
+import Picker from '../../components/picker';
 
 @setStatusBar({
   translucent: true,
@@ -25,8 +27,32 @@ class WorkExperience extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pickId: null,
       date: '',
+      salaryList: [],
+      form: {
+        companyName: '',
+        depName: '',
+        jobDesc: '',
+        // monthlySalary: 0,
+        salaryId: 0,
+        salaryName: '',
+        positionName: '',
+        servicetimeEnd: new Date(),
+        servicetimeIs: 0,
+        servicetimeStart: new Date(),
+        resumeId: this.props.navigation.getParam('id'),
+      },
     };
+  }
+  UNSAFE_componentWillMount() {
+    global.gettypelist('salary', res => {
+      // 年薪
+      console.log('salaryList', res.data);
+      this.setState({
+        salaryList: res.data,
+      });
+    });
   }
   renderSafeArea() {
     return (
@@ -37,9 +63,63 @@ class WorkExperience extends Component {
       </View>
     );
   }
+  setParams(key, value) {
+    const form = this.state.form;
+    form[key] = value;
+    this.setState({
+      form: form,
+    });
+  }
+  getTime(time) {
+    return global.dateMonth(new Date(time)).replace(/\//g, '.');
+  }
+  openPicked({list}) {
+    TopviewGetInstance()
+      .add(
+        <Picker
+          list={list}
+          labelKey={'dvalue'}
+          valueKey={'id'}
+          selected={this.state.form[key]}
+          close={() => {
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+          selectedEvent={item => {
+            const form = this.state.form;
+            form.salaryId = item.id;
+            form.salaryName = item.dvalue;
+            // valList
+            this.setState({
+              form: form,
+            });
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          pickId: id,
+        });
+      });
+  }
+  save() {
+    global.httpPost(
+      'resumeworkexp/save',
+      this.state.form,
+      res => {
+        console.log('resumeworkexp', res);
+        this.props.navigation.state.params.callBack(this.state.form);
+        this.props.navigation.goBack();
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
     const iconRightFontColor = '#666666';
     const hintColor = '#333';
+    const form = this.state.form;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -48,6 +128,7 @@ class WorkExperience extends Component {
           fullScreen
           onRightPress={() => {
             console.log('保存');
+            this.save();
           }}
           onPressBack={() => {
             this.props.navigation.goBack();
@@ -60,9 +141,13 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="上海宝山科技公司"
+                defaultValue={form.companyName}
+                value={form.companyName}
                 style={sty.textInput}
                 placeholder={'公司名称'}
+                onChange={e => {
+                  this.setParams('companyName', e.nativeEvent.text);
+                }}
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
@@ -73,9 +158,13 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="人力资源经理"
+                defaultValue={form.positionName}
+                value={form.positionName}
                 style={sty.textInput}
                 placeholder={'职位名称'}
+                onChange={e => {
+                  this.setParams('positionName', e.nativeEvent.text);
+                }}
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
@@ -86,7 +175,11 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="行政部"
+                defaultValue={form.depName}
+                value={form.depName}
+                onChange={e => {
+                  this.setParams('depName', e.nativeEvent.text);
+                }}
                 style={sty.textInput}
                 placeholder={'所属部门'}
               />
@@ -96,12 +189,18 @@ class WorkExperience extends Component {
           <View style={sty.inputBox}>
             <View>
               <Text style={[baseStyle.textGray, baseStyle.ft12]}>在职时间</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  this.dateModal.open();
-                }}
-                style={[baseStyle.row, baseStyle.paddingTop]}>
-                <Text style={baseStyle.ft15}>2019.9</Text>
+              <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.datePickerRef.open({
+                      value: form.servicetimeStart,
+                      key: 'servicetimeStart',
+                    });
+                  }}>
+                  <Text style={baseStyle.ft15}>
+                    {this.getTime(form.servicetimeStart)}
+                  </Text>
+                </TouchableOpacity>
                 <Text
                   style={[
                     baseStyle.ft15,
@@ -110,14 +209,28 @@ class WorkExperience extends Component {
                   ]}>
                   -
                 </Text>
-                <Text style={baseStyle.ft15}>至今</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.datePickerRef.open({
+                      value: form.servicetimeEnd,
+                      type: 'endTime',
+                      key: 'servicetimeEnd',
+                    });
+                  }}>
+                  <Text style={baseStyle.ft15}>
+                    {this.getTime(form.servicetimeEnd)}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
           <TouchableOpacity
             onPress={() => {
-              this.basicModal.open();
+              // this.basicModal.open();
+              this.openPicked({
+                list: this.state.salaryList,
+              });
             }}
             style={sty.inputBox}>
             <TextInputLayout
@@ -125,9 +238,9 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="15000元/月"
+                defaultValue=""
                 style={sty.textInput}
-                placeholder={'月薪'}
+                placeholder={'年薪'}
                 editable={false}
               />
             </TextInputLayout>
@@ -139,11 +252,11 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="1 我任职于该公司人力资源经理职位，在职期间负
-                责制定公司人力资源规划、组织设计、岗位职责设
-                计，并根据公司发展不断完善、优化；
-                2、建立并不断完善公司人力资源管理系统，解决
-                引进人、培养人和留人涉及的相关问题；"
+                defaultValue={form.jobDesc}
+                value={form.jobDesc}
+                onChange={e => {
+                  this.setParams('jobDesc', e.nativeEvent.text);
+                }}
                 style={sty.multiTextInput}
                 placeholder={'工作描述'}
                 multiline
@@ -152,29 +265,15 @@ class WorkExperience extends Component {
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
         </ScrollView>
-        <BottomModal
-          ref={c => {
-            this.dateModal = c;
+        <DatePicker
+          ref={res => {
+            this.datePickerRef = res;
           }}
-          title="请选择日期"
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Datepicker
-              style={{paddingHorizontal: 50}}
-              proportion={[1, 1, 1]}
-              startYear={2010}
-              numberOfYears={10}
-              date={this.state.date}
-              onChange={value => {
-                console.log(value);
-                this.setState({
-                  date: value,
-                });
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
+          type="month"
+          rightCallback={({date, key}) => {
+            this.setParams(key, date);
+          }}
+        />
         <BottomModal
           ref={c => {
             this.basicModal = c;

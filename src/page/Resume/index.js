@@ -16,6 +16,37 @@ import {baseStyle} from '../../components/baseStyle';
 class NotData extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      currentUser: null,
+      list: [],
+    };
+  }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      this.setState({
+        currentUser: res,
+      });
+      this.getResumeList();
+    });
+  }
+  getResumeList() {
+    global.httpGet(
+      'resume/list',
+      {
+        page: 1,
+        size: 10,
+        userId: this.state.currentUser.userId,
+      },
+      res => {
+        console.log(res);
+        this.setState({
+          list: res.data.result,
+        });
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
   render() {
     return (
@@ -66,7 +97,11 @@ class Resume extends Component {
         />
         <NotData
           onPressAdd={() => {
-            this.props.navigation.navigate('ResumeAdd');
+            this.props.navigation.navigate('ResumeAdd', {
+              callBack: res => {
+                console.log(res);
+              },
+            });
           }}
         />
       </View>

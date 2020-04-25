@@ -33,15 +33,30 @@ class ResumeInfo extends Component {
     super(props);
     this.state = {
       pickerVal: null,
+      pickDate: '',
+      pickKey: '',
       sexList: [{label: '男', value: 1}, {label: '女', value: 2}],
       info: {
         userPic: '',
-        userRealname: '',
         userSex: 0,
-        birthdate: '',
+        birthDate: new Date().getTime(),
+        workingDate: new Date().getTime(),
         sex: 2,
+        phone: '',
+        wechat: '',
+        userId: null,
       },
+      currentUser: null,
     };
+  }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      console.log(res);
+      this.setState({
+        currentUser: res,
+      });
+      this.setParams('userId', res.userId);
+    });
   }
   renderSafeArea() {
     return (
@@ -53,35 +68,22 @@ class ResumeInfo extends Component {
     );
   }
   saveInfo() {
-    const params = {
-      birthdate: null,
-      cityId: 0,
-      housekeeperIs: 0,
-      housekeeperStatus: 0,
-      housekeeperTitle: 'string',
-      latitude: 0,
-      longitude: 0,
-      provinceId: 0,
-      skillDesc: 'string',
-      skillLabel: 'string',
-      userAccount: 0,
-      userCard: 'string',
-      userCardFanpic: 'string',
-      userCardPic: 'string',
-      userDate: '2020-04-16T12:00:15.698Z',
-      userId: 0,
-      userIntroduction: 'string',
-      userLogin: 'string',
-      userNickname: 'string',
-      userPassword: 'string',
-      userPic: 'string',
-      userRealname: 'string',
-      userRegion: 0,
-      userSex: 0,
-      userType: 0,
-    };
-    global.httpPost('user/update', params, res => {
-      console.log(res);
+    const params = this.state.info;
+    params.workdate = new Date(params.workingDate).getFullYear();
+    const workdateTime = new Date(params.workingDate).getTime();
+    const nowDate = new Date().getTime();
+    const date = nowDate - workdateTime;
+    const year = parseInt(date / 1000 / 60 / 60 / 24 / 365);
+    params.workyear = year;
+    console.log(params);
+    // this.props.navigation.state.params.callBack(params);
+    // this.props.navigation.goBack();
+    // 'user/update'
+    global.httpPost('resume/save', params, res => {
+      console.log('resume', res);
+      params.id = res.data;
+      this.props.navigation.state.params.callBack(params);
+      this.props.navigation.goBack();
     });
   }
   setParams(key, value) {
@@ -135,7 +137,7 @@ class ResumeInfo extends Component {
           right="保存"
           fullScreen
           onRightPress={() => {
-            console.log('保存');
+            this.saveInfo();
           }}
           onPressBack={() => {
             this.props.navigation.goBack();
@@ -204,6 +206,10 @@ class ResumeInfo extends Component {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              this.setState({
+                pickDate: global.date2Str(this.state.info.workingDate),
+                pickKey: 'workingDate',
+              });
               this.dateModal.open();
             }}
             style={sty.inputBox}>
@@ -212,7 +218,8 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="2014.6"
+                value={global.date2Str(this.state.info.workingDate)}
+                defaultValue={global.date2Str(this.state.info.workingDate)}
                 style={sty.textInput}
                 placeholder={'参加工作时间'}
                 editable={false}
@@ -222,6 +229,10 @@ class ResumeInfo extends Component {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              this.setState({
+                pickDate: global.date2Str(this.state.info.birthDate),
+                pickKey: 'birthDate',
+              });
               this.dateModal.open();
             }}
             style={sty.inputBox}>
@@ -230,7 +241,8 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="1992.9"
+                value={global.date2Str(this.state.info.birthDate)}
+                defaultValue={global.date2Str(this.state.info.birthDate)}
                 style={sty.textInput}
                 placeholder={'出生年月'}
                 editable={false}
@@ -244,9 +256,13 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="1896773456"
+                defaultValue={info.phone}
+                value={info.phone}
                 style={sty.textInput}
                 placeholder={'手机号码'}
+                onChange={e => {
+                  this.setParams('phone', e.nativeEvent.text);
+                }}
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
@@ -257,9 +273,13 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="89986799@qq.com"
+                defaultValue={info.email}
+                value={info.email}
                 style={sty.textInput}
                 placeholder={'电子邮箱'}
+                onChange={e => {
+                  this.setParams('email', e.nativeEvent.text);
+                }}
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
@@ -270,7 +290,11 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue="zu178678990"
+                defaultValue={info.wechat}
+                value={info.wechat}
+                onChange={e => {
+                  this.setParams('wechat', e.nativeEvent.text);
+                }}
                 style={sty.textInput}
                 placeholder={'微信号码'}
               />
@@ -283,40 +307,35 @@ class ResumeInfo extends Component {
             this.dateModal = c;
           }}
           title="请选择日期"
+          rightCallback={() => {
+            if (this.state.pickDate) {
+              const nowDate = this.state.pickDate.split('-');
+              const oldDate = global.date2Str(
+                new Date(this.state.info.pickDate),
+              );
+              const oldDateList = oldDate.split('/');
+              nowDate.map((item, idx) => {
+                if (item) {
+                  oldDateList[idx] = item;
+                }
+              });
+              this.setParams(
+                this.state.pickKey,
+                new Date(oldDateList.toString().replace(/,/g, '/')).getTime(),
+              );
+            }
+          }}
           cancelable={true}>
           <View style={{paddingVertical: 15}}>
             <Datepicker
               style={{paddingHorizontal: 50}}
               proportion={[1, 1, 1]}
-              startYear={2010}
-              numberOfYears={10}
-              date={this.state.birthdate}
+              startYear={1992}
+              numberOfYears={50}
+              date={this.state.pickDate}
               onChange={value => {
-                console.log(value);
                 this.setState({
-                  birthdate: value,
-                });
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
-        <BottomModal
-          ref={c => {
-            this.sexModal = c;
-          }}
-          title="请选择"
-          rightCallback={() => {
-            this.setParams('sex', this.state.pickerVal.value);
-          }}
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Scrollpicker
-              style={{paddingHorizontal: 0}}
-              list={[this.state.sexList]}
-              onChange={data => {
-                this.setState({
-                  pickerVal: data,
+                  pickDate: value,
                 });
               }}
             />

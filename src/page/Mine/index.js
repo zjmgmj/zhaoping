@@ -135,6 +135,7 @@ class Mine extends Component {
           icon: require('../../images/qiehuan_icon.png'),
           title: '切换HR角色',
           url: 'HrMain',
+          event: () => {},
           right: (
             <View>
               <Text style={baseStyle.textYellow}>点击切换</Text>
@@ -276,6 +277,13 @@ class Mine extends Component {
                   key={idx}
                   onPress={() => {
                     this.props.navigation.navigate(item.url);
+                    // if () {
+                    //   global.localStorage.set({
+                    //     key: 'currentUser',
+                    //     data: userInfo,
+                    //     expires: null,
+                    //   });
+                    // }
                   }}>
                   <MineList item={item} />
                 </TouchableOpacity>

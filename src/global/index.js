@@ -6,6 +6,8 @@ import {
   datetime2Str,
   date2Time,
   modal,
+  dateMonth,
+  date2Month,
 } from '../utils/mixins';
 global.localStorage = localStorage;
 global.httpGet = httpGet;
@@ -17,3 +19,5 @@ global.date2Str = date2Str;
 global.datetime2Str = datetime2Str;
 global.date2Time = date2Time;
 global.modal = modal;
+global.dateMonth = dateMonth;
+global.date2Month = date2Month;

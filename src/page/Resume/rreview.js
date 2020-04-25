@@ -25,7 +25,7 @@ import Picker from '../../components/picker';
   translucent: true,
   backgroundColor: 'transparent',
 })
-class Resume extends Component {
+class rreview extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,7 +40,7 @@ class Resume extends Component {
         resumeStatus: 0,
         resumeIntention: '',
         selfEvaluation: '',
-        id: 3,
+        id: 1,
       },
       jobStatus: '',
       resumeStatus: '',
@@ -67,7 +67,6 @@ class Resume extends Component {
     });
     global.gettypelist('resumeStatus', res => {
       // 简历设置
-      console.log('resumeStatus', res.data);
       this.setState({
         resumeStatusList: res.data,
       });
@@ -83,61 +82,11 @@ class Resume extends Component {
       return '';
     }
   }
-  setResume(key, value) {
-    const resume = this.state.resume;
-    resume[key] = value;
-    this.setState({
-      resume: resume,
-    });
-  }
   getAge() {
     const nowDate = new Date().getTime();
     const birthDate = this.state.resume.birthDate;
     const date = nowDate - birthDate;
     return parseInt(date / 1000 / 60 / 60 / 24 / 365);
-  }
-  openPicked({list, key, valueKey, labelKey = 'label'}) {
-    TopviewGetInstance()
-      .add(
-        <Picker
-          list={list}
-          labelKey={labelKey}
-          valueKey={valueKey}
-          selected={this.state.resume[key]}
-          close={() => {
-            TopviewGetInstance().remove(this.state.pickId);
-          }}
-          selectedEvent={item => {
-            const resume = this.state.resume;
-            resume[key] = item[valueKey];
-            this.setState({
-              resume: resume,
-            });
-            TopviewGetInstance().remove(this.state.pickId);
-            this.updateResume();
-          }}
-        />,
-      )
-      .then(id => {
-        this.setState({
-          pickId: id,
-        });
-      });
-  }
-  setWorkExperience(res) {
-    console.log(res);
-    const workExperienceList = this.state.workExperienceList;
-    workExperienceList.push(res);
-    this.setState({
-      workExperienceList: workExperienceList,
-    });
-  }
-  setProjectExperience(res) {
-    const projectExperienceList = this.state.projectExperienceList;
-    projectExperienceList.push(res);
-    this.setState({
-      projectExperienceList: projectExperienceList,
-    });
   }
   getJobStatus(key) {
     const jobStatus = this.state.resume.jobStatus;
@@ -149,9 +98,8 @@ class Resume extends Component {
   getResumeStatus(key) {
     const resumeStatus = this.state.resume.resumeStatus;
     const resumeStatusItem = this.state.resumeStatusList.find(item => {
-      return item.id === resumeStatus;
+      return item.value === resumeStatus;
     });
-    console.log('resumeStatusItem', resumeStatusItem);
     if (resumeStatusItem) {
       return resumeStatusItem[key];
     } else {
@@ -175,37 +123,16 @@ class Resume extends Component {
     return (
       <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
         <Header
-          title="添加简历"
-          right="预览简历"
+          title="简历预览"
           rightStyle={baseStyle.textYellow}
           fullScreen
-          onRightPress={() => {
-            console.log('预览简历');
-            this.props.navigation.navigate('Rreview', {
-              resume: this.state.resume,
-              workExperienceList: this.state.workExperienceList,
-              projectExperienceList: this.state.projectExperienceList,
-              educationalExpList: this.state.educationalExpList,
-            });
-          }}
           onPressBack={() => {
             this.props.navigation.goBack();
           }}
         />
         <ScrollView>
           <View style={{padding: 10}}>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('ResumeInfo', {
-                  callBack: res => {
-                    console.log('ResumeInfo', res);
-                    this.setState({
-                      resume: Object.assign(resume, res),
-                    });
-                  },
-                });
-              }}
-              style={[sty.inforItem, sty.flexContentBetween]}>
+            <View style={[sty.inforItem, sty.flexContentBetween]}>
               <View>
                 <View style={baseStyle.row}>
                   <Text>个人信息</Text>
@@ -223,34 +150,17 @@ class Resume extends Component {
                 style={sty.authorImg}
                 source={require('../../images/author.png')}
               />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.openPicked({
-                  list: this.state.resumeStatusList,
-                  key: 'resumeStatus',
-                  labelKey: 'code',
-                  valueKey: 'id',
-                });
-              }}
-              style={[sty.inforItem, sty.flexContentBetween]}>
+            </View>
+            <View style={[sty.inforItem, sty.flexContentBetween]}>
               <Text>求职状态</Text>
               <View style={sty.rigtSty}>
                 <Text style={baseStyle.textGray}>
-                  {this.getResumeStatus('code')}
+                  {this.getResumeStatus('dvalue')}
                 </Text>
                 <Iconright color="#999999" style={baseStyle.paddingLeft} />
               </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('PositionCategory', {
-                  callBack: res => {
-                    this.setResume('resumeIntention', res.name);
-                  },
-                });
-              }}
-              style={sty.inforItem}>
+            </View>
+            <View style={sty.inforItem}>
               <View
                 style={[
                   sty.flexContentBetween,
@@ -263,8 +173,8 @@ class Resume extends Component {
               <Text style={[baseStyle.textGray, baseStyle.paddingTop]}>
                 {resume.resumeIntention || '请选择职业意向'}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={sty.inforItem}>
+            </View>
+            <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
                 <Text>技能标签</Text>
                 <Iconedit />
@@ -282,26 +192,12 @@ class Resume extends Component {
                 </Button>
                 <Text style={baseStyle.textGray}>定义你的个性化标签</Text>
               </View>
-            </TouchableOpacity>
+            </View>
             <View style={sty.inforItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (!resume.id) {
-                    Alert.alert('提示', '请先完善个人信息');
-                    return false;
-                  }
-                  this.props.navigation.navigate('ResumeWorkExperience', {
-                    id: resume.id,
-                    callBack: res => {
-                      this.setWorkExperience(res);
-                      console.log(res);
-                    },
-                  });
-                }}
-                style={sty.flexContentBetween}>
+              <View style={sty.flexContentBetween}>
                 <Text>工作经历</Text>
                 <IconcircleAdd />
-              </TouchableOpacity>
+              </View>
               {this.state.workExperienceList.map(item => {
                 return (
                   <View style={baseStyle.paddingTop}>
@@ -325,20 +221,9 @@ class Resume extends Component {
               })}
             </View>
             <View style={sty.inforItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate('ResumeProjectExperience', {
-                    id: resume.id,
-                    callBack: res => {
-                      console.log('callBack', res);
-                      this.setProjectExperience(res);
-                    },
-                  });
-                }}
-                style={sty.flexContentBetween}>
+              <View style={sty.flexContentBetween}>
                 <Text>项目经历</Text>
-                <IconcircleAdd />
-              </TouchableOpacity>
+              </View>
               {this.state.projectExperienceList.map(item => {
                 return (
                   <View style={baseStyle.paddingTop}>
@@ -360,27 +245,9 @@ class Resume extends Component {
               })}
             </View>
             <View style={sty.inforItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate(
-                    'ResumeEducationalExperience',
-                    {
-                      id: resume.id,
-                      callBack: res => {
-                        const educationalExpList = this.state
-                          .educationalExpList;
-                        educationalExpList.push(res);
-                        this.setState({
-                          educationalExpList: educationalExpList,
-                        });
-                      },
-                    },
-                  );
-                }}
-                style={sty.flexContentBetween}>
+              <View style={sty.flexContentBetween}>
                 <Text>教育经历</Text>
-                <IconcircleAdd />
-              </TouchableOpacity>
+              </View>
               {this.state.educationalExpList.map(item => {
                 return (
                   <View style={baseStyle.paddingTop}>
@@ -404,25 +271,9 @@ class Resume extends Component {
               })}
             </View>
             <View style={sty.inforItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate('Evaluation', {
-                    selfEvaluation: this.state.resume.selfEvaluation,
-                    callBack: res => {
-                      console.log(res);
-                      const resume = this.state.resume;
-                      resume.selfEvaluation = res;
-                      this.setState({
-                        resume: resume,
-                      });
-                      this.updateResume();
-                    },
-                  });
-                }}
-                style={sty.flexContentBetween}>
+              <View style={sty.flexContentBetween}>
                 <Text>自我评价</Text>
-                <Iconedit />
-              </TouchableOpacity>
+              </View>
               {resume.selfEvaluation ? (
                 <View style={baseStyle.paddingTop}>
                   <Text style={baseStyle.textGray}>
@@ -441,19 +292,9 @@ class Resume extends Component {
               </View>
             </View> */}
             <View style={sty.inforItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  // this.props.navigation.navigate('ResumePrivacySet');
-                  this.openPicked({
-                    list: this.state.jobStatusList,
-                    key: 'jobStatus',
-                    valueKey: 'value',
-                  });
-                }}
-                style={sty.flexContentBetween}>
+              <View style={sty.flexContentBetween}>
                 <Text>简历设置</Text>
-                <Iconedit />
-              </TouchableOpacity>
+              </View>
               <View style={baseStyle.paddingTop}>
                 <Text>{this.getJobStatus('label')}</Text>
               </View>
@@ -485,7 +326,7 @@ class Resume extends Component {
   }
 }
 
-export default Resume;
+export default rreview;
 const sty = StyleSheet.create({
   subBtn: {
     width: 140,

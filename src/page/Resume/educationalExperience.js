@@ -15,18 +15,39 @@ import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 // import Datepicker from 'beeshell/dist/components/Datepicker';
-import {Scrollpicker, Datepicker, Button, BottomModal} from 'beeshell';
+import {TopviewGetInstance} from 'beeshell';
+import DatePicker from '../../components/DatePicker';
+import Picker from '../../components/picker';
 
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
 })
-class WorkExperience extends Component {
+class EducationalExperience extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pickId: null,
       date: '',
+      educationList: [],
+      form: {
+        educationId: null,
+        schoolName: '',
+        schoolEnd: new Date(),
+        schoolStart: new Date(),
+        resumeId: this.props.navigation.getParam('id'),
+      },
     };
+  }
+  UNSAFE_componentWillMount() {
+    debugger;
+    global.gettypelist('education', res => {
+      // 学历
+      console.log('educationList', res.data);
+      this.setState({
+        educationList: res.data,
+      });
+    });
   }
   renderSafeArea() {
     return (
@@ -37,9 +58,73 @@ class WorkExperience extends Component {
       </View>
     );
   }
+  openPicked({list, key, valueKey, labelKey = 'label'}) {
+    debugger;
+    console.log(list);
+    TopviewGetInstance()
+      .add(
+        <Picker
+          list={list}
+          labelKey={labelKey}
+          valueKey={valueKey}
+          selected={this.state.form[key]}
+          close={() => {
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+          selectedEvent={item => {
+            const form = this.state.form;
+            form[key] = item[valueKey];
+            this.setState({
+              form: form,
+            });
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          pickId: id,
+        });
+      });
+  }
+  setParams(key, value) {
+    const form = this.state.form;
+    form[key] = value;
+    this.setState({
+      form: form,
+    });
+  }
+
+  getTime(time) {
+    return global.dateMonth(new Date(time)).replace(/\//g, '.');
+  }
+  save() {
+    global.httpPost(
+      'resumeschoolexp/save',
+      this.state.form,
+      res => {
+        console.log('resumeschoolexp', res);
+        this.props.navigation.state.params.callBack(this.state.form);
+        this.props.navigation.goBack();
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
+  getEducationName(id) {
+    const education = this.state.educationList.find(item => {
+      return item.id === id;
+    });
+    if (education) {
+      return education.dvalue;
+    } else {
+      return '';
+    }
+  }
   render() {
-    const iconRightFontColor = '#666666';
-    const hintColor = '#333';
+    const iconRightFontColor = '#D3CECE';
+    const form = this.state.form;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -48,6 +133,7 @@ class WorkExperience extends Component {
           fullScreen
           onRightPress={() => {
             console.log('保存');
+            this.save();
           }}
           onPressBack={() => {
             this.props.navigation.goBack();
@@ -55,40 +141,64 @@ class WorkExperience extends Component {
         />
         <ScrollView style={baseStyle.content}>
           <View style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
+            <View style={{flex: 1}}>
+              <Text style={[sty.ftColor, baseStyle.ft12]}>学校名称</Text>
               <TextInput
-                defaultValue="如：清华大学"
+                defaultValue={form.schoolName}
+                value={form.schoolName}
                 style={sty.textInput}
-                placeholder={'学校名称'}
+                placeholderTextColor="#666666"
+                placeholder={'如：清华大学'}
+                onChange={e => {
+                  form.schoolName = e.nativeEvent.text;
+                  this.setState({
+                    form: form,
+                  });
+                }}
               />
-            </TextInputLayout>
+            </View>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
           <View style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
+            <TouchableOpacity
+              onPress={() => {
+                this.openPicked({
+                  list: this.state.educationList,
+                  key: 'educationId',
+                  valueKey: 'id',
+                  labelKey: 'dvalue',
+                });
+              }}
+              style={{flex: 1}}>
+              <Text style={[sty.ftColor, baseStyle.ft12]}>学历</Text>
               <TextInput
-                defaultValue="如：本科"
+                defaultValue={this.getEducationName(
+                  this.state.form.educationId,
+                )}
+                value={this.getEducationName(this.state.form.educationId)}
                 style={sty.textInput}
-                placeholder={'学历'}
+                placeholderTextColor="#666666"
+                placeholder={'如：本科'}
+                editable={false}
               />
-            </TextInputLayout>
+            </TouchableOpacity>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
           <View style={sty.inputBox}>
             <View>
-              <Text style={[baseStyle.textGray, baseStyle.ft12]}>在校时间</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  this.dateModal.open();
-                }}
-                style={[baseStyle.row, baseStyle.paddingTop]}>
-                <Text style={baseStyle.ft15}>入学时间</Text>
+              <Text style={[sty.ftColor, baseStyle.ft12]}>在校时间</Text>
+              <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.datePickerRef.open({
+                      value: form.schoolStart,
+                      key: 'schoolStart',
+                    });
+                  }}>
+                  <Text style={baseStyle.ft15}>
+                    {this.getTime(form.schoolStart)}
+                  </Text>
+                </TouchableOpacity>
                 <Text
                   style={[
                     baseStyle.ft15,
@@ -97,58 +207,38 @@ class WorkExperience extends Component {
                   ]}>
                   -
                 </Text>
-                <Text style={baseStyle.ft15}>毕业时间</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.datePickerRef.open({
+                      value: form.schoolEnd,
+                      type: 'endTime',
+                      key: 'schoolEnd',
+                    });
+                  }}>
+                  <Text style={baseStyle.ft15}>
+                    {this.getTime(form.schoolEnd)}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
         </ScrollView>
-        <BottomModal
-          ref={c => {
-            this.dateModal = c;
+        <DatePicker
+          ref={res => {
+            this.datePickerRef = res;
           }}
-          title="请选择日期"
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Datepicker
-              style={{paddingHorizontal: 50}}
-              proportion={[1, 1, 1]}
-              startYear={2010}
-              numberOfYears={10}
-              date={this.state.date}
-              onChange={value => {
-                console.log(value);
-                this.setState({
-                  date: value,
-                });
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
-        <BottomModal
-          ref={c => {
-            this.basicModal = c;
+          type="month"
+          rightCallback={({date, key}) => {
+            this.setParams(key, date);
           }}
-          title="请选择"
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Scrollpicker
-              style={{paddingHorizontal: 0}}
-              list={[['15000元/月', '10000元/月']]}
-              onChange={data => {
-                console.log(data);
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
+        />
       </View>
     );
   }
 }
 
-export default WorkExperience;
+export default EducationalExperience;
 const sty = StyleSheet.create({
   authorImg: {
     width: 44,
@@ -178,6 +268,7 @@ const sty = StyleSheet.create({
     // paddingTop: 10,
     // paddingBottom: 10,
     color: '#333',
+    paddingLeft: 0,
   },
   inputLayout: {
     color: '#000',
@@ -191,5 +282,10 @@ const sty = StyleSheet.create({
   inputBox: {
     position: 'relative',
     paddingTop: 10,
+    borderBottomColor: '#E8E7E7',
+    borderBottomWidth: 0.5,
+  },
+  ftColor: {
+    color: '#666',
   },
 });

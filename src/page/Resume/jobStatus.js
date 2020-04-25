@@ -12,6 +12,18 @@ import {Icontick} from '../../iconfont/Icontick';
 class JobStatus extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      jobStatusList: [
+        {
+          label: '可见',
+          value: 0,
+        },
+        {
+          label: '不可见',
+          value: 1,
+        },
+      ],
+    };
   }
   render() {
     return (
@@ -28,22 +40,14 @@ class JobStatus extends Component {
           }}
         />
         <View style={[baseStyle.paddingLeft, baseStyle.paddingRight]}>
-          <View style={[sty.flexContentBetween, sty.inforItem]}>
-            <Text>考虑机会</Text>
-            {/* <Icontick color="#AC3E40" /> */}
-          </View>
-          <View style={[sty.flexContentBetween, sty.inforItem]}>
-            <Text>随时到岗</Text>
-            {/* <Icontick color="#AC3E40" /> */}
-          </View>
-          <View style={[sty.flexContentBetween, sty.inforItem]}>
-            <Text>月内到岗</Text>
-            <Icontick color="#AC3E40" />
-          </View>
-          <View style={[sty.flexContentBetween, sty.inforItem]}>
-            <Text>暂不考虑</Text>
-            {/* <Icontick color="#AC3E40" /> */}
-          </View>
+          {this.state.jobStatusList.length.map(item => {
+            return (
+              <View style={[sty.flexContentBetween, sty.inforItem]}>
+                <Text>{item.label}</Text>
+                <Icontick color="#AC3E40" />
+              </View>
+            );
+          })}
         </View>
       </View>
     );

@@ -46,6 +46,8 @@ import IndustryNews from './HR/IndustryNews';
 // import IndustryRelease from './HR/IndustryNews/release';
 import AddressBook from './HR/AddressBook';
 import PersonInfo from './HR/PersonInfo';
+import Evaluation from './Resume/evaluation';
+import Rreview from './Resume/rreview';
 
 const personNavigator = {
   Home: {
@@ -168,6 +170,8 @@ const StackRouteConfigs = createStackNavigator(
     // IndustryRelease,
     PersonInfo,
     Dynamic,
+    Evaluation,
+    Rreview,
   },
   {
     defaultNavigationOptions: {
