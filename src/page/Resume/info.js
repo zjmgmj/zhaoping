@@ -50,6 +50,9 @@ class ResumeInfo extends Component {
     };
   }
   UNSAFE_componentWillMount() {
+    this.setState({
+      info: this.props.navigation.getParam('data'),
+    });
     global.localStorage.get({key: 'currentUser'}).then(res => {
       console.log(res);
       this.setState({
@@ -76,10 +79,11 @@ class ResumeInfo extends Component {
     const year = parseInt(date / 1000 / 60 / 60 / 24 / 365);
     params.workyear = year;
     console.log(params);
-    // this.props.navigation.state.params.callBack(params);
-    // this.props.navigation.goBack();
-    // 'user/update'
-    global.httpPost('resume/save', params, res => {
+    let url = 'user/save';
+    if (params.id) {
+      url = 'user/update';
+    }
+    global.httpPost(url, params, res => {
       console.log('resume', res);
       params.id = res.data;
       this.props.navigation.state.params.callBack(params);

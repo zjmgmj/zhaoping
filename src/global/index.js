@@ -8,6 +8,8 @@ import {
   modal,
   dateMonth,
   date2Month,
+  getAge,
+  gettypelistName,
 } from '../utils/mixins';
 global.localStorage = localStorage;
 global.httpGet = httpGet;
@@ -21,3 +23,5 @@ global.date2Time = date2Time;
 global.modal = modal;
 global.dateMonth = dateMonth;
 global.date2Month = date2Month;
+global.getAge = getAge;
+global.gettypelistName = gettypelistName;

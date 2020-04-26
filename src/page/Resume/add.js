@@ -59,6 +59,10 @@ class Resume extends Component {
     };
   }
   UNSAFE_componentWillMount() {
+    const resumeId = this.props.navigation.getParam('id');
+    if (resumeId) {
+      this.getDetail(resumeId);
+    }
     global.gettypelist('education', res => {
       // 学历
       this.setState({
@@ -72,6 +76,21 @@ class Resume extends Component {
         resumeStatusList: res.data,
       });
     });
+  }
+  getDetail(id) {
+    global.httpGet(
+      'resume/detail',
+      {id: id},
+      res => {
+        console.log('getDetail', res);
+        this.setState({
+          resume: res.data,
+        });
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
   getEducationName(id) {
     const education = this.state.educationList.find(item => {
@@ -197,6 +216,7 @@ class Resume extends Component {
             <TouchableOpacity
               onPress={() => {
                 this.props.navigation.navigate('ResumeInfo', {
+                  data: resume,
                   callBack: res => {
                     console.log('ResumeInfo', res);
                     this.setState({

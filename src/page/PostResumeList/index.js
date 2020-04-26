@@ -9,12 +9,12 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import {Button} from 'beeshell/dist/components/Button';
 import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 // import editResume from './editResume';
-import Iconright from '../../iconfont/Iconright';
+import Icontick from '../../iconfont/Icontick';
+import {Radio, Button} from 'beeshell';
 
 class NotData extends Component {
   constructor(props) {
@@ -53,6 +53,7 @@ class ResumeItem extends Component {
   }
   render() {
     const item = this.props.item;
+    const activeId = this.props.activeId;
     return (
       <View
         style={[
@@ -84,7 +85,9 @@ class ResumeItem extends Component {
             </View>
           </View>
         </View>
-        <Iconright color="#D3CECE" />
+        {activeId === item.id ? <Icontick color="#D9B06F" /> : null}
+
+        {/* <Iconright color="#D3CECE" /> */}
       </View>
     );
   }
@@ -94,7 +97,7 @@ class ResumeItem extends Component {
   translucent: true,
   backgroundColor: 'transparent',
 })
-class Resume extends Component {
+class PostResumeList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -102,6 +105,7 @@ class Resume extends Component {
       videoSource: null,
       list: [],
       currentUser: null,
+      activeId: null,
     };
   }
   UNSAFE_componentWillMount() {
@@ -131,12 +135,20 @@ class Resume extends Component {
       },
     );
   }
+
   render() {
     const list = this.state.list;
     return (
       <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
         <Header
           fullScreen
+          title="简历列表"
+          right="确定"
+          onRightPress={() => {
+            console.log('---');
+            this.props.navigation.state.params.callBack(this.state.activeId);
+            this.props.navigation.goBack();
+          }}
           onPressBack={() => {
             this.props.navigation.goBack();
           }}
@@ -148,17 +160,34 @@ class Resume extends Component {
                 <TouchableOpacity
                   key={item.id}
                   onPress={() => {
-                    this.props.navigation.navigate('ResumeAdd', {
-                      id: item.id,
-                      callBack: res => {
-                        console.log(res);
-                      },
+                    this.setState({
+                      activeId: item.id,
                     });
                   }}>
-                  <ResumeItem item={item} />
+                  <ResumeItem activeId={this.state.activeId} item={item} />
                 </TouchableOpacity>
               );
             })}
+            {/* <Radio
+              value={this.state.value}
+              iconPosition="right"
+              onChange={value => {
+                console.log('Radio', value);
+                this.setState({
+                  value,
+                });
+              }}>
+              {list.map(item => {
+                return (
+                  <Radio.Item
+                    value={item.id}
+                    renderItem={() => {
+                      return <ResumeItem item={item} />;
+                    }}
+                  />
+                );
+              })}
+            </Radio> */}
           </ScrollView>
         ) : (
           <NotData
@@ -176,7 +205,7 @@ class Resume extends Component {
   }
 }
 
-export default Resume;
+export default PostResumeList;
 const sty = StyleSheet.create({
   borderLeft: {
     borderLeftWidth: 0.5,

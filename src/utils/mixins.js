@@ -1,11 +1,11 @@
 import React from 'react';
-import { Text } from 'react-native';
-import { httpGet } from './httpUtil';
-import Modal, { ModalContent } from 'react-native-modals';
+import {Text} from 'react-native';
+import {httpGet, httpGetPromise} from './httpUtil';
+import Modal, {ModalContent} from 'react-native-modals';
 export const gettypelist = (code, success, failure) => {
   httpGet(
     'dictionary/gettypelist',
-    { code: code },
+    {code: code},
     res => {
       console.log(res);
       success(res);
@@ -17,7 +17,7 @@ export const gettypelist = (code, success, failure) => {
   );
 };
 
-function formatNumber (n) {
+function formatNumber(n) {
   n = n.toString();
   return n[1] ? n : '0' + n;
 }
@@ -113,4 +113,10 @@ export const modal = (modalShow, modalContent, callBack) => {
       </ModalContent>
     </Modal>
   );
+};
+
+export const getAge = birthDate => {
+  const nowDate = new Date().getTime();
+  const date = nowDate - birthDate;
+  return parseInt(date / 1000 / 60 / 60 / 24 / 365);
 };

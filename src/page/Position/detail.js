@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  Alert,
 } from 'react-native';
 import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
@@ -27,24 +28,46 @@ class Detail extends Component {
     super(props);
     this.state = {
       shareModal: false,
-      detail: null,
+      detail: {
+        positionBenefits: [],
+        currentUser: null,
+      },
     };
   }
   UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      this.setState({
+        currentUser: res,
+      });
+    });
     this.getDetail();
+  }
+  gettypelist(id, type, key) {
+    global.gettypelist(type, res => {
+      const resData = res.data;
+      const findData = resData.find(item => {
+        return item.id === id;
+      });
+      const detail = this.state.detail;
+      detail[key] = findData.dvalue;
+      this.setState({
+        detail: detail,
+      });
+    });
   }
   getDetail() {
     const id = this.props.navigation.getParam('id');
-    console.log('id', id);
     global.httpGet(
       'position/detail',
       {id: id},
       res => {
         console.log('positionDetail', res);
         if (res.code === 1) {
+          const resData = res.data;
           this.setState({
-            detail: res.data,
+            detail: resData,
           });
+          this.gettypelist(resData.salaryId, 'salary', 'salaryName');
         }
       },
       err => {
@@ -52,13 +75,33 @@ class Detail extends Component {
       },
     );
   }
-  positionrecord() {}
+  positionrecord(resumeId) {
+    const detail = this.state.detail;
+    const params = {
+      positionId: detail.id,
+      resumeId: resumeId,
+      // status: 0,
+      userId: this.state.currentUser.userId,
+    };
+    console.log('params', params);
+    global.httpPost(
+      'positionrecord/save',
+      params,
+      res => {
+        Alert.alert(res.msg);
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   onpenModal() {
     this.setState({
       shareModal: true,
     });
   }
   render() {
+    const detail = this.state.detail;
     return (
       <View
         style={{backgroundColor: '#FBFBFB', height: baseStyle.screenHeight}}>
@@ -82,18 +125,20 @@ class Detail extends Component {
         <ScrollView>
           <View style={[baseStyle.bgWhite, baseStyle.content]}>
             <View style={[baseStyle.row, baseStyle.justifyBetween]}>
-              <Text style={baseStyle.ft16}>人力资源主管</Text>
-              <Text style={baseStyle.textRed}>18-20K</Text>
+              <Text style={baseStyle.ft16}>{detail.positionName || ''}</Text>
+              <Text style={baseStyle.textRed}>{detail.salaryName || ''}</Text>
             </View>
             <View style={[baseStyle.row, baseStyle.paddingTop]}>
               <View style={sty.positionTag}>
-                <Text style={sty.textGray}>上海宝山区</Text>
+                <Text style={sty.textGray}>{detail.workAddress || ''}</Text>
               </View>
               <View style={sty.positionTag}>
-                <Text style={sty.textGray}>1-3年</Text>
+                <Text style={sty.textGray}>
+                  {detail.experienceName || ''}年
+                </Text>
               </View>
               <View style={sty.positionTag}>
-                <Text style={sty.textGray}>本科</Text>
+                <Text style={sty.textGray}>{detail.educationName || ''}</Text>
               </View>
             </View>
             <View
@@ -126,10 +171,10 @@ class Detail extends Component {
                 source={require('../../images/author.png')}
               />
               <View style={baseStyle.paddingLeft}>
-                <Text style={baseStyle.ft16}>李小姐</Text>
+                <Text style={baseStyle.ft16}>{detail.userNickname || ''}</Text>
                 <Text
                   style={[baseStyle.ft12, baseStyle.textGray, {marginTop: 10}]}>
-                  上海宝鸟服饰有限公司/人事经理
+                  {detail.companyName || ''}/{detail.userTitle || ''}
                 </Text>
               </View>
             </View>
@@ -138,39 +183,30 @@ class Detail extends Component {
           <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 20}]}>
             <Text style={baseStyle.ft16}>职位描述</Text>
             <Text style={baseStyle.paddingTop}>
-              1、根据公司战略发展的需要，制定公司人力资源需求计划和配置方案，完成人力资源开发和管理工作；
-              3、对人力资源六大模块都有一定的认识和了解，熟悉
-              招聘和绩效模块最佳； 4、有互联网或电子商务企业工作经验优先；
-              5、能够吃苦耐劳，学习能力强，有自己的想法；
-              6、有良好的职业规划，愿意在人力资源方向长期发展。
-              7、良好的服务意识，能适应快节奏的工作环境，快速
-              学习、沟通协作、抗压能力好。
+              {detail.positionDesc || ''}
             </Text>
             <Text style={{paddingTop: 20}}>学历要求：</Text>
             <Text style={baseStyle.paddingTop}>
-              1、大专及以上学历，人力资源管理、工商管理等相关 专业优先；
+              {detail.educationName || ''}
             </Text>
             <Text style={{paddingTop: 20}}>经验要求：</Text>
             <Text style={baseStyle.paddingTop}>
-              一年以上人力资源相关工作经验；
+              {detail.experienceName || ''}
             </Text>
             <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位福利</Text>
-            <View style={[baseStyle.row, baseStyle.paddingTop]}>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>五险一金</Text>
+            {/* {detail.positionBenefits.length > 0 ? (
+              <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                {detail.positionBenefits.map((item, idx) => {
+                  return (
+                    <View key={idx} style={sty.positionTag}>
+                      <Text style={sty.textGray}>{item.name}</Text>
+                    </View>
+                  );
+                })}
               </View>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>加班补助</Text>
-              </View>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>员工旅游</Text>
-              </View>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>节日福利</Text>
-              </View>
-            </View>
+            ) : null} */}
           </View>
-          <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 10}]}>
+          {/* <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 10}]}>
             <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位补充说明</Text>
             <View
               style={[
@@ -206,8 +242,8 @@ class Detail extends Component {
             <View style={baseStyle.paddingTop}>
               <Text style={baseStyle.textYellow}>查看全部面试经</Text>
             </View>
-          </View>
-          <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 5}]}>
+          </View> */}
+          {/* <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 5}]}>
             <View style={[baseStyle.justifyBetween, baseStyle.row]}>
               <View style={[baseStyle.row]}>
                 <Image
@@ -215,7 +251,7 @@ class Detail extends Component {
                   source={require('../../images/author.png')}
                 />
                 <View style={baseStyle.paddingLeft}>
-                  <Text style={baseStyle.ft16}>上海像太阳电商有限公司</Text>
+                  <Text style={baseStyle.ft16}>{detail.companyName}</Text>
                   <Text
                     style={[
                       baseStyle.ft12,
@@ -238,7 +274,7 @@ class Detail extends Component {
                 marginBottom: 50,
               }}
             />
-          </View>
+          </View> */}
           <View
             style={[
               baseStyle.bgWhite,
@@ -254,7 +290,6 @@ class Detail extends Component {
             ]}>
             <TouchableOpacity
               onPress={() => {
-                // this._modal.open();
                 this.setState({
                   shareModal: true,
                 });
@@ -268,6 +303,15 @@ class Detail extends Component {
             </TouchableOpacity>
             <View style={baseStyle.row}>
               <Button
+                onPress={() => {
+                  this.props.navigation.navigate('PostResumeList', {
+                    callBack: resumeId => {
+                      console.log(resumeId);
+                      this.positionrecord(resumeId);
+                    },
+                  });
+                  console.log('投递简历');
+                }}
                 style={[
                   sty.subBtn,
                   {width: 109, borderColor: '#D9B06F', borderWidth: 0.5},

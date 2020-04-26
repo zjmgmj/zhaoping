@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   Text,
   View,
@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { baseStyle } from './baseStyle';
+import {baseStyle} from './baseStyle';
 import Icontick from '../iconfont/Icontick';
 
 class Province extends Component {
@@ -14,7 +14,7 @@ class Province extends Component {
     super(props);
     this.state = {};
   }
-  render () {
+  render() {
     const item = this.props.item;
     return (
       <TouchableOpacity
@@ -34,7 +34,7 @@ class City extends Component {
     super(props);
     this.state = {};
   }
-  render () {
+  render() {
     const item = this.props.item;
     return (
       <TouchableOpacity
@@ -57,11 +57,11 @@ export default class CitySelected extends Component {
       cityList: [],
     };
   }
-  selected (id) {
+  selected(id) {
     return id === this.props.selected ? <Icontick color="#D9B06F" /> : null;
   }
-  UNSAFE_componentWillMount () {
-    global.httpGet('region/getregionlist', { pid: 1001000000 }, res => {
+  UNSAFE_componentWillMount() {
+    global.httpGet('region/getregionlist', {pid: 1001000000}, res => {
       console.log(res);
       this.setState({
         provinceList: res.data,
@@ -69,15 +69,15 @@ export default class CitySelected extends Component {
     });
   }
 
-  getCityList (pid) {
-    global.httpGet('region/getregionlist', { pid: pid }, res => {
+  getCityList(pid) {
+    global.httpGet('region/getregionlist', {pid: pid}, res => {
       console.log(res);
       this.setState({
         cityList: res.data,
       });
     });
   }
-  render () {
+  render() {
     return (
       <TouchableOpacity
         style={baseStyle.fullScreenMask}

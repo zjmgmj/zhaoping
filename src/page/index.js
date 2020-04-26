@@ -48,6 +48,7 @@ import AddressBook from './HR/AddressBook';
 import PersonInfo from './HR/PersonInfo';
 import Evaluation from './Resume/evaluation';
 import Rreview from './Resume/rreview';
+import PostResumeList from './PostResumeList';
 
 const personNavigator = {
   Home: {
@@ -172,6 +173,7 @@ const StackRouteConfigs = createStackNavigator(
     Dynamic,
     Evaluation,
     Rreview,
+    PostResumeList,
   },
   {
     defaultNavigationOptions: {
