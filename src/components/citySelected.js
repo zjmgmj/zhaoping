@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {baseStyle} from './baseStyle';
+import { baseStyle } from './baseStyle';
 import Icontick from '../iconfont/Icontick';
 
 class Province extends Component {
@@ -14,14 +14,16 @@ class Province extends Component {
     super(props);
     this.state = {};
   }
-  render() {
+  render () {
+    const item = this.props.item;
     return (
       <TouchableOpacity
         onPress={() => {
+          this.props.selectProvince(item);
           return false;
         }}
         style={[baseStyle.row, baseStyle.justifyBetween, sty.itemSty]}>
-        <Text>全国</Text>
+        <Text>{item.name}</Text>
       </TouchableOpacity>
     );
   }
@@ -32,14 +34,15 @@ class City extends Component {
     super(props);
     this.state = {};
   }
-  render() {
+  render () {
+    const item = this.props.item;
     return (
       <TouchableOpacity
         onPress={() => {
           return false;
         }}
         style={[baseStyle.row, baseStyle.justifyBetween, sty.itemSty]}>
-        <Text>全国</Text>
+        <Text>{item.name}</Text>
       </TouchableOpacity>
     );
   }
@@ -54,15 +57,27 @@ export default class CitySelected extends Component {
       cityList: [],
     };
   }
-  selected(id) {
+  selected (id) {
     return id === this.props.selected ? <Icontick color="#D9B06F" /> : null;
   }
-  UNSAFE_componentWillMount() {
-    global.httpGet('region/getregionlist', {pid: 1001000000}, res => {
+  UNSAFE_componentWillMount () {
+    global.httpGet('region/getregionlist', { pid: 1001000000 }, res => {
       console.log(res);
+      this.setState({
+        provinceList: res.data,
+      });
     });
   }
-  render() {
+
+  getCityList (pid) {
+    global.httpGet('region/getregionlist', { pid: pid }, res => {
+      console.log(res);
+      this.setState({
+        cityList: res.data,
+      });
+    });
+  }
+  render () {
     return (
       <TouchableOpacity
         style={baseStyle.fullScreenMask}
@@ -73,12 +88,29 @@ export default class CitySelected extends Component {
         <View style={baseStyle.row}>
           <ScrollView style={sty.scrollView}>
             {this.state.provinceList.map((item, idx) => {
-              return <Province key={idx} />;
+              return (
+                <Province
+                  key={idx}
+                  item={item}
+                  selectProvince={res => {
+                    console.log('selectProvince', res);
+                    this.getCityList(res.pid);
+                  }}
+                />
+              );
             })}
           </ScrollView>
           <ScrollView style={sty.scrollView}>
             {this.state.cityList.map((item, idx) => {
-              return <City key={idx} />;
+              return (
+                <City
+                  key={idx}
+                  item={item}
+                  selectCity={res => {
+                    console.log('selectCity', res);
+                  }}
+                />
+              );
             })}
           </ScrollView>
         </View>

@@ -5716,6 +5716,21 @@ react-native-root-siblings@^3.2.2:
     prop-types "^15.6.2"
     static-container "^1.0.0"
 
+react-native-root-siblings@^4.0.0:
+  version "4.0.6"
+  resolved "https://registry.npm.taobao.org/react-native-root-siblings/download/react-native-root-siblings-4.0.6.tgz?cache=0&sync_timestamp=1576147516913&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-native-root-siblings%2Fdownload%2Freact-native-root-siblings-4.0.6.tgz#6dd7eedb725faacd7ba19c159dd279cf2e6d8476"
+  integrity sha1-bdfu23Jfqs17oZwVndJ5zy5thHY=
+  dependencies:
+    static-container "^1.5.1"
+
+react-native-root-toast@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.npm.taobao.org/react-native-root-toast/download/react-native-root-toast-3.2.1.tgz#f456d029f5c5b76e4b686334f25371465478a3be"
+  integrity sha1-9FbQKfXFt25LaGM08lNxRlR4o74=
+  dependencies:
+    prop-types "^15.5.10"
+    react-native-root-siblings "^4.0.0"
+
 react-native-safe-area-context@^0.7.3:
   version "0.7.3"
   resolved "https://registry.npm.taobao.org/react-native-safe-area-context/download/react-native-safe-area-context-0.7.3.tgz#ad6bd4abbabe195332c53810e4ce5851eb21aa2a"
@@ -5778,7 +5793,7 @@ react-native-tab-view@^2.11.0:
   resolved "https://registry.npm.taobao.org/react-native-tab-view/download/react-native-tab-view-2.13.0.tgz#23037aa43b0f8f682ddc20415a4baaaf6f82ae8f"
   integrity sha1-IwN6pDsPj2gt3CBBWkuqr2+Cro8=
 
-"react-native-webview-bridge@github:HoneyBook/react-native-webview-bridge":
+react-native-webview-bridge@HoneyBook/react-native-webview-bridge:
   version "0.62.0"
   resolved "https://codeload.github.com/HoneyBook/react-native-webview-bridge/tar.gz/411cb25d3af514a6cb2fb9161c437416c3480066"
   dependencies:
@@ -6589,7 +6604,7 @@ stacktrace-parser@^0.1.3:
   dependencies:
     type-fest "^0.7.1"
 
-static-container@^1.0.0:
+static-container@^1.0.0, static-container@^1.5.1:
   version "1.5.1"
   resolved "https://registry.npm.taobao.org/static-container/download/static-container-1.5.1.tgz#9d7a94e04dea864539a7b6a1304843ada740dc19"
   integrity sha1-nXqU4E3qhkU5p7ahMEhDradA3Bk=
