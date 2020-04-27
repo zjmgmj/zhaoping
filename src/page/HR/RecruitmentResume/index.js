@@ -4,6 +4,7 @@ import {setStatusBar} from '../../../components/setStatusBar';
 import Header from '../../../components/Header';
 import Item from './item';
 import {baseStyle} from '../../../components/baseStyle';
+import {Longlist} from 'beeshell/dist/components/Longlist';
 
 @setStatusBar({
   translucent: true,
@@ -14,6 +15,8 @@ class RecruitmentResume extends Component {
     super(props);
     this.state = {
       list: [],
+      total: 0,
+      page: 1,
     };
   }
   UNSAFE_componentWillMount() {
@@ -31,6 +34,7 @@ class RecruitmentResume extends Component {
       {
         page: 1,
         size: 10,
+        positionType: 1,
         userId: currentUser.userId,
       },
       res => {
@@ -40,8 +44,32 @@ class RecruitmentResume extends Component {
       },
     );
   }
+  refresh() {
+    return global
+      .httpGetPromise('position/list', {
+        page: this.state.page,
+        size: 10,
+        positionType: 1,
+        userId: this.state.currentUser.userId,
+      })
+      .then(res => {
+        console.log('res', res);
+        const page = this.state.page;
+        let oldList = this.state.list;
+        const resData = res.data;
+        if (page > 1) {
+          oldList.push(...resData.result);
+        } else {
+          oldList = resData.result;
+        }
+        this.setState({
+          list: oldList,
+          total: resData.total,
+        });
+      });
+  }
   render() {
-    const list = this.state.list;
+    const {total, list} = this.state;
     return (
       <View style={[{flex: 1, backgroundColor: '#FBFBFB'}]}>
         <Header
@@ -52,8 +80,13 @@ class RecruitmentResume extends Component {
           fullScreen
           isBorder={false}
         />
-        <ScrollView>
-          {list.map(item => {
+        <Longlist
+          ref={longList => {
+            this.longList = longList;
+          }}
+          total={total}
+          data={list}
+          renderItem={({item, index}) => {
             return (
               <View
                 key={item.id}
@@ -61,8 +94,21 @@ class RecruitmentResume extends Component {
                 <Item item={item} navigation={this.props.navigation} />
               </View>
             );
-          })}
-        </ScrollView>
+          }}
+          onEndReached={() => {
+            const page = this.state.page + 1;
+            this.setState({
+              page: page,
+            });
+            return this.refresh();
+          }}
+          onRefresh={() => {
+            this.setState({
+              page: 1,
+            });
+            return this.refresh();
+          }}
+        />
       </View>
     );
   }

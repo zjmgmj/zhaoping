@@ -75,7 +75,6 @@ class TabContent extends Component {
       },
     );
   }
-  getPositionList() {}
   render() {
     const renderList = [];
     return (
@@ -170,10 +169,25 @@ class PositionList extends Component {
       list: [],
     };
   }
-  UNSAFE_componentWillMount() {
+  // UNSAFE_componentWillMount() {
+  //   this.getPositiontypeList();
+  // }
+  componentDidMount() {
     this.getPositiontypeList();
   }
+  getSalaryName(id) {
+    console.log('this.props.salaryList', this.props.salaryList);
+    const resSalary = this.props.salaryList.find(item => {
+      return item.id === id;
+    });
+    if (resSalary) {
+      return resSalary.dvalue;
+    } else {
+      return '';
+    }
+  }
   getPositiontypeList(cardActive) {
+    debugger;
     const currentUser = this.props.currentUser;
     const params = {
       page: 1,
@@ -309,7 +323,8 @@ class PositionList extends Component {
                         alignItems: 'flex-end',
                       }}>
                       <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
-                        18-20K
+                        {/* 18-20K */}
+                        {this.getSalaryName(item.salaryId)}
                       </Text>
                       {/* <Text style={baseStyle.textYellow}>分享职位链接</Text> */}
                     </View>
@@ -332,7 +347,16 @@ class Home extends Component {
     super();
     this.state = {
       currentUser: null,
+      salaryList: [],
     };
+  }
+  UNSAFE_componentWillMount() {
+    global.gettypelist('salary', res => {
+      // 年薪
+      this.setState({
+        salaryList: res.data,
+      });
+    });
   }
   componentDidMount() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
@@ -351,6 +375,7 @@ class Home extends Component {
           <TabContent />
           {this.state.currentUser ? (
             <PositionList
+              salaryList={this.state.salaryList}
               currentUser={this.state.currentUser}
               navigate={this.props.navigation}
             />

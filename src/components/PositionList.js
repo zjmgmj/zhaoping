@@ -77,11 +77,9 @@ class PositionList extends Component {
     });
   }
   getSalaryName(id) {
-    console.log('getSalaryName', id);
     const resSalary = this.state.salaryList.find(item => {
       return item.id === id;
     });
-    console.log('resSalary', resSalary);
     if (resSalary) {
       return resSalary.dvalue;
     } else {

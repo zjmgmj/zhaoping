@@ -1,7 +1,7 @@
 // import React, {Component} from 'react';
 import ImagePicker from 'react-native-image-picker';
 
-export const selectPhotoTapped = ({me, options, cb}) => {
+export const selectPhotoTapped = ({options, cb}) => {
   const defaultOptions = {
     // title: '选择图片',
     cancelButtonTitle: '取消',
@@ -22,7 +22,7 @@ export const selectPhotoTapped = ({me, options, cb}) => {
       skipBackup: true,
     },
   };
-  // Object.assign(defaultOptions, options);
+  Object.assign(defaultOptions, options);
   ImagePicker.showImagePicker(defaultOptions, response => {
     console.log('Response = ', response);
 

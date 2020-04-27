@@ -6,14 +6,24 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {setStatusBar} from '../../../components/setStatusBar';
 import Header from '../../../components/Header';
 import {baseStyle} from '../../../components/baseStyle';
 import Iconright from '../../../iconfont/Iconright';
+import {Longlist} from 'beeshell/dist/components/Longlist';
 
 class ItemComp extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentUser: null,
+    };
+  }
+
   render() {
+    const item = this.props.item;
     return (
       <View>
         <View
@@ -23,23 +33,30 @@ class ItemComp extends Component {
             {paddingBottom: 5, paddingTop: 10, alignItems: 'flex-end'},
           ]}>
           <View style={baseStyle.row}>
-            <Image
-              style={sty.author}
-              source={require('../../../images/author.png')}
-            />
+            <Image style={sty.author} source={{uri: item.pic}} />
             <View style={baseStyle.paddingLeft}>
-              <Text style={{marginBottom: 5}}>李梅亭</Text>
-              <Text>市场经理 | 互联网价值观</Text>
+              <Text style={{marginBottom: 5}}>{item.name}</Text>
+              <Text>{item.resumeIntention}</Text>
+              {/* <Text>市场经理 | 互联网价值观</Text> */}
             </View>
           </View>
           <Iconright color="#D3CECE" />
         </View>
         <View
           style={[baseStyle.row, {justifyContent: 'flex-end', marginTop: 10}]}>
-          <TouchableOpacity style={sty.buttonSty}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log('----');
+              this.props.refuse();
+            }}
+            style={sty.buttonSty}>
             <Text style={baseStyle.textYellow}>拒绝面试</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={sty.buttonSty}>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.updatePositionRecord(item.userId);
+            }}
+            style={sty.buttonSty}>
             <Text style={baseStyle.textYellow}>邀请面试</Text>
           </TouchableOpacity>
         </View>
@@ -57,9 +74,16 @@ class ResumeList extends Component {
     super(props);
     this.state = {
       list: [],
+      page: 1,
+      total: 0,
+      positionId: null,
     };
   }
   UNSAFE_componentWillMount() {
+    const positionId = this.props.navigation.getParam('positionId');
+    this.setState({
+      positionId,
+    });
     global.localStorage.get({key: 'currentUser'}).then(res => {
       this.setState({
         currentUser: res,
@@ -73,7 +97,8 @@ class ResumeList extends Component {
       {
         page: 1,
         size: 10,
-        positionId: this.props.navigation.getParam('id'),
+        positionId: this.state.positionId,
+        userId: this.state.currentUser.userId,
       },
       res => {
         this.setState({
@@ -82,11 +107,52 @@ class ResumeList extends Component {
       },
     );
   }
+  refresh() {
+    return global
+      .httpGetPromise('resume/getResumeSubmittedList', {
+        page: this.state.page,
+        size: 10,
+        positionId: this.state.positionId,
+        userId: this.state.currentUser.userId,
+      })
+      .then(res => {
+        console.log('res', res);
+        const page = this.state.page;
+        let oldList = this.state.list;
+        const resData = res.data;
+        if (page > 1) {
+          oldList.push(...resData.result);
+        } else {
+          oldList = resData.result;
+        }
+        this.setState({
+          list: oldList,
+          total: resData.total,
+        });
+      });
+  }
+  updatePositionRecord(userId) {
+    const params = {
+      positionId: this.state.positionId,
+      userId: userId,
+      status: 1,
+    };
+    global.httpPost(
+      'positionrecord/update',
+      params,
+      res => {
+        console.log(res);
+        Alert.alert('', '邀请成功');
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
-    // const list = this.state.list;
-    const list = [1, 2, 3, 4];
+    const {total, list} = this.state;
     return (
-      <View style={[{flex: 1, backgroundColor: '#fff'}]}>
+      <View style={[baseStyle.content, {flex: 1, backgroundColor: '#fff'}]}>
         <Header
           title="招聘简历"
           onPressBack={() => {
@@ -94,15 +160,45 @@ class ResumeList extends Component {
           }}
           fullScreen
         />
-        <ScrollView style={baseStyle.content}>
-          {list.map(item => {
+        <Longlist
+          ref={longList => {
+            this.longList = longList;
+          }}
+          total={total}
+          data={list}
+          renderItem={({item, index}) => {
             return (
-              <View style={baseStyle.borderBottom} key={item}>
-                <ItemComp navigation={this.props.navigation} />
+              <View style={baseStyle.borderBottom} key={item.id}>
+                <ItemComp
+                  updatePositionRecord={userId => {
+                    this.updatePositionRecord(userId);
+                  }}
+                  refuse={() => {
+                    this.props.navigation.navigate('Refuse', {
+                      userId: item.userId,
+                      positionId: this.state.positionId,
+                    });
+                  }}
+                  item={item}
+                  navigation={this.props.navigation}
+                />
               </View>
             );
-          })}
-        </ScrollView>
+          }}
+          onEndReached={() => {
+            const page = this.state.page + 1;
+            this.setState({
+              page: page,
+            });
+            return this.refresh();
+          }}
+          onRefresh={() => {
+            this.setState({
+              page: 1,
+            });
+            return this.refresh();
+          }}
+        />
       </View>
     );
   }

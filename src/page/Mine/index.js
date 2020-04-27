@@ -80,6 +80,18 @@ class Mine extends Component {
           icon: require('../../images/qiehuan_icon.png'),
           title: '切换HR角色',
           url: 'Main',
+          handler: () => {
+            const currentUser = this.state.currentUser;
+            currentUser.userType = 2;
+            this.setState({
+              currentUser: currentUser,
+            });
+            global.localStorage.set({
+              key: 'currentUser',
+              data: currentUser,
+              expires: null,
+            });
+          },
           right: (
             <View>
               <Text style={baseStyle.textYellow}>点击切换</Text>
@@ -133,9 +145,21 @@ class Mine extends Component {
         },
         {
           icon: require('../../images/qiehuan_icon.png'),
-          title: '切换HR角色',
+          title: '切换角色',
           url: 'HrMain',
-          event: () => {},
+          handler: () => {
+            const currentUser = this.state.currentUser;
+            currentUser.userType = 1;
+            this.setState({
+              currentUser: currentUser,
+            });
+            global.localStorage.set({
+              key: 'currentUser',
+              data: currentUser,
+              expires: null,
+            });
+            console.log('currentUser');
+          },
           right: (
             <View>
               <Text style={baseStyle.textYellow}>点击切换</Text>
@@ -167,8 +191,13 @@ class Mine extends Component {
     });
   }
   render() {
-    const list = this.state.menuList;
     const currentUser = this.state.currentUser;
+    if (!currentUser) {
+      return false;
+    }
+    // let list = []
+    const list =
+      currentUser.userType === 2 ? this.state.menuList : this.state.hrMenuList;
     return (
       <ScrollView>
         <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
@@ -276,6 +305,11 @@ class Mine extends Component {
                 <TouchableOpacity
                   key={idx}
                   onPress={() => {
+                    console.log('---', item);
+                    if (item.handler) {
+                      debugger;
+                      item.handler();
+                    }
                     this.props.navigation.navigate(item.url);
                     // if () {
                     //   global.localStorage.set({
