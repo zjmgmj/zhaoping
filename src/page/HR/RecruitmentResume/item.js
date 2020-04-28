@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 import {baseStyle} from '../../../components/baseStyle';
-import {Button} from 'beeshell/dist/components/Button';
 
 class Item extends Component {
   constructor(props) {
@@ -27,7 +26,14 @@ class Item extends Component {
         </Text>
         <View
           style={[baseStyle.row, {justifyContent: 'flex-end', marginTop: 10}]}>
-          <TouchableOpacity style={sty.buttonSty}>
+          <TouchableOpacity
+            onPress={() => {
+              global.uploadFile(res => {
+                console.log('res', res);
+                this.props.updatePositionRecord(res.data);
+              });
+            }}
+            style={sty.buttonSty}>
             <Text style={baseStyle.textYellow}>上传简历模板</Text>
           </TouchableOpacity>
           <TouchableOpacity

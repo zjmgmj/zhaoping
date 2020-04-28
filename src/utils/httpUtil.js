@@ -63,7 +63,7 @@ export const httpPost = (url, parameter, success, failure) => {
     });
 };
 
-export const uploadFile = (url, file, success, failure) => {
+export const uploadImage = (url, file, success, failure) => {
   let formData = new FormData();
   const fileData = {
     uri: file.uri,
@@ -72,6 +72,44 @@ export const uploadFile = (url, file, success, failure) => {
     size: file.fileSize,
   };
   formData.append('file', fileData);
+  fetch(baseUrl + url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    body: formData,
+  })
+    .then(data => {
+      console.log('data', data);
+      return data.json();
+    })
+    .then(res => {
+      console.log('uploadFile', res);
+      success(res);
+    })
+    .then(err => {
+      console.log('err', err);
+      failure(err);
+    });
+};
+
+export const uploadFilePost = ({
+  url = 'upload/fileupload',
+  file,
+  success,
+  failure,
+}) => {
+  console.log('file', file);
+  let formData = new FormData();
+  const fileData = {
+    uri: file.uri,
+    type: 'multipart/form-data;charset=utf-8',
+    fileType: file.type,
+    name: encodeURIComponent(file.fileName),
+    // size: 100,
+  };
+  formData.append('file', fileData);
+  // formData.append('file', {uri: `file://${path}`, type: 'multipart/form-data'});
   fetch(baseUrl + url, {
     method: 'POST',
     headers: {

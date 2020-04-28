@@ -34,7 +34,7 @@ export const selectPhotoTapped = ({options, cb}) => {
       console.log('User tapped custom button: ', response.customButton);
     } else {
       // let source = {uri: response.uri, data: response.data};
-      global.uploadFile(
+      global.uploadImage(
         'upload/fileupload',
         response,
         res => {

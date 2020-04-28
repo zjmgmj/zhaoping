@@ -4,7 +4,8 @@ import ScrollableTabView from 'react-native-scrollable-tab-view';
 import {setStatusBar} from '../../components/setStatusBar';
 import TabBar from '../../components/TabBar';
 import Header from '../../components/Header';
-import Item from './item';
+import ResumeSubmit from './ResumeSubmit';
+import InviteInterview from './InviteInterview';
 import {baseStyle} from '../../components/baseStyle';
 
 @setStatusBar({
@@ -12,8 +13,32 @@ import {baseStyle} from '../../components/baseStyle';
   backgroundColor: 'transparent',
 })
 class Progress extends Component {
+  constructor() {
+    super();
+    this.state = {
+      currentUser: null,
+    };
+  }
+  UNSAFE_componentWillMount() {
+    global.localStorage.get({key: 'currentUser'}).then(res => {
+      console.log(res);
+      this.setState({
+        currentUser: res,
+      });
+    });
+  }
+  getSalaryName(id) {
+    const resSalary = this.state.salaryList.find(item => {
+      return item.id === id;
+    });
+    if (resSalary) {
+      return resSalary.dvalue;
+    } else {
+      return '';
+    }
+  }
   render() {
-    const list = [1, 2, 3, 4];
+    const currentUser = this.state.currentUser;
     return (
       <View style={[{flex: 1, backgroundColor: '#FBFBFB'}]}>
         <Header
@@ -24,32 +49,27 @@ class Progress extends Component {
           fullScreen
           isBorder={false}
         />
-        <ScrollableTabView
-          renderTabBar={() => <TabBar />}
-          tabBarBackgroundColor="#3671ff"
-          tabBarActiveTextColor="#fff"
-          tabBarInactiveTextColor="#fff">
-          <View tabLabel="已投简历">
-            {list.map((item, index) => {
-              return (
-                <View
-                  key={index}
-                  style={{marginBottom: 10, backgroundColor: '#fff'}}>
-                  <Item />
-                </View>
-              );
-            })}
-          </View>
-          <View tabLabel="邀请面试">
-            <Text>邀请面试</Text>
-          </View>
-          <View tabLabel="面试进度">
-            <Text>面试进度</Text>
-          </View>
-          <View tabLabel="待入职">
-            <Text>待入职</Text>
-          </View>
-        </ScrollableTabView>
+        {currentUser ? (
+          <ScrollableTabView
+            renderTabBar={() => <TabBar />}
+            tabBarBackgroundColor="#3671ff"
+            tabBarActiveTextColor="#fff"
+            tabBarInactiveTextColor="#fff"
+            style={baseStyle.bgWhite}>
+            <View tabLabel="已投简历">
+              <ResumeSubmit currentUser={currentUser} />
+            </View>
+            <View tabLabel="邀请面试">
+              <InviteInterview currentUser={currentUser} />
+            </View>
+            <View tabLabel="面试进度">
+              <Text>面试进度</Text>
+            </View>
+            <View tabLabel="待入职">
+              <Text>入职情况</Text>
+            </View>
+          </ScrollableTabView>
+        ) : null}
       </View>
     );
   }

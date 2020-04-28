@@ -1,7 +1,8 @@
 import React from 'react';
-import {Text} from 'react-native';
-import {httpGet, httpGetPromise} from './httpUtil';
+import {Text, Platform} from 'react-native';
+import {httpGet, httpGetPromise, uploadFilePost} from './httpUtil';
 import Modal, {ModalContent} from 'react-native-modals';
+import RNFileSelector from 'react-native-file-selector';
 export const gettypelist = (code, success, failure) => {
   httpGet(
     'dictionary/gettypelist',
@@ -119,4 +120,68 @@ export const getAge = birthDate => {
   const nowDate = new Date().getTime();
   const date = nowDate - birthDate;
   return parseInt(date / 1000 / 60 / 60 / 24 / 365);
+};
+
+export const uploadFile = callBack => {
+  // this.props.close();
+  let filterFile;
+  if (Platform.OS === 'ios') {
+    //文件夹内容筛选IOS和安卓是相反的，要注意
+    filterFile = [
+      'log',
+      'LOG',
+      'HTML',
+      'html',
+      'js',
+      'JS',
+      'bat',
+      'BAT',
+      'class',
+      'CLASS',
+      'java',
+      'JAVA',
+      'PRO',
+      'pro',
+      'sql',
+      'SQL',
+    ];
+  } else if (Platform.OS === 'android') {
+    filterFile =
+      '.+(.pdf|.PDF|.doc|.DOC|.DOCX|.docx|.xls|.xlsx|.XLS|.XLSX|.ppt|.PPT|.PPTX|.pptx|.txt|.TXT|.rar|.RAR|.zip|.ZIP)$';
+  }
+  //文档目录
+  RNFileSelector.Show({
+    title: '选择文件',
+    closeMenu: true,
+    filter: filterFile,
+    onDone: path => {
+      // android上通过'react-native-file-selector获取的path是不包含file://'协议的，
+      // android上需要拼接协议为'file://'+ path，
+      // 而IOS则不需要,type可以是文件的MIME类型或者'multipart/form-data'
+      let Path = Platform.OS === 'ios' ? path : `file://${path}`;
+      let fileParams = {mime: '', path: Path};
+      let fileArr = path.split('.');
+      console.log('fileArr: ', fileArr);
+      if (fileArr.length > 1) {
+        let arr = path.split('/'); //截取获取文件名为数组
+        fileParams.mime = `.${fileArr[fileArr.length - 1]}`;
+        uploadFilePost({
+          file: {
+            uri: Path,
+            fileType: fileParams.mime,
+            fileName: arr[arr.length - 1],
+          },
+          success: res => {
+            // return res;
+            callBack(res);
+          },
+        });
+      } else {
+        // Toast.info('文件类型错误，请重新选择！', 2000);
+      }
+    },
+    onCancel: () => {
+      console.log('cancelled');
+    },
+  });
 };

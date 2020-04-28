@@ -1,5 +1,11 @@
 import localStorage from './storage';
-import {httpGet, httpPost, uploadFile, httpGetPromise} from '../utils/httpUtil';
+import {
+  httpGet,
+  httpPost,
+  // uploadFile,
+  uploadImage,
+  httpGetPromise,
+} from '../utils/httpUtil';
 import {
   gettypelist,
   date2Str,
@@ -10,11 +16,13 @@ import {
   date2Month,
   getAge,
   gettypelistName,
+  uploadFile,
 } from '../utils/mixins';
 global.localStorage = localStorage;
 global.httpGet = httpGet;
 global.httpPost = httpPost;
 global.uploadFile = uploadFile;
+global.uploadImage = uploadImage;
 global.gettypelist = gettypelist;
 global.httpGetPromise = httpGetPromise;
 global.date2Str = date2Str;

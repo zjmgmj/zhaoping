@@ -29,6 +29,7 @@ class PostPosition extends Component {
       experienceList: [],
       educationList: [],
       salaryList: [],
+      companyList: [],
       positionTypeList: [
         {dvalue: '普通职位', id: 1},
         {dvalue: '内推职位', id: 2},
@@ -66,10 +67,10 @@ class PostPosition extends Component {
   }
   UNSAFE_componentWillMount() {
     const positionParams = this.state.params;
-
     global.localStorage.get({key: 'currentUser'}).then(res => {
       positionParams.userId = res.userId;
       positionParams.userNickname = res.userNickname;
+      this.getCompanyList();
       this.setState({
         params: positionParams,
       });
@@ -95,6 +96,27 @@ class PostPosition extends Component {
   }
   componentDidMount() {
     this.getRegion();
+  }
+  getCompanyList() {
+    const positionParams = this.state.params;
+    global.httpGet(
+      'company/list',
+      {
+        page: 1,
+        size: 100,
+        userId: positionParams.userId,
+      },
+      res => {
+        // 公司列表
+        console.log('公司列表', res);
+        this.setState({
+          companyList: res.data.result,
+        });
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
   getRegion() {
     global.httpGet(
@@ -127,23 +149,25 @@ class PostPosition extends Component {
       params: params,
     });
   }
-  openPicked(list, key) {
+  openPicked(list, key, labelKey = 'dvalue', valKey = 'id') {
     list.map(item => {
       item.active = false;
-      item.label = item.dvalue;
+      item.label = item[labelKey];
     });
+    console.log('list', list.label);
     TopviewGetInstance()
       .add(
         <Picker
           list={list}
-          selected={this.state.params.experienceId}
+          labelKey={labelKey}
+          selected={this.state.params[`${key}Id`]}
           close={() => {
             TopviewGetInstance().remove(this.state.pickId);
           }}
           selectedEvent={item => {
             const params = this.state.params;
-            params[`${key}Name`] = item.dvalue;
-            params[`${key}Id`] = item.id;
+            params[`${key}Name`] = item[labelKey];
+            params[`${key}Id`] = item[valKey];
             this.setState({
               params: params,
             });
@@ -191,7 +215,7 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          {/* {/* <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>公司信息</Text>
             <View style={[baseStyle.row]}>
               <TextInput
@@ -199,10 +223,27 @@ class PostPosition extends Component {
                 style={[baseStyle.textYellow, sty.textInputSty]}>
                 山东共展信息科技有限公司
               </TextInput>
-              {/* <Text style={baseStyle.textYellow}>山东共展信息科技有限公司</Text> */}
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
+            </View> */}
+          <TouchableOpacity
+            onPress={() => {
+              this.openPicked(this.state.companyList, 'company', 'name');
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
+            <Text>公司信息</Text>
+            <View style={[baseStyle.row]}>
+              <Text
+                style={
+                  this.state.params.salaryId
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.companyName || '请选择'}
+              </Text>
+              <Iconright color={iconRightFontColor} style={sty.Iconright} />
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               this.props.navigation.navigate('PositionName', {

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ScrollView} from 'react-native';
+import {Text, View, ScrollView, Alert} from 'react-native';
 import {setStatusBar} from '../../../components/setStatusBar';
 import Header from '../../../components/Header';
 import Item from './item';
@@ -68,6 +68,25 @@ class RecruitmentResume extends Component {
         });
       });
   }
+  updatePositionRecord(item, resumeTemp) {
+    const params = {
+      positionId: item.positionId,
+      userId: item.userId,
+      status: item.status,
+      resumeTemp: resumeTemp,
+    };
+    global.httpPost(
+      'positionrecord/update',
+      params,
+      res => {
+        console.log(res);
+        Alert.alert('', '上传模板成功');
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
     const {total, list} = this.state;
     return (
@@ -91,7 +110,13 @@ class RecruitmentResume extends Component {
               <View
                 key={item.id}
                 style={{marginBottom: 10, backgroundColor: '#fff'}}>
-                <Item item={item} navigation={this.props.navigation} />
+                <Item
+                  updatePositionRecord={path => {
+                    this.updatePositionRecord(item, path);
+                  }}
+                  item={item}
+                  navigation={this.props.navigation}
+                />
               </View>
             );
           }}
