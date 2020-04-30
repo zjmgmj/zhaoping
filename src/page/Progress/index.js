@@ -7,6 +7,8 @@ import Header from '../../components/Header';
 import ResumeSubmit from './ResumeSubmit';
 import InviteInterview from './InviteInterview';
 import {baseStyle} from '../../components/baseStyle';
+import InterviewProgress from './InterviewProgress';
+import OnboardingSituation from './OnboardingSituation';
 
 @setStatusBar({
   translucent: true,
@@ -63,10 +65,11 @@ class Progress extends Component {
               <InviteInterview currentUser={currentUser} />
             </View>
             <View tabLabel="面试进度">
-              <Text>面试进度</Text>
+              <InterviewProgress currentUser={currentUser} />
             </View>
-            <View tabLabel="待入职">
-              <Text>入职情况</Text>
+            <View tabLabel="入职情况">
+              <OnboardingSituation currentUser={currentUser} />
+              {/* <Text>入职情况</Text> */}
             </View>
           </ScrollableTabView>
         ) : null}

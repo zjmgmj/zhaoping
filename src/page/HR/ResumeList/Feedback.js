@@ -6,20 +6,16 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  Alert,
-  // SafeAreaView,
 } from 'react-native';
-import {Button} from 'beeshell/dist/components/Button';
 import Header from '../../../components/Header';
 import {setStatusBar} from '../../../components/setStatusBar';
 import {baseStyle} from '../../../components/baseStyle';
-import {Iconright} from '../../../iconfont/Iconright';
 
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
 })
-class Refuse extends Component {
+class Feedback extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,17 +36,12 @@ class Refuse extends Component {
     });
   };
   refuse() {
-    if (!this.state.content) {
-      Alert.alert('提示', '请输入拒绝理由');
-      return false;
-    }
-    // const userId = this.props.navigation.getParam('userId');
+    const userId = this.props.navigation.getParam('userId');
     const positionRecordId = this.props.navigation.getParam('positionRecordId');
     const params = {
       id: positionRecordId,
-      // userId: userId,
-      status: 4,
-      refuseDesc: this.state.content,
+      userId: userId,
+      intfeedback: this.state.content,
     };
     global.httpPost(
       'positionrecord/update',
@@ -64,7 +55,6 @@ class Refuse extends Component {
         console.log(err);
       },
     );
-    // this.props.navigation.state.params.callBack(params);
   }
   render() {
     const content = this.state.content;
@@ -78,13 +68,13 @@ class Refuse extends Component {
           height: 200,
           width: baseStyle.screenWidth - 20,
         }}>
-        <Text style={baseStyle.textGray}>请输入拒绝理由</Text>
+        <Text style={baseStyle.textGray}>请输入面试反馈</Text>
       </View>
     ) : null;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
-          title="拒绝面试"
+          title="面试反馈"
           fullScreen
           right="确定"
           onRightPress={() => {
@@ -122,21 +112,13 @@ class Refuse extends Component {
             />
             {placeholder}
           </TouchableOpacity>
-          <Button
-            onPress={() => {
-              this.savePosition();
-            }}
-            style={[sty.subBtn, {backgroundColor: '#D9B06F', marginTop: 20}]}
-            textStyle={{color: '#fff'}}>
-            简历委托
-          </Button>
         </ScrollView>
       </View>
     );
   }
 }
 
-export default Refuse;
+export default Feedback;
 const sty = StyleSheet.create({
   inputContent: {
     lineHeight: 20,

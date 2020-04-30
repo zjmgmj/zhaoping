@@ -50,6 +50,8 @@ import Evaluation from './Resume/evaluation';
 import Rreview from './Resume/rreview';
 import PostResumeList from './PostResumeList';
 import Refuse from './HR/ResumeList/Refuse';
+import InviteInterview from './HR/InviteInterview';
+import Feedback from './HR/ResumeList/Feedback';
 
 const personNavigator = {
   Home: {
@@ -176,6 +178,8 @@ const StackRouteConfigs = createStackNavigator(
     Rreview,
     PostResumeList,
     Refuse,
+    InviteInterview,
+    Feedback,
   },
   {
     defaultNavigationOptions: {

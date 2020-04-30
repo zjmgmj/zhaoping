@@ -67,11 +67,11 @@ class Login extends Component {
       timeShow: true,
       sencodeInterval: sencodeTimeInterval,
     });
-    // httpGet('user/sencodes', {phone: this.state.phone}, res => {
-    //   me.setState({
-    //     senCode: res.data,
-    //   });
-    // });
+    httpGet('user/sencodes', {phone: this.state.phone}, res => {
+      me.setState({
+        senCode: res.data,
+      });
+    });
   }
   loginHandler() {
     const senCode = this.state.senCode;
@@ -84,13 +84,13 @@ class Login extends Component {
       });
       return false;
     }
-    // if (!code || code !== senCode) {
-    //   this.setState({
-    //     modalShow: true,
-    //     modalContent: '验证码错误',
-    //   });
-    //   return false;
-    // }
+    if (!code || code !== senCode) {
+      this.setState({
+        modalShow: true,
+        modalContent: '验证码错误',
+      });
+      return false;
+    }
     const params = {
       phone: this.state.phone,
     };
@@ -100,15 +100,14 @@ class Login extends Component {
       if (res.code === 1) {
         const userInfo = res.data;
         userInfo.isLogin = true;
-        // userInfo.userType = 1; // 招聘官
-        userInfo.userType = 2; // 智推官
+        userInfo.userType = 1; // 招聘官
+        // userInfo.userType = 2; // 智推官
         global.localStorage.set({
           key: 'currentUser',
           data: userInfo,
           expires: null,
         });
         this.props.navigation.navigate('HrMain');
-
         // console.log('登陆成功');
       }
     });
@@ -214,7 +213,7 @@ class Login extends Component {
                   style={{width: 100}}
                   activeOpacity={1}
                   onPress={() => {
-                    // this.getSencodes();
+                    this.getSencodes();
                   }}>
                   {sencodeElem}
                 </TouchableOpacity>
@@ -227,6 +226,13 @@ class Login extends Component {
                 }}>
                 登陆
               </Button>
+              <TouchableOpacity
+                style={baseStyle.paddingTop}
+                onPress={() => {
+                  this.props.navigation.navigate('Reg');
+                }}>
+                {/* <Text>注册账号</Text> */}
+              </TouchableOpacity>
             </View>
             {this.ModalToggleBox()}
           </View>

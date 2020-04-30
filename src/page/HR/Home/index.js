@@ -233,7 +233,9 @@ class Home extends Component {
         </ScrollView>
         <TouchableOpacity
           onPress={() => {
-            this.props.navigation.navigate('PostPosition');
+            this.props.navigation.navigate('PostPosition', {
+              callBack: () => {},
+            });
           }}
           style={{position: 'absolute', bottom: 64, right: 20}}>
           <Image

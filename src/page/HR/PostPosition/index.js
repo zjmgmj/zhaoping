@@ -38,7 +38,7 @@ class PostPosition extends Component {
         cityId: 0,
         cityName: '',
         companyId: null,
-        companyName: '山东共展信息科技有限公司',
+        companyName: '',
         educationId: 0,
         educationName: '',
         experienceId: 0,
@@ -140,6 +140,8 @@ class PostPosition extends Component {
     console.log(JSON.stringify(params));
     global.httpPost('position/save', params, res => {
       console.log(res);
+      // this.props.navigation.state.params.callBack();
+      this.props.navigation.goBack();
     });
   }
   setParams(val, key) {
@@ -235,7 +237,7 @@ class PostPosition extends Component {
             <View style={[baseStyle.row]}>
               <Text
                 style={
-                  this.state.params.salaryId
+                  this.state.params.companyName
                     ? baseStyle.textYellow
                     : baseStyle.textGray
                 }>
@@ -310,7 +312,12 @@ class PostPosition extends Component {
             style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位描述</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>
+              <Text
+                style={
+                  this.state.params.positionDesc
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
                 {this.state.params.positionDesc
                   ? this.state.params.positionDesc
                   : '请选择'}

@@ -96,7 +96,6 @@ class DatePicker extends Component {
   getPickList() {
     let pickList = [this.state.yearList, ['至今']];
     const yearIdx = this.state.valueList[0];
-    debugger;
     if (this.state.yearList[yearIdx] !== '至今') {
       pickList = [this.state.yearList, this.state.monthList];
     }
@@ -113,7 +112,6 @@ class DatePicker extends Component {
         rightCallback={() => {
           const yearList = this.state.yearList;
           const monthList = this.state.monthList;
-          debugger;
           const date = [yearList[valueList[0]], monthList[valueList[1]]];
           const resVal = date.toString().replace(/,/g, '/');
           this.props.rightCallback({

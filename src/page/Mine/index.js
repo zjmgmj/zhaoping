@@ -307,7 +307,6 @@ class Mine extends Component {
                   onPress={() => {
                     console.log('---', item);
                     if (item.handler) {
-                      debugger;
                       item.handler();
                     }
                     this.props.navigation.navigate(item.url);

@@ -40,7 +40,6 @@ class EducationalExperience extends Component {
     };
   }
   UNSAFE_componentWillMount() {
-    debugger;
     global.gettypelist('education', res => {
       // 学历
       console.log('educationList', res.data);
@@ -59,7 +58,6 @@ class EducationalExperience extends Component {
     );
   }
   openPicked({list, key, valueKey, labelKey = 'label'}) {
-    debugger;
     console.log(list);
     TopviewGetInstance()
       .add(

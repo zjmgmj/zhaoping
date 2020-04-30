@@ -187,7 +187,6 @@ class PositionList extends Component {
     }
   }
   getPositiontypeList(cardActive) {
-    debugger;
     const currentUser = this.props.currentUser;
     const params = {
       page: 1,

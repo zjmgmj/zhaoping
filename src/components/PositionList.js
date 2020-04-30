@@ -126,7 +126,12 @@ class PositionList extends Component {
           data={list}
           renderItem={({item, index}) => {
             return (
-              <View
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('PositionDetail', {
+                    id: item.id,
+                  });
+                }}
                 style={[
                   baseStyle.borderBottom,
                   sty.positionItem,
@@ -172,9 +177,9 @@ class PositionList extends Component {
                           </View>
                         ) : null}
                       </View>
-                      <Text style={[baseStyle.textGray, baseStyle.ft12]}>
+                      {/* <Text style={[baseStyle.textGray, baseStyle.ft12]}>
                         HR 7天未查看
-                      </Text>
+                      </Text> */}
                     </View>
                   </View>
                 </View>
@@ -183,7 +188,7 @@ class PositionList extends Component {
                     {this.getSalaryName(item.salaryId)}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
           onEndReached={() => {

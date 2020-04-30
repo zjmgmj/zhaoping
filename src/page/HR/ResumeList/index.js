@@ -13,6 +13,7 @@ import Header from '../../../components/Header';
 import {baseStyle} from '../../../components/baseStyle';
 import Iconright from '../../../iconfont/Iconright';
 import {Longlist} from 'beeshell/dist/components/Longlist';
+import DatePicker from '../../../components/DatePicker';
 
 class ItemComp extends Component {
   constructor(props) {
@@ -24,6 +25,7 @@ class ItemComp extends Component {
 
   render() {
     const item = this.props.item;
+    const navigation = this.props.navigation;
     return (
       <View>
         <View
@@ -42,24 +44,119 @@ class ItemComp extends Component {
           </View>
           <Iconright color="#D3CECE" />
         </View>
-        <View
-          style={[baseStyle.row, {justifyContent: 'flex-end', marginTop: 10}]}>
-          <TouchableOpacity
-            onPress={() => {
-              console.log('----');
-              this.props.refuse();
-            }}
-            style={sty.buttonSty}>
-            <Text style={baseStyle.textYellow}>拒绝面试</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.updatePositionRecord(item.userId);
-            }}
-            style={sty.buttonSty}>
-            <Text style={baseStyle.textYellow}>邀请面试</Text>
-          </TouchableOpacity>
-        </View>
+        {item.positionRecordstatus === 0 ? (
+          <View
+            style={[
+              baseStyle.row,
+              {justifyContent: 'flex-end', marginTop: 10},
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                // this.props.refuse();
+                navigation.navigate('Refuse', {
+                  positionRecordId: item.positionRecordId,
+                  callBack: () => {
+                    this.props.refresh();
+                  },
+                });
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>拒绝面试</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                this.props.updatePositionRecord(1);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>邀请面试</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                // this.props.updatePositionRecord(item.userId);
+                console.log('查看简历模板');
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>查看简历模板</Text>
+            </TouchableOpacity>
+          </View>
+        ) : item.positionRecordstatus === 1 ? (
+          <View
+            style={[
+              baseStyle.row,
+              {justifyContent: 'flex-end', marginTop: 10},
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                this.props.updatePositionRecord(2);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>已面试</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                this.props.updatePositionRecord(3);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>未面试</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                this.props.updatePositionRecord(4);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>拒绝面试</Text>
+            </TouchableOpacity>
+          </View>
+        ) : item.positionRecordstatus === 4 ? (
+          <View
+            style={[
+              baseStyle.row,
+              {justifyContent: 'flex-end', marginTop: 10},
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                this.props.updatePositionRecord(6);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>确认录用</Text>
+            </TouchableOpacity>
+          </View>
+        ) : item.positionRecordstatus === 6 ? (
+          <View
+            style={[
+              baseStyle.row,
+              {justifyContent: 'flex-end', marginTop: 10},
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                // this.props.updatePositionRecord(6);
+                navigation.navigate('Feedback', {
+                  positionRecordId: item.positionRecordId,
+                  callBack: () => {
+                    this.props.refresh();
+                  },
+                });
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>上传面试反馈</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                // this.props.updatePositionRecord(6);
+                this.props.datePickerRef();
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>设置入职时间</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
     );
   }
@@ -77,6 +174,7 @@ class ResumeList extends Component {
       page: 1,
       total: 0,
       positionId: null,
+      positionRecordId: null,
     };
   }
   UNSAFE_componentWillMount() {
@@ -93,7 +191,7 @@ class ResumeList extends Component {
   }
   getPositiontypeList() {
     global.httpGet(
-      'resume/getResumeSubmittedList',
+      'positionrecord/list',
       {
         page: 1,
         size: 10,
@@ -101,6 +199,7 @@ class ResumeList extends Component {
         userId: this.state.currentUser.userId,
       },
       res => {
+        console.log('res.data.result', res.data.result);
         this.setState({
           list: res.data.result,
         });
@@ -109,7 +208,7 @@ class ResumeList extends Component {
   }
   refresh() {
     return global
-      .httpGetPromise('resume/getResumeSubmittedList', {
+      .httpGetPromise('positionrecord/list', {
         page: this.state.page,
         size: 10,
         positionId: this.state.positionId,
@@ -131,18 +230,22 @@ class ResumeList extends Component {
         });
       });
   }
-  updatePositionRecord(userId) {
+  updatePositionRecord(positionRecordId, status) {
     const params = {
-      positionId: this.state.positionId,
-      userId: userId,
-      status: 1,
+      id: positionRecordId,
+      status: status,
     };
+    console.log(params);
+    this.positionrecordUpdate(params);
+  }
+  positionrecordUpdate(params) {
     global.httpPost(
       'positionrecord/update',
       params,
       res => {
         console.log(res);
-        Alert.alert('', '邀请成功');
+        this.refresh();
+        Alert.alert('', '操作成功');
       },
       err => {
         console.log(err);
@@ -170,15 +273,26 @@ class ResumeList extends Component {
             return (
               <View style={baseStyle.borderBottom} key={item.id}>
                 <ItemComp
-                  updatePositionRecord={userId => {
-                    this.updatePositionRecord(userId);
+                  updatePositionRecord={status => {
+                    this.updatePositionRecord(item.positionRecordId, status);
                   }}
-                  refuse={() => {
-                    this.props.navigation.navigate('Refuse', {
-                      userId: item.userId,
-                      positionId: this.state.positionId,
+                  refresh={() => {
+                    this.refresh();
+                  }}
+                  datePickerRef={() => {
+                    this.setState({
+                      positionRecordId: item.positionRecordId,
+                    });
+                    this.datePickerRef.open({
+                      value: new Date(),
                     });
                   }}
+                  // refuse={() => {
+                  //   this.props.navigation.navigate('Refuse', {
+                  //     userId: item.userId,
+                  //     positionId: this.state.positionId,
+                  //   });
+                  // }}
                   item={item}
                   navigation={this.props.navigation}
                 />
@@ -197,6 +311,19 @@ class ResumeList extends Component {
               page: 1,
             });
             return this.refresh();
+          }}
+        />
+        <DatePicker
+          ref={res => {
+            this.datePickerRef = res;
+          }}
+          type="month"
+          rightCallback={({date, key}) => {
+            // this.setParams(key, date);
+            this.positionrecordUpdate({
+              id: this.state.positionRecordId,
+              entryDate: date,
+            });
           }}
         />
       </View>

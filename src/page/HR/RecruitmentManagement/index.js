@@ -59,11 +59,11 @@ class RecruitmentManagement extends Component {
           title: '招聘管理',
           url: 'RecruitmentResume',
         },
-        {
-          icon: require('../../../images/invite_icon.png'),
-          title: '邀请面试',
-          url: 'FollowPosition',
-        },
+        // {
+        //   icon: require('../../../images/invite_icon.png'),
+        //   title: '邀请面试',
+        //   url: 'InviteInterview',
+        // },
         {
           icon: require('../../../images/setting_icon.png'),
           title: '设置入职状态',

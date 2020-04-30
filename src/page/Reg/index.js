@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
@@ -34,8 +35,9 @@ class Reg extends Component {
     };
   }
   getSencodes() {
-    httpGet('user/sencodes', {phone: this.state.phone}, res => {
+    global.httpGet('user/sencodes', {phone: this.state.phone}, res => {
       const me = this;
+      console.log('999');
       const sencodeTimeInterval = setInterval(() => {
         let time = me.state.time;
         time--;
@@ -82,13 +84,14 @@ class Reg extends Component {
     httpPost('user/save', params, res => {
       console.log('res', res);
       if (res.code === 1) {
-        this.setState({
-          modalShow: true,
-          modalContent: '注册成功',
-        });
+        // this.setState({
+        //   modalShow: true,
+        //   modalContent: '注册成功',
+        // });
+        // Alert.alert('', '注册成功');
         const me = this;
         setTimeout(() => {
-          me.props.navigation.navigare('Login');
+          me.props.navigation.navigate('Login');
         }, 500);
       }
     });
@@ -155,7 +158,7 @@ class Reg extends Component {
                 <TextInput
                   keyboardType="numeric"
                   placeholder="请输入手机号码"
-                  onEndEditing={event => {
+                  onChange={event => {
                     this.setState({
                       phone: event.nativeEvent.text,
                     });
