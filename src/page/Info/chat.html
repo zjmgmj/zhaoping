@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>chat</title>
+    <style type="text/css">
+      html,body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      *{padding:0; margin: 0;}
+      .scrollView {
+        height: 500px;
+        width: 100%;
+        padding: 10px;
+      }
+      .authorImg {
+        width: 40px;
+        height: 40px;
+      }
+      .foot {
+        background: #F9F0F3;
+        border-top: 1px #ccc solid;
+        padding: 10px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      .text-input {
+        background: #fff;
+        flex: 1;
+        border-radius: 5px;
+        border: none;
+        height: 45px;
+        margin: 0 10px;
+      }
+      .chatInput {
+        background: #fff;
+        border-radius: 4px;
+        flex: 1;
+        margin: 0 5px;
+        height: 35px;
+        line-height: 35px;
+        border: none;
+        padding: 0 5px;
+      }
+      .iconSize {
+        width: 30px;
+        height: 30px;
+        margin-right: 0 5px;
+      }
+      .leftChat {
+        background: #f2f2f2;
+        padding: 10px;
+        margin-left: 10px;
+        border-radius: 5px;
+      }
+      .rightChat {
+        background: #D9B06F;
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 5px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+      }
+    </style>
+</head>
+<body>
+    <div id="main" style="padding: 10px">
+      <div class="row" style="margin-top: 20px;">
+        <img src="../../images/author.png" class="authorImg">
+        <!-- <Image
+          style={sty.authorImg}
+          source={require('../../images/author.png')}
+        /> -->
+        <div class="leftChat">
+          麻烦把简历发我看一下
+        </div>
+      </div>
+      <div class="row" style="justify-content: flex-end; margin-top: 15px;">
+        <div class="rightChat">
+          <span style="color: #fff; text-align: right;">
+            在吗在吗 我对您公司新发布职位感兴趣
+          </span>
+        </div>
+        <img src="../../images/author.png" class="authorImg">
+        <!-- <Image
+          style={sty.authorImg}
+          source={require('../../images/author.png')}
+        /> -->
+      </div>
+    </div>
+    <div class="foot row">
+      <img src="../../images/chat_yuyin_icon.png">
+      <input type="text" class="chatInput">
+      <img src="../../images/chat_bq_icon.png">
+      <img src="../../images/chat_add_icon.png" style="margin-left: 10px;">
+    </div>
+</body>
+</html>

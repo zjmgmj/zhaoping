@@ -111,7 +111,7 @@ class ItemComp extends Component {
               <Text style={baseStyle.textYellow}>拒绝面试</Text>
             </TouchableOpacity>
           </View>
-        ) : item.positionRecordstatus === 4 ? (
+        ) : item.positionRecordstatus === 2 ? (
           <View
             style={[
               baseStyle.row,

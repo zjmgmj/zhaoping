@@ -40,7 +40,8 @@ class Resume extends Component {
         resumeStatus: 0,
         resumeIntention: '',
         selfEvaluation: '',
-        id: 3,
+        // id: 3,
+        labels: '',
       },
       jobStatus: '',
       resumeStatus: '',
@@ -189,8 +190,34 @@ class Resume extends Component {
       },
     );
   }
+  saveResume() {
+    global.httpPost(
+      'resume/save',
+      this.state.resume,
+      res => {
+        console.log(res);
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
+  setParams(val, key) {
+    const params = this.state.resume;
+    params[key] = val;
+    this.setState({
+      resume: params,
+    });
+    this.updateResume();
+  }
   render() {
     const resume = this.state.resume;
+    let labels = [];
+    if (resume.labels) {
+      debugger;
+      labels = resume.labels.split(',');
+    }
+    console.log('labels', labels);
     return (
       <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
         <Header
@@ -241,7 +268,11 @@ class Resume extends Component {
               </View>
               <Image
                 style={sty.authorImg}
-                source={require('../../images/author.png')}
+                source={
+                  resume.pic
+                    ? {uri: resume.pic}
+                    : require('../../images/author.png')
+                }
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -284,23 +315,66 @@ class Resume extends Component {
                 {resume.resumeIntention || '请选择职业意向'}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={sty.inforItem}>
+            <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('SkillTags', {
+                  labels: this.state.resume.labels,
+                  callBack: res => {
+                    console.log('callBack', res);
+                    this.setParams(res.labels, 'labels');
+                  },
+                });
+              }}
+              style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
                 <Text>技能标签</Text>
                 <Iconedit />
               </View>
               <View style={[baseStyle.row, baseStyle.paddingTop]}>
-                <Button
-                  size="sm"
-                  style={{borderColor: '#999999', marginRight: 10}}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={[{marginRight: 5}, baseStyle.textGray]}>
-                      添加标签
-                    </Text>
-                    <Iconadd />
+                {labels.length > 0 ? (
+                  labels.map((item, idx) => {
+                    return (
+                      <View
+                        key={idx}
+                        style={{
+                          borderColor: '#999999',
+                          borderWidth: 0.5,
+                          padding: 5,
+                          marginRight: 10,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}>
+                        <Text style={[{marginRight: 5}, baseStyle.textGray]}>
+                          {item}
+                        </Text>
+                      </View>
+                    );
+                  })
+                ) : (
+                  <View style={baseStyle.row}>
+                    <Button
+                      onPress={() => {
+                        this.props.navigation.navigate('SkillTags', {
+                          labels: this.state.resume.labels,
+                          callBack: res => {
+                            console.log('callBack', res);
+                            this.setParams(res.labels, 'labels');
+                          },
+                        });
+                      }}
+                      size="sm"
+                      style={{borderColor: '#999999', marginRight: 10}}>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={[{marginRight: 5}, baseStyle.textGray]}>
+                          添加标签
+                        </Text>
+                        <Iconadd />
+                      </View>
+                    </Button>
+                    <Text style={baseStyle.textGray}>定义你的个性化标签</Text>
                   </View>
-                </Button>
-                <Text style={baseStyle.textGray}>定义你的个性化标签</Text>
+                )}
               </View>
             </TouchableOpacity>
             <View style={sty.inforItem}>
@@ -483,22 +557,32 @@ class Resume extends Component {
               <Iconedit />
             </TouchableOpacity> */}
           </View>
-          {/* <View
+          <View
             style={[
               baseStyle.row,
               {justifyContent: 'center', paddingBottom: 40, paddingTop: 20},
             ]}>
             <Button
+              onPress={() => {
+                this.saveResume();
+                // this.props.navigation.navigate('Rreview', {
+                //   resume: this.state.resume,
+                //   workExperienceList: this.state.workExperienceList,
+                //   projectExperienceList: this.state.projectExperienceList,
+                //   educationalExpList: this.state.educationalExpList,
+                // });
+              }}
               style={[sty.subBtn, {borderColor: '#D9B06F', borderWidth: 0.5}]}
               textStyle={{color: '#D9B06F'}}>
               预览简历
+              {/* 保存简历 */}
             </Button>
-            <Button
+            {/* <Button
               style={[sty.subBtn, {backgroundColor: '#D9B06F'}]}
               textStyle={{color: '#fff'}}>
               附件简历上传
-            </Button>
-          </View> */}
+            </Button> */}
+          </View>
         </ScrollView>
       </View>
     );

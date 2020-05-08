@@ -29,9 +29,9 @@ class Detail extends Component {
     this.state = {
       shareModal: false,
       detail: {
-        positionBenefits: [],
         currentUser: null,
       },
+      company: null,
     };
   }
   UNSAFE_componentWillMount() {
@@ -67,8 +67,24 @@ class Detail extends Component {
           this.setState({
             detail: resData,
           });
-          this.gettypelist(resData.salaryId, 'salary', 'salaryName');
+          this.getCompany(resData.companyId);
+          // this.gettypelist(resData.salaryId, 'salary', 'salaryName');
         }
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
+  getCompany(companyId) {
+    global.httpGet(
+      'company/detail',
+      {id: companyId},
+      res => {
+        console.log(res);
+        this.setState({
+          company: res.data,
+        });
       },
       err => {
         console.log(err);
@@ -101,7 +117,13 @@ class Detail extends Component {
     });
   }
   render() {
-    const detail = this.state.detail;
+    const {detail, company} = this.state;
+    if (!detail.id) {
+      return false;
+    }
+    const positionBenefits = detail.positionBenefits
+      ? detail.positionBenefits.split(',')
+      : [];
     return (
       <View
         style={{backgroundColor: '#FBFBFB', height: baseStyle.screenHeight}}>
@@ -129,17 +151,21 @@ class Detail extends Component {
               <Text style={baseStyle.textRed}>{detail.salaryName || ''}</Text>
             </View>
             <View style={[baseStyle.row, baseStyle.paddingTop]}>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>{detail.workAddress || ''}</Text>
-              </View>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>
-                  {detail.experienceName || ''}年
-                </Text>
-              </View>
-              <View style={sty.positionTag}>
-                <Text style={sty.textGray}>{detail.educationName || ''}</Text>
-              </View>
+              {detail.workAddress ? (
+                <View style={sty.positionTag}>
+                  <Text style={sty.textGray}>{detail.workAddress}</Text>
+                </View>
+              ) : null}
+              {detail.experienceName ? (
+                <View style={sty.positionTag}>
+                  <Text style={sty.textGray}>{detail.experienceName}</Text>
+                </View>
+              ) : null}
+              {detail.educationName ? (
+                <View style={sty.positionTag}>
+                  <Text style={sty.textGray}>{detail.educationName}</Text>
+                </View>
+              ) : null}
             </View>
             <View
               style={[
@@ -148,7 +174,8 @@ class Detail extends Component {
                 baseStyle.paddingTop,
               ]}>
               <Text style={[baseStyle.textGray, baseStyle.ft12]}>
-                1天前发布
+                {/* 1天前发布 */}
+                {global.date2Str(detail.createDate)}
               </Text>
               <View style={sty.attentionBtn}>
                 <Text style={[baseStyle.textYellow, baseStyle.ft12]}>
@@ -171,10 +198,12 @@ class Detail extends Component {
                 source={require('../../images/author.png')}
               />
               <View style={baseStyle.paddingLeft}>
-                <Text style={baseStyle.ft16}>{detail.userNickname || ''}</Text>
+                <Text style={baseStyle.ft16}>
+                  {detail.userNickname || '暂无'}
+                </Text>
                 <Text
                   style={[baseStyle.ft12, baseStyle.textGray, {marginTop: 10}]}>
-                  {detail.companyName || ''}/{detail.userTitle || ''}
+                  {detail.companyName || ''}/{detail.userTitle || '暂无'}
                 </Text>
               </View>
             </View>
@@ -193,18 +222,20 @@ class Detail extends Component {
             <Text style={baseStyle.paddingTop}>
               {detail.experienceName || ''}
             </Text>
-            <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位福利</Text>
-            {/* {detail.positionBenefits.length > 0 ? (
-              <View style={[baseStyle.row, baseStyle.paddingTop]}>
-                {detail.positionBenefits.map((item, idx) => {
-                  return (
-                    <View key={idx} style={sty.positionTag}>
-                      <Text style={sty.textGray}>{item.name}</Text>
-                    </View>
-                  );
-                })}
+            {detail.positionBenefits ? (
+              <View>
+                <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位福利</Text>
+                <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                  {positionBenefits.map((item, idx) => {
+                    return (
+                      <View key={idx} style={sty.positionTag}>
+                        <Text style={sty.textGray}>{item}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
               </View>
-            ) : null} */}
+            ) : null}
           </View>
           {/* <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 10}]}>
             <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位补充说明</Text>
@@ -243,38 +274,38 @@ class Detail extends Component {
               <Text style={baseStyle.textYellow}>查看全部面试经</Text>
             </View>
           </View> */}
-          {/* <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 5}]}>
-            <View style={[baseStyle.justifyBetween, baseStyle.row]}>
-              <View style={[baseStyle.row]}>
-                <Image
-                  style={sty.authorImg}
-                  source={require('../../images/author.png')}
-                />
-                <View style={baseStyle.paddingLeft}>
-                  <Text style={baseStyle.ft16}>{detail.companyName}</Text>
-                  <Text
-                    style={[
-                      baseStyle.ft12,
-                      baseStyle.textGray,
-                      {marginTop: 10},
-                    ]}>
-                    100-299人 国企 上海宝山
-                  </Text>
+          {company ? (
+            <View
+              style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 5}]}>
+              <View style={[baseStyle.justifyBetween, baseStyle.row]}>
+                <View style={[baseStyle.row]}>
+                  <Image
+                    style={sty.authorImg}
+                    source={
+                      company.logo
+                        ? {uri: company.logo}
+                        : require('../../images/author.png')
+                    }
+                  />
+                  <View style={baseStyle.paddingLeft}>
+                    <Text style={baseStyle.ft16}>{company.name}</Text>
+                    <Text
+                      style={[
+                        baseStyle.ft12,
+                        baseStyle.textGray,
+                        {marginTop: 10},
+                      ]}>
+                      {company.companySizeName}
+                      {company.unitQualificationName}
+                      {company.cityName}
+                    </Text>
+                  </View>
                 </View>
+                <Iconright color="#D3CECE" />
               </View>
-              <Iconright color="#D3CECE" />
             </View>
-            <Image
-              source={require('../../images/ditu.png')}
-              style={{
-                width: baseStyle.screenWidth - 20,
-                height: 129,
-                resizeMode: 'cover',
-                marginTop: 15,
-                marginBottom: 50,
-              }}
-            />
-          </View> */}
+          ) : null}
+
           <View
             style={[
               baseStyle.bgWhite,

@@ -37,6 +37,9 @@ class PositionList extends Component {
       page: 1,
       list: [],
       salaryList: [],
+      getPositionList: res => {
+        return this.getPositiontypeList(res);
+      },
     };
   }
   UNSAFE_componentWillMount() {
@@ -55,18 +58,20 @@ class PositionList extends Component {
       this.getPositiontypeList();
     });
   }
-  getPositiontypeList() {
+  getPositiontypeList(param = {}) {
     const currentUser = this.state.currentUser;
-    const params = {
+    const obj = {
       page: 1,
       size: 10,
       userId: currentUser.userId,
-      positionType: this.props.positionType,
     };
+    const params = Object.assign(obj, param);
+    if (this.props.positionType) {
+      params.positionType = this.props.positionType;
+    }
     if (this.props.isrecommend) {
       params.isrecommend = 1;
     }
-    console.log('params', params);
     global.httpGet('position/list', params, res => {
       console.log('positionList', res);
       this.setState({

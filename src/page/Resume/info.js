@@ -37,7 +37,7 @@ class ResumeInfo extends Component {
       pickKey: '',
       sexList: [{label: '男', value: 1}, {label: '女', value: 2}],
       info: {
-        userPic: '',
+        pic: '',
         userSex: 0,
         birthDate: new Date().getTime(),
         workingDate: new Date().getTime(),
@@ -50,9 +50,15 @@ class ResumeInfo extends Component {
     };
   }
   UNSAFE_componentWillMount() {
+    debugger;
+    Object.assign(this.state.info, this.props.navigation.getParam('data'));
     this.setState({
-      info: this.props.navigation.getParam('data'),
+      info: Object.assign(
+        this.state.info,
+        this.props.navigation.getParam('data'),
+      ),
     });
+    debugger;
     global.localStorage.get({key: 'currentUser'}).then(res => {
       console.log(res);
       this.setState({
@@ -71,6 +77,7 @@ class ResumeInfo extends Component {
     );
   }
   saveInfo() {
+    debugger;
     const params = this.state.info;
     params.workdate = new Date(params.workingDate).getFullYear();
     const workdateTime = new Date(params.workingDate).getTime();
@@ -78,17 +85,25 @@ class ResumeInfo extends Component {
     const date = nowDate - workdateTime;
     const year = parseInt(date / 1000 / 60 / 60 / 24 / 365);
     params.workyear = year;
+    debugger;
     console.log(params);
-    let url = 'user/save';
+    let url = 'resume/save';
     if (params.id) {
-      url = 'user/update';
+      url = 'resume/update';
     }
-    global.httpPost(url, params, res => {
-      console.log('resume', res);
-      params.id = res.data;
-      this.props.navigation.state.params.callBack(params);
-      this.props.navigation.goBack();
-    });
+    global.httpPost(
+      url,
+      params,
+      res => {
+        console.log('resume', res);
+        params.id = res.data;
+        this.props.navigation.state.params.callBack(params);
+        this.props.navigation.goBack();
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
   setParams(key, value) {
     const params = this.state.info;
@@ -185,7 +200,7 @@ class ResumeInfo extends Component {
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               this.openPicked({
                 list: this.state.sexList,
@@ -207,7 +222,7 @@ class ResumeInfo extends Component {
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => {
               this.setState({

@@ -12,14 +12,20 @@ import Header from '../../components/Header';
 import {baseStyle} from '../../components/baseStyle';
 import Iconsearch from '../../iconfont/Iconsearch';
 import IconjiantouDown from '../../iconfont/IconjiantouDown';
-import PositionItem from '../../components/PositionItem';
+// import PositionItem from '../../components/PositionItem';
+import PositionList from '../../components/PositionList';
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
 })
 class Position extends Component {
+  constructor() {
+    super();
+    this.state = {
+      params: {},
+    };
+  }
   render() {
-    const list = [1, 2, 3, 4, 5, 6];
     return (
       <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
         <Header isHeader={false} />
@@ -48,7 +54,11 @@ class Position extends Component {
               </View>
               <TouchableOpacity
                 onPress={() => {
-                  this.props.navigation.navigate('PositionFilter');
+                  this.props.navigation.navigate('PositionFilter', {
+                    callBack: res => {
+                      this.positionList.state.getPositionList(res);
+                    },
+                  });
                 }}
                 style={[baseStyle.paddingLeft, baseStyle.row]}>
                 <Text style={{paddingRight: 5}}>筛选</Text>
@@ -58,15 +68,12 @@ class Position extends Component {
           </View>
         </View>
         <ScrollView style={sty.scrollView}>
-          {list.map(item => {
-            return (
-              <View
-                style={{marginBottom: 10, backgroundColor: '#fff'}}
-                key={item}>
-                <PositionItem />
-              </View>
-            );
-          })}
+          <PositionList
+            ref={position => {
+              this.positionList = position;
+            }}
+            navigation={this.props.navigation}
+          />
         </ScrollView>
       </View>
     );

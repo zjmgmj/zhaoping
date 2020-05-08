@@ -192,7 +192,7 @@ class PositionList extends Component {
       page: 1,
       size: 10,
       userId: currentUser.userId,
-      positionType: 1,
+      // positionType: 1,
     };
     if (cardActive === 2) {
       params.isrecommend = 1;

@@ -33,7 +33,22 @@ const localStorage = {
    * @params id  非必传 标识
    *
    * */
-
+  setItem (key, data, expires) {
+    if (key.indexOf('_') !== -1) {
+      const keyList = key.split('_')
+      keyList.map((keyMap, idx) => {
+        keyList[idx] = keyMap.charAt(0).toUpperCase() + keyMap.slice(1)
+      })
+      key = keyList.join('')
+    }
+    let setValue = JSON.stringify(data);
+    const obj = {
+      key: key,
+      data: setValue,
+      expires: expires ? expires : null,
+    };
+    storage.save(obj);
+  },
   set({key, data, expires, id}) {
     let setValue = JSON.stringify(data);
     const obj = {
@@ -46,7 +61,34 @@ const localStorage = {
     }
     storage.save(obj);
   },
-
+    
+  async getItem (key) {
+    if (key.indexOf('_') !== -1) {
+      const keyList = key.split('_')
+      keyList.map((keyMap, idx) => {
+        keyList[idx] = keyMap.charAt(0).toUpperCase() + keyMap.slice(1)
+      })
+      key = keyList.join('')
+    }
+    const obj = {
+      key: key,
+    };
+    try {
+      const data = await storage.load(obj);
+      return data
+    } catch (err) {
+      console.log(err)
+     }
+    
+      // .then(res => {
+      //   // if (res) return JSON.parse(res)
+      //   // return res ? JSON.parse(res) : null
+      //   return res;
+      // })
+      // .catch(err => {
+      //   throw err;
+      // });
+   },
   /**
    * 根据key 或者 key-id的到数据
    * @params key 必传

@@ -1,7 +1,7 @@
 // import React, {Component} from 'react';
 import ImagePicker from 'react-native-image-picker';
 
-export const selectPhotoTapped = ({options, cb}) => {
+export const selectPhotoTapped = ({options, cb, isSource}) => {
   const defaultOptions = {
     // title: '选择图片',
     cancelButtonTitle: '取消',
@@ -34,17 +34,21 @@ export const selectPhotoTapped = ({options, cb}) => {
       console.log('User tapped custom button: ', response.customButton);
     } else {
       // let source = {uri: response.uri, data: response.data};
-      global.uploadImage(
-        'upload/fileupload',
-        response,
-        res => {
-          console.log('res', res);
-          cb(res.data);
-        },
-        err => {
-          console.log('err---->', err);
-        },
-      );
+      if (isSource) {
+        return {uri: response.uri, data: response.data};
+      } else {
+        global.uploadImage(
+          'upload/fileupload',
+          response,
+          res => {
+            console.log('res', res);
+            cb(res.data);
+          },
+          err => {
+            console.log('err---->', err);
+          },
+        );
+      }
       // You can also display the image using data:
       // let source = { uri: 'data:image/jpeg;base64,' + response.data };
       // return source;

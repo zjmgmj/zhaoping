@@ -39,28 +39,34 @@ class PositionList extends Component {
       this.getPositiontypeList(1);
     });
   }
-  getPositiontypeList(type) {
+  getPositiontypeList(type, params) {
     this.setState({
       positionType: type,
     });
+
     const currentUser = this.state.currentUser;
-    global.httpGet(
-      'position/list',
-      {
-        page: 1,
-        size: 10,
-        userId: currentUser.userId,
-        positionType: type,
-      },
-      res => {
-        const obj = {};
-        obj[`positionList_${type}`] = res.data.result;
-        this.setState({
-          list: res.data.result,
-        });
-        console.log('getPositiontypeList', res);
-      },
-    );
+    const obj = {
+      page: 1,
+      size: 10,
+      userId: currentUser.userId,
+      positionType: type,
+    };
+    let param = obj;
+    if (params) {
+      Object.keys(params).forEach(key => {
+        params[key] = params[key].toString();
+      });
+      param = Object.assign(obj, params);
+    }
+    console.log('param', param);
+    global.httpGet('position/list', param, res => {
+      const obj = {};
+      obj[`positionList_${type}`] = res.data.result;
+      this.setState({
+        list: res.data.result,
+      });
+      console.log('getPositiontypeList', res);
+    });
   }
   render() {
     const navigate = this.props.navigate.navigate;
@@ -122,7 +128,12 @@ class PositionList extends Component {
               </View>
               <TouchableOpacity
                 onPress={() => {
-                  navigate('PositionFilter');
+                  navigate('PositionFilter', {
+                    callBack: res => {
+                      console.log('res', res);
+                      this.getPositiontypeList(this.state.cardNum, res);
+                    },
+                  });
                 }}
                 style={[baseStyle.paddingLeft, baseStyle.row]}>
                 <Text style={{paddingRight: 5}}>筛选</Text>
@@ -149,7 +160,11 @@ class PositionList extends Component {
                     <View style={[baseStyle.row, {flex: 1}]}>
                       <Image
                         style={sty.positionImg}
-                        source={require('../../../images/position_1.png')}
+                        source={
+                          item.logo
+                            ? {uri: item.logo}
+                            : require('../../../images/position_1.png')
+                        }
                       />
                       <View style={{paddingLeft: 15}}>
                         <Text style={baseStyle.positionTitle}>
@@ -188,7 +203,7 @@ class PositionList extends Component {
                         alignItems: 'flex-end',
                       }}>
                       <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
-                        18-20K
+                        {item.salaryName}
                       </Text>
                       <Text style={baseStyle.textYellow}>分享职位链接</Text>
                     </View>

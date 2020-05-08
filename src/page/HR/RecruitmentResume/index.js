@@ -34,7 +34,7 @@ class RecruitmentResume extends Component {
       {
         page: 1,
         size: 10,
-        positionType: 1,
+        // positionType: 1,
         userId: currentUser.userId,
       },
       res => {
@@ -49,7 +49,7 @@ class RecruitmentResume extends Component {
       .httpGetPromise('position/list', {
         page: this.state.page,
         size: 10,
-        positionType: 1,
+        // positionType: 1,
         userId: this.state.currentUser.userId,
       })
       .then(res => {

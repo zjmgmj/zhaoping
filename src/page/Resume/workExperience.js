@@ -80,7 +80,7 @@ class WorkExperience extends Component {
           list={list}
           labelKey={'dvalue'}
           valueKey={'id'}
-          selected={this.state.form[key]}
+          selected={this.state.form.salaryId}
           close={() => {
             TopviewGetInstance().remove(this.state.pickId);
           }}
@@ -238,7 +238,8 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue=""
+                // defaultValue=""
+                value={this.state.form.salaryName}
                 style={sty.textInput}
                 placeholder={'年薪'}
                 editable={false}

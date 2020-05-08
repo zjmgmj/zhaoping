@@ -84,19 +84,19 @@ class Login extends Component {
       });
       return false;
     }
-    if (!code || code !== senCode) {
-      this.setState({
-        modalShow: true,
-        modalContent: '验证码错误',
-      });
-      return false;
-    }
+    // if (!code || code !== senCode) {
+    //   this.setState({
+    //     modalShow: true,
+    //     modalContent: '验证码错误',
+    //   });
+    //   return false;
+    // }
     const params = {
       phone: this.state.phone,
     };
     console.log('params', params);
     httpGet('user/login', params, res => {
-      console.log('res', res);
+      console.log('login', res);
       if (res.code === 1) {
         const userInfo = res.data;
         userInfo.isLogin = true;

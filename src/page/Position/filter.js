@@ -20,19 +20,50 @@ class Filter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      educationList: [
-        '全部',
-        '初中及以下',
-        '中专/中技',
-        '高中',
-        '大专',
-        '本科',
-        '硕士',
-        '博士',
-      ],
+      educationList: [],
+      salaryList: [],
+      experienceList: [],
+      companySizeList: [],
+      financingStageList: [],
+      educationId: '',
+      salaryId: '',
+      experienceId: '',
+      companySize: '',
+      financingStage: '',
+      list: [],
     };
   }
+  UNSAFE_componentWillMount() {
+    this.getDictionary('education', '学历要求', 'educationId');
+    this.getDictionary('salary', '薪资待遇', 'salaryId');
+    this.getDictionary('experience', '经验要求', 'experienceId');
+    this.getDictionary('companySize', '公司规模');
+    this.getDictionary('financingStage', '融资阶段');
+  }
+  getDictionary(key, label, prop) {
+    global.gettypelist(
+      key,
+      res => {
+        console.log('getDictionary', res);
+        const obj = {
+          label: label,
+          prop: prop || key,
+          list: res.data,
+        };
+        const list = this.state.list;
+        list.push(obj);
+        // obj[`${key}List`] = res.data;
+        this.setState({list: list});
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
   render() {
+    const {list} = this.state;
+    console.log('list', list);
+    debugger;
     return (
       <View style={{backgroundColor: '#fff', height: baseStyle.screenHeight}}>
         <Header
@@ -43,33 +74,103 @@ class Filter extends Component {
           }}
         />
         <ScrollView>
-          <View style={baseStyle.content}>
-            <Text style={[baseStyle.ft16, baseStyle.paddingLeft]}>
-              学历要求
-            </Text>
-            <View style={[sty.flexRow]}>
-              {this.state.educationList.map((item, index) => {
-                return (
-                  <View style={sty.filterItem} key={index}>
-                    <Text style={sty.itemText}>{item}</Text>
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-          <View style={baseStyle.content}>
-            <Text style={[baseStyle.ft16, baseStyle.paddingLeft]}>
-              薪资待遇
-            </Text>
-            <View style={[sty.flexRow]}>
-              {this.state.educationList.map((item, index) => {
-                return (
-                  <View style={sty.filterItem} key={index}>
-                    <Text style={sty.itemText}>{item}</Text>
-                  </View>
-                );
-              })}
-            </View>
+          {list.map(item => {
+            return (
+              <View key={item.label} style={baseStyle.content}>
+                <Text style={[baseStyle.ft16, baseStyle.paddingLeft]}>
+                  {item.label}
+                </Text>
+                <View style={[sty.flexRow]}>
+                  {item.list.map(listItem => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          const obj = {};
+                          debugger;
+                          obj[`${item.prop}`] = listItem.id;
+                          this.setState(obj);
+                        }}
+                        key={listItem.id}>
+                        <View
+                          style={[
+                            sty.filterItem,
+                            {
+                              backgroundColor:
+                                this.state[`${item.prop}`] === listItem.id
+                                  ? '#D9B06F'
+                                  : '#fff',
+                            },
+                          ]}>
+                          <Text
+                            style={[
+                              sty.itemText,
+                              {
+                                color:
+                                  this.state[`${item.prop}`] === listItem.id
+                                    ? '#fff'
+                                    : '#666',
+                              },
+                            ]}>
+                            {listItem.dvalue}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            );
+          })}
+          <View
+            style={[
+              baseStyle.row,
+              baseStyle.content,
+              baseStyle.justifyBetween,
+              {
+                borderTopColor: '#E2E1E1',
+                borderTopWidth: 0.5,
+                width: baseStyle.screenWidth - 20,
+              },
+            ]}>
+            <Button
+              onPress={() => {
+                console.log('清除');
+                this.setState({
+                  educationId: '',
+                  salaryId: '',
+                  experienceId: '',
+                  companySize: '',
+                  financingStage: '',
+                });
+              }}
+              style={[sty.subBtn, {backgroundColor: '#F3F1F1'}]}
+              textStyle={{color: '#666666'}}>
+              清除
+            </Button>
+            <Button
+              onPress={() => {
+                console.log('确定');
+                const {
+                  educationId,
+                  salaryId,
+                  experienceId,
+                  companySize,
+                  financingStage,
+                } = this.state;
+                const obj = {
+                  educationId,
+                  salaryId,
+                  experienceId,
+                  companySize,
+                  financingStage,
+                };
+                this.props.navigation.state.params.callBack(obj);
+                this.props.navigation.goBack();
+              }}
+              style={[sty.subBtn, {backgroundColor: '#D9B06F', flex: 1}]}
+              textStyle={{color: '#fff'}}>
+              确定
+            </Button>
           </View>
         </ScrollView>
       </View>
@@ -103,5 +204,10 @@ const sty = StyleSheet.create({
   itemActive: {
     backgroundColor: '#D9B06F',
     color: '#fff',
+  },
+  subBtn: {
+    height: 40,
+    marginLeft: 10,
+    borderRadius: 3,
   },
 });

@@ -202,9 +202,6 @@ class PostPosition extends Component {
             style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>职位类型</Text>
             <View style={[baseStyle.row]}>
-              {/* <TextInput style={[baseStyle.textYellow, sty.textInputSty]}>
-                内推职位
-              </TextInput> */}
               <Text
                 style={
                   this.state.params.positionTypeName
@@ -217,17 +214,6 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
-          {/* {/* <View style={[baseStyle.borderBottom, sty.inputBox]}>
-            <Text>公司信息</Text>
-            <View style={[baseStyle.row]}>
-              <TextInput
-                placeholder="请输入公司信息"
-                style={[baseStyle.textYellow, sty.textInputSty]}>
-                山东共展信息科技有限公司
-              </TextInput>
-              <Iconright color={iconRightFontColor} style={sty.Iconright} />
-            </View>
-            </View> */}
           <TouchableOpacity
             onPress={() => {
               this.openPicked(this.state.companyList, 'company', 'name');
@@ -270,7 +256,7 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               this.props.navigation.navigate('PositionCategory', {
                 callBack: res => {
@@ -296,10 +282,9 @@ class PostPosition extends Component {
                   ? this.state.positionClassName
                   : '请选择'}
               </Text>
-              {/* <Text style={baseStyle.textGray}>请选择</Text> */}
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => {
               this.props.navigation.navigate('PositionDes', {

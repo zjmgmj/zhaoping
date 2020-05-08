@@ -44,7 +44,6 @@ class PositionCategory extends Component {
     global.httpGet('positiontype/list', {pid: pid}, res => {
       console.log(res);
       if (pid) {
-        debugger;
         list[idx].child = res.data;
       } else {
         res.data.map(item => {
