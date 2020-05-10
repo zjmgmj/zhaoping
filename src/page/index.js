@@ -53,6 +53,9 @@ import Refuse from './HR/ResumeList/Refuse';
 import InviteInterview from './HR/InviteInterview';
 import Feedback from './HR/ResumeList/Feedback';
 import SkillTags from './HR/SkillTags';
+import Housekeeper from './HR/Housekeeper';
+import InviteSet from './HR/ResumeList/Invite';
+import OnboardingSet from './HR/ResumeList/OnboardingSet';
 
 const personNavigator = {
   Home: {
@@ -182,6 +185,9 @@ const StackRouteConfigs = createStackNavigator(
     InviteInterview,
     Feedback,
     SkillTags,
+    Housekeeper,
+    InviteSet,
+    OnboardingSet,
   },
   {
     defaultNavigationOptions: {

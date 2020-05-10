@@ -14,6 +14,8 @@ import Iconsearch from '../../iconfont/Iconsearch';
 import IconjiantouDown from '../../iconfont/IconjiantouDown';
 // import PositionItem from '../../components/PositionItem';
 import PositionList from '../../components/PositionList';
+import CitySelected from '../../components/CitySelected';
+import {TopviewGetInstance} from 'beeshell';
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
@@ -23,7 +25,37 @@ class Position extends Component {
     super();
     this.state = {
       params: {},
+      cityPickId: null,
     };
+  }
+  openCityPick() {
+    const {provinceId, cityId} = this.state.params;
+    const selected = {
+      provinceId: provinceId || '',
+      cityId: cityId || '',
+    };
+    TopviewGetInstance()
+      .add(
+        <CitySelected
+          selected={selected}
+          close={() => {
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+          selectedEvent={res => {
+            const params = Object.assign(this.state.params, res);
+            this.setState({
+              params,
+            });
+            this.positionList.state.getPositionList(params);
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          cityPickId: id,
+        });
+      });
   }
   render() {
     return (
@@ -48,10 +80,14 @@ class Position extends Component {
               <View style={sty.yellowSolidBottom} />
             </View>
             <View style={baseStyle.row}>
-              <View style={baseStyle.row}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.openCityPick();
+                }}
+                style={baseStyle.row}>
                 <Text style={{paddingRight: 5}}>城市</Text>
                 <IconjiantouDown color="#B0ADAD" />
-              </View>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   this.props.navigation.navigate('PositionFilter', {

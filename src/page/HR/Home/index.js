@@ -6,6 +6,7 @@ import {baseStyle} from '../../../components/baseStyle';
 import {sty} from './sty';
 import Header from '../../../components/Header';
 import IconjiantouDown from '../../../iconfont/IconjiantouDown';
+import CitySelected from '../../../components/CitySelected';
 
 class Banner extends Component {
   render() {
@@ -28,6 +29,8 @@ class PositionList extends Component {
       list: [],
       positionList_1: [],
       positionList_2: [],
+      cityPickId: null,
+      params: {},
     };
   }
   UNSAFE_componentWillMount() {
@@ -67,6 +70,35 @@ class PositionList extends Component {
       });
       console.log('getPositiontypeList', res);
     });
+  }
+  openCityPick() {
+    const {provinceId, cityId} = this.state.params;
+    const selected = {
+      provinceId: provinceId || '',
+      cityId: cityId || '',
+    };
+    TopviewGetInstance()
+      .add(
+        <CitySelected
+          selected={selected}
+          close={() => {
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+          selectedEvent={res => {
+            const params = Object.assign(this.state.params, res);
+            this.setState({
+              params,
+            });
+            this.getPositiontypeList(this.state.cardNum, params);
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          cityPickId: id,
+        });
+      });
   }
   render() {
     const navigate = this.props.navigate.navigate;
@@ -122,10 +154,14 @@ class PositionList extends Component {
               </TouchableOpacity>
             </View>
             <View style={baseStyle.row}>
-              <View style={baseStyle.row}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.openCityPick();
+                }}
+                style={baseStyle.row}>
                 <Text style={{paddingRight: 5}}>城市</Text>
                 <IconjiantouDown color="#B0ADAD" />
-              </View>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   navigate('PositionFilter', {
@@ -160,11 +196,7 @@ class PositionList extends Component {
                     <View style={[baseStyle.row, {flex: 1}]}>
                       <Image
                         style={sty.positionImg}
-                        source={
-                          item.logo
-                            ? {uri: item.logo}
-                            : require('../../../images/position_1.png')
-                        }
+                        source={{uri: item.logo}}
                       />
                       <View style={{paddingLeft: 15}}>
                         <Text style={baseStyle.positionTitle}>

@@ -174,7 +174,7 @@ class PostPosition extends Component {
         <ScrollView style={baseStyle.content}>
           <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>单位名称</Text>
-            <View style={[baseStyle.row]}>
+            <View style={[baseStyle.row, {flex: 1}]}>
               <TextInput
                 placeholder="请输入公司信息"
                 style={[baseStyle.textYellow, sty.textInputSty]}
@@ -211,6 +211,25 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
+          {/* <TouchableOpacity
+            onPress={() => {
+              console.log('---');
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
+            <Text>公司地址</Text>
+            <View style={[baseStyle.row]}>
+              <Text
+                style={
+                  this.state.params.cityName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.cityName || '请选择'}
+                {this.state.params.address}
+              </Text>
+              <Iconright color={iconRightFontColor} style={sty.Iconright} />
+            </View>
+          </TouchableOpacity> */}
           <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>联系人信息</Text>
             <View style={[baseStyle.row]}>

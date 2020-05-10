@@ -42,6 +42,9 @@ class RecruitmentResume extends Component {
           list: res.data.result,
         });
       },
+      err => {
+        console.log(err);
+      },
     );
   }
   refresh() {
@@ -70,13 +73,14 @@ class RecruitmentResume extends Component {
   }
   updatePositionRecord(item, resumeTemp) {
     const params = {
-      positionId: item.positionId,
-      userId: item.userId,
-      status: item.status,
+      id: item.id,
+      // userId: item.userId,
+      // status: item.status,
       resumeTemp: resumeTemp,
     };
+    console.log('params------', params);
     global.httpPost(
-      'positionrecord/update',
+      'position/update',
       params,
       res => {
         console.log(res);
@@ -112,6 +116,7 @@ class RecruitmentResume extends Component {
                 style={{marginBottom: 10, backgroundColor: '#fff'}}>
                 <Item
                   updatePositionRecord={path => {
+                    console.log('updatePositionRecord', item);
                     this.updatePositionRecord(item, path);
                   }}
                   item={item}

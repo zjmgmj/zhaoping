@@ -36,7 +36,7 @@ export const httpGet = (api, parameter = {}, success, failure = () => {}) => {
       }
     });
 };
-export const httpPost = (url, parameter, success, failure) => {
+export const httpPost = (url, parameter, success, failure = () => {}) => {
   //封装请求配置： 请求方法、请求头、请求体
   let opt = {
     method: 'POST',
@@ -63,7 +63,7 @@ export const httpPost = (url, parameter, success, failure) => {
     });
 };
 
-export const uploadImage = (url, file, success, failure) => {
+export const uploadImage = (url, file, success, failure = () => {}) => {
   let formData = new FormData();
   const fileData = {
     uri: file.uri,
@@ -97,7 +97,7 @@ export const uploadFilePost = ({
   url = 'upload/fileupload',
   file,
   success,
-  failure,
+  failure = () => {},
 }) => {
   console.log('file', file);
   let formData = new FormData();

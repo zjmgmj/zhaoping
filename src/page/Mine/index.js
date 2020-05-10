@@ -53,7 +53,6 @@ class Mine extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // userType: 1,
       currentUser: null,
       hrMenuList: [
         {
@@ -69,7 +68,7 @@ class Mine extends Component {
         {
           icon: require('../../images/yun_icon.png'),
           title: '专属管家',
-          url: 'FollowPosition',
+          url: 'Housekeeper',
         },
         {
           icon: require('../../images/news_icon.png'),
@@ -78,19 +77,20 @@ class Mine extends Component {
         },
         {
           icon: require('../../images/qiehuan_icon.png'),
-          title: '切换HR角色',
-          url: 'Main',
+          title: '切换智推官角色',
+          // url: 'Main',
           handler: () => {
             const currentUser = this.state.currentUser;
             currentUser.userType = 2;
-            this.setState({
-              currentUser: currentUser,
-            });
             global.localStorage.set({
               key: 'currentUser',
               data: currentUser,
               expires: null,
             });
+            // this.setState({
+            //   currentUser: currentUser,
+            // });
+            this.props.navigation.navigate('Main');
           },
           right: (
             <View>
@@ -145,20 +145,20 @@ class Mine extends Component {
         },
         {
           icon: require('../../images/qiehuan_icon.png'),
-          title: '切换角色',
-          url: 'HrMain',
+          title: '切换HR角色',
+          // url: 'HrMain',
           handler: () => {
             const currentUser = this.state.currentUser;
             currentUser.userType = 1;
-            this.setState({
-              currentUser: currentUser,
-            });
             global.localStorage.set({
               key: 'currentUser',
               data: currentUser,
               expires: null,
             });
-            console.log('currentUser');
+            // this.setState({
+            //   currentUser: currentUser,
+            // });
+            this.props.navigation.navigate('HrMain');
           },
           right: (
             <View>
@@ -183,74 +183,94 @@ class Mine extends Component {
     };
   }
   UNSAFE_componentWillMount() {
+    this.getCurrentUser();
+  }
+  getCurrentUser() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
-      console.log(res);
+      console.log('currentUser', res);
       this.setState({
         currentUser: res,
       });
     });
   }
   render() {
-    const currentUser = this.state.currentUser;
+    const {currentUser} = this.state;
     if (!currentUser) {
       return false;
     }
-    // let list = []
     const list =
       currentUser.userType === 2 ? this.state.menuList : this.state.hrMenuList;
     return (
-      <ScrollView>
-        <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
-          <ImageBackground
-            style={sty.headSty}
-            source={require('../../images/mine_bg.png')}>
-            <Header isHeader={false} />
-            <View style={[baseStyle.flex, sty.headContent]}>
-              <Image
-                source={require('../../images/author.png')}
-                style={sty.authorImg}
-              />
-              <View
-                style={[
-                  baseStyle.paddingLeft,
-                  {flexDirection: 'column', justifyContent: 'space-between'},
-                ]}>
-                <View>
-                  <Text style={[baseStyle.textWhite, baseStyle.ft16]}>
-                    Lisa yang
-                  </Text>
+      <ScrollView
+        style={{height: baseStyle.screenHeight, backgroundColor: '#fff'}}>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('ResumeInfo', {
+                from: 'mine',
+                callBack: res => {
+                  console.log(res);
+                  this.getCurrentUser();
+                },
+              });
+            }}>
+            <ImageBackground
+              style={sty.headSty}
+              source={require('../../images/mine_bg.png')}>
+              <Header isHeader={false} />
+              <View style={[baseStyle.flex, sty.headContent]}>
+                <View style={sty.authorImgBox}>
+                  <Image
+                    source={
+                      currentUser.userPic
+                        ? {uri: currentUser.userPic}
+                        : require('../../images/author.png')
+                    }
+                    style={sty.authorImg}
+                  />
                 </View>
-                {this.state.userType === 1 ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      console.log('签到');
-                    }}
-                    style={sty.qiandao}>
-                    <Text style={baseStyle.textWhite}>点击签到</Text>
-                  </TouchableOpacity>
-                ) : (
+                <View
+                  style={[
+                    baseStyle.paddingLeft,
+                    {flexDirection: 'column', justifyContent: 'space-between'},
+                  ]}>
                   <View>
-                    <View>
-                      <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
-                        <Text>人力资源经理</Text>
-                        <Text style={sty.pLpr}> | </Text>
-                        <Text>深圳房多多科技公司</Text>
-                      </Text>
-                    </View>
-                    <View>
-                      <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
-                        <Text>28岁</Text>
-                        <Text style={sty.pLpr}> | </Text>
-                        <Text>工作5年</Text>
-                        <Text style={sty.pLpr}> | </Text>
-                        <Text>上海长宁区</Text>
-                      </Text>
-                    </View>
+                    <Text style={[baseStyle.textWhite, baseStyle.ft16]}>
+                      {currentUser.userNickname}
+                    </Text>
                   </View>
-                )}
+                  {this.state.userType === 1 ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        console.log('签到');
+                      }}
+                      style={sty.qiandao}>
+                      <Text style={baseStyle.textWhite}>点击签到</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View>
+                      <View>
+                        <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
+                          <Text>人力资源经理</Text>
+                          <Text style={sty.pLpr}> | </Text>
+                          <Text>深圳房多多科技公司</Text>
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
+                          <Text>28岁</Text>
+                          <Text style={sty.pLpr}> | </Text>
+                          <Text>工作5年</Text>
+                          <Text style={sty.pLpr}> | </Text>
+                          <Text>上海长宁区</Text>
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-          </ImageBackground>
+            </ImageBackground>
+          </TouchableOpacity>
           <View style={sty.tabBoxSty}>
             <Card style={sty.tabContentSty}>
               {currentUser && currentUser.userType === 1 ? (
@@ -308,15 +328,9 @@ class Mine extends Component {
                     console.log('---', item);
                     if (item.handler) {
                       item.handler();
+                    } else {
+                      this.props.navigation.navigate(item.url);
                     }
-                    this.props.navigation.navigate(item.url);
-                    // if () {
-                    //   global.localStorage.set({
-                    //     key: 'currentUser',
-                    //     data: userInfo,
-                    //     expires: null,
-                    //   });
-                    // }
                   }}>
                   <MineList item={item} />
                 </TouchableOpacity>
@@ -375,6 +389,12 @@ const sty = StyleSheet.create({
     width: baseStyle.screenWidth,
     height: 145.5,
     resizeMode: 'contain',
+  },
+  authorImgBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 100,
+    overflow: 'hidden',
   },
   authorImg: {
     width: 60,

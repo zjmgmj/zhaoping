@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Alert} from 'react-native';
 import {baseStyle} from '../../components/baseStyle';
+import RNFetchBlob from 'rn-fetch-blob';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 class Item extends Component {
   constructor(props) {
@@ -15,8 +17,38 @@ class Item extends Component {
       },
     };
   }
+  updatePositionRecord(item, resumeTemp) {
+    const params = {
+      positionId: item.positionId,
+      userId: item.userId,
+      status: item.status,
+      resumeTemp: resumeTemp,
+    };
+    global.httpPost(
+      'positionrecord/update',
+      params,
+      res => {
+        console.log(res);
+        Alert.alert('', '上传模板成功');
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
+  downFile(item) {
+    console.log('downFile--------', item);
+    // let dirs = RNFetchBlob.fs.dirs;
+    RNFetchBlob.fetch('GET', item.resumeTemp)
+      .then(res => {
+        console.log('----下载完成文件保存路径为\n' + JSON.stringify(res));
+        Alert.alert('下载成功');
+      })
+      .catch(err => console.log('err', err));
+  }
   render() {
     const item = this.props.item.item;
+    console.log('职位进展item', item);
     const statusObj = this.state.statusObj;
     return (
       <View style={baseStyle.content}>
@@ -46,12 +78,23 @@ class Item extends Component {
         {item.positionRecordstatus === 1 ? (
           item.resumeTemp ? (
             <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
-              <View style={sty.btn}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.downFile(item);
+                }}
+                style={sty.btn}>
                 <Text style={baseStyle.textYellow}>下载简历模板</Text>
-              </View>
-              <View style={sty.btn}>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  global.uploadFile(res => {
+                    console.log('res', res);
+                    this.updatePositionRecord(item, res.data);
+                  });
+                }}
+                style={sty.btn}>
                 <Text style={baseStyle.textYellow}>上传新简历</Text>
-              </View>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>

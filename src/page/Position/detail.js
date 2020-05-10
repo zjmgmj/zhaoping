@@ -32,6 +32,7 @@ class Detail extends Component {
         currentUser: null,
       },
       company: null,
+      headHeight: 0,
     };
   }
   UNSAFE_componentWillMount() {
@@ -117,16 +118,16 @@ class Detail extends Component {
     });
   }
   render() {
-    const {detail, company} = this.state;
-    if (!detail.id) {
+    const {detail, company, currentUser, headHeight} = this.state;
+    if (!detail.id && !currentUser) {
       return false;
     }
+    console.log('currentUser', currentUser.userType);
     const positionBenefits = detail.positionBenefits
       ? detail.positionBenefits.split(',')
       : [];
     return (
-      <View
-        style={{backgroundColor: '#FBFBFB', height: baseStyle.screenHeight}}>
+      <View style={{backgroundColor: '#fff', height: baseStyle.screenHeight}}>
         <ImageBackground
           style={sty.headSty}
           source={require('../../images/position_bg.png')}>
@@ -305,58 +306,62 @@ class Detail extends Component {
               </View>
             </View>
           ) : null}
-
-          <View
-            style={[
-              baseStyle.bgWhite,
-              baseStyle.content,
-              baseStyle.row,
-              baseStyle.justifyBetween,
-              {
-                borderTopColor: '#E8E7E7',
-                borderTopWidth: 0.5,
-                paddingTop: 15,
-                paddingBottom: 15,
-              },
-            ]}>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  shareModal: true,
-                });
-              }}
-              style={{
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}>
-              <IconShare size={25} />
-              <Text style={{marginTop: 5}}>我要推荐</Text>
-            </TouchableOpacity>
-            <View style={baseStyle.row}>
-              <Button
+          {currentUser.userType == 2 ? (
+            <View
+              style={[
+                baseStyle.bgWhite,
+                baseStyle.content,
+                baseStyle.row,
+                baseStyle.justifyBetween,
+                {
+                  borderTopColor: '#E8E7E7',
+                  borderTopWidth: 0.5,
+                  paddingTop: 15,
+                  paddingBottom: 15,
+                },
+              ]}>
+              <TouchableOpacity
                 onPress={() => {
-                  this.props.navigation.navigate('PostResumeList', {
-                    callBack: resumeId => {
-                      console.log(resumeId);
-                      this.positionrecord(resumeId);
-                    },
+                  this.setState({
+                    shareModal: true,
                   });
-                  console.log('投递简历');
                 }}
-                style={[
-                  sty.subBtn,
-                  {width: 109, borderColor: '#D9B06F', borderWidth: 0.5},
-                ]}
-                textStyle={{color: '#D9B06F'}}>
-                投递简历
-              </Button>
-              <Button
-                style={[sty.subBtn, {width: 166.5, backgroundColor: '#D9B06F'}]}
-                textStyle={{color: '#fff'}}>
-                立即沟通
-              </Button>
+                style={{
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}>
+                <IconShare size={25} />
+                <Text style={{marginTop: 5}}>我要推荐</Text>
+              </TouchableOpacity>
+              <View style={baseStyle.row}>
+                <Button
+                  onPress={() => {
+                    this.props.navigation.navigate('PostResumeList', {
+                      callBack: resumeId => {
+                        console.log(resumeId);
+                        this.positionrecord(resumeId);
+                      },
+                    });
+                    console.log('投递简历');
+                  }}
+                  style={[
+                    sty.subBtn,
+                    {width: 109, borderColor: '#D9B06F', borderWidth: 0.5},
+                  ]}
+                  textStyle={{color: '#D9B06F'}}>
+                  投递简历
+                </Button>
+                <Button
+                  style={[
+                    sty.subBtn,
+                    {width: 166.5, backgroundColor: '#D9B06F'},
+                  ]}
+                  textStyle={{color: '#fff'}}>
+                  立即沟通
+                </Button>
+              </View>
             </View>
-          </View>
+          ) : null}
         </ScrollView>
         {/* <Share /> */}
         <Modal

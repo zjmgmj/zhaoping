@@ -29,7 +29,7 @@ class Item extends Component {
           <TouchableOpacity
             onPress={() => {
               global.uploadFile(res => {
-                console.log('res', res);
+                console.log('uploadFile', res);
                 this.props.updatePositionRecord(res.data);
               });
             }}

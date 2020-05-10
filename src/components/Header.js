@@ -29,6 +29,7 @@ const Header = ({
   isHeader = true,
   isBorder = true,
   titleElement = false,
+  setHeadHeight,
 }) => {
   const headerStyle = [
     styles.header,
@@ -38,6 +39,12 @@ const Header = ({
     },
     style,
   ];
+
+  let isHeight = false;
+  if (setHeadHeight && !isHeight) {
+    setHeadHeight(fullScreen || isiOS() ? STATUS_BAR_HEIGHT : 0);
+    isHeight = true;
+  }
   const back = <Iconback color={color} />;
   const titleDom = <Text style={[styles.title, {color}]}>{title}</Text>;
   const titleRender = titleElement ? <View>{titleElement}</View> : titleDom;

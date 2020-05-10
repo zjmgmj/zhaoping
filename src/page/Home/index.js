@@ -283,7 +283,7 @@ class PositionList extends Component {
                     <View style={[baseStyle.row, {flex: 1}]}>
                       <Image
                         style={sty.positionImg}
-                        source={require('../../images/position_1.png')}
+                        source={{uri: item.logo}}
                       />
                       <View style={{paddingLeft: 15}}>
                         <Text style={baseStyle.positionTitle}>

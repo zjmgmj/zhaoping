@@ -15,6 +15,7 @@ import {baseStyle} from '../../../components/baseStyle';
 import {Iconright} from '../../../iconfont/Iconright';
 import Picker from '../../../components/picker';
 import {TopviewGetInstance} from 'beeshell';
+import CitySelected from '../../../components/CitySelected';
 
 @setStatusBar({
   translucent: true,
@@ -63,6 +64,7 @@ class PostPosition extends Component {
         userTitle: '',
         workAddress: '',
       },
+      cityPickId: null,
     };
   }
   UNSAFE_componentWillMount() {
@@ -180,6 +182,34 @@ class PostPosition extends Component {
       .then(id => {
         this.setState({
           pickId: id,
+        });
+      });
+  }
+  openCityPick() {
+    const {provinceId, cityId} = this.state.params;
+    const selected = {
+      provinceId: provinceId || '',
+      cityId: cityId || '',
+    };
+    TopviewGetInstance()
+      .add(
+        <CitySelected
+          selected={selected}
+          close={() => {
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+          selectedEvent={res => {
+            const params = Object.assign(this.state.params, res);
+            this.setState({
+              params,
+            });
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          cityPickId: id,
         });
       });
   }
@@ -387,13 +417,25 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
-          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+          <TouchableOpacity
+            onPress={() => {
+              this.openCityPick();
+            }}
+            style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>工作地点</Text>
             <View style={[baseStyle.row]}>
-              <Text style={baseStyle.textGray}>请选择</Text>
+              <Text
+                style={
+                  this.state.params.provinceName
+                    ? baseStyle.textYellow
+                    : baseStyle.textGray
+                }>
+                {this.state.params.provinceName || '请选择'}
+                {this.state.params.cityName}
+              </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </View>
+          </TouchableOpacity>
           <Button
             onPress={() => {
               this.savePosition();

@@ -3,7 +3,7 @@ import {Text, Platform} from 'react-native';
 import {httpGet, httpGetPromise, uploadFilePost} from './httpUtil';
 import Modal, {ModalContent} from 'react-native-modals';
 import RNFileSelector from 'react-native-file-selector';
-export const gettypelist = (code, success, failure) => {
+export const gettypelist = (code, success, failure = () => {}) => {
   httpGet(
     'dictionary/gettypelist',
     {code: code},

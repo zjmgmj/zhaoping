@@ -50,22 +50,30 @@ class ResumeInfo extends Component {
     };
   }
   UNSAFE_componentWillMount() {
-    debugger;
-    Object.assign(this.state.info, this.props.navigation.getParam('data'));
-    this.setState({
-      info: Object.assign(
-        this.state.info,
-        this.props.navigation.getParam('data'),
-      ),
-    });
-    debugger;
-    global.localStorage.get({key: 'currentUser'}).then(res => {
-      console.log(res);
-      this.setState({
-        currentUser: res,
+    if (this.props.navigation.getParam('from') === 'mine') {
+      global.localStorage.get({key: 'currentUser'}).then(res => {
+        console.log(res);
+        this.setState({
+          currentUser: res,
+          info: res,
+        });
+        this.setParams('userId', res.userId);
       });
-      this.setParams('userId', res.userId);
-    });
+    } else {
+      Object.assign(this.state.info, this.props.navigation.getParam('data'));
+      this.setState({
+        info: Object.assign(
+          this.state.info,
+          this.props.navigation.getParam('data'),
+        ),
+      });
+      global.localStorage.get({key: 'currentUser'}).then(res => {
+        this.setState({
+          currentUser: res,
+        });
+        this.setParams('userId', res.userId);
+      });
+    }
   }
   renderSafeArea() {
     return (
@@ -77,7 +85,6 @@ class ResumeInfo extends Component {
     );
   }
   saveInfo() {
-    debugger;
     const params = this.state.info;
     params.workdate = new Date(params.workingDate).getFullYear();
     const workdateTime = new Date(params.workingDate).getTime();
@@ -87,10 +94,19 @@ class ResumeInfo extends Component {
     params.workyear = year;
     debugger;
     console.log(params);
-    let url = 'resume/save';
-    if (params.id) {
-      url = 'resume/update';
+    let url = '';
+    if (this.props.navigation.getParam('from') === 'mine') {
+      url = 'user/save';
+      if (params.userId) {
+        url = 'user/update';
+      }
+    } else {
+      url = 'resume/save';
+      if (params.id) {
+        url = 'resume/update';
+      }
     }
+    console.log('params', params);
     global.httpPost(
       url,
       params,
@@ -99,6 +115,14 @@ class ResumeInfo extends Component {
         params.id = res.data;
         this.props.navigation.state.params.callBack(params);
         this.props.navigation.goBack();
+        if (this.props.navigation.getParam('from') === 'mine') {
+          const currentUser = Object.assign(this.state.info, params);
+          global.localStorage.set({
+            key: 'currentUser',
+            data: currentUser,
+            expires: null,
+          });
+        }
       },
       err => {
         console.log(err);
@@ -148,7 +172,12 @@ class ResumeInfo extends Component {
   render() {
     const iconRightFontColor = '#666666';
     const hintColor = '#333';
+    if (!this.state.currentUser) {
+      return false;
+    }
+    const isMine = this.props.navigation.getParam('from') === 'mine';
     const info = this.state.info;
+    console.log('info', info);
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -168,14 +197,17 @@ class ResumeInfo extends Component {
               selectPhotoTapped({
                 me: this,
                 cb: res => {
-                  this.setParams('pic', res);
+                  this.setParams(isMine ? 'userPic' : 'pic', res);
                 },
               });
             }}
             style={[sty.flexContentBetween, sty.inforItem]}>
             <Text>头像</Text>
-            {info.pic ? (
-              <Image style={sty.authorImg} source={{uri: info.pic}} />
+            {info.pic || info.userPic ? (
+              <Image
+                style={sty.authorImg}
+                source={{uri: info.pic || info.userPic}}
+              />
             ) : (
               <Image
                 style={sty.authorImg}
@@ -189,12 +221,14 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue={info.name}
-                value={info.name}
+                value={info.userNickname || info.name}
                 style={sty.textInput}
                 placeholder={'姓名'}
                 onChange={e => {
-                  this.setParams('name', e.nativeEvent.text);
+                  this.setParams(
+                    isMine ? 'userNickname' : 'name',
+                    e.nativeEvent.text,
+                  );
                 }}
               />
             </TextInputLayout>
@@ -275,12 +309,14 @@ class ResumeInfo extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue={info.phone}
-                value={info.phone}
+                value={info.userLogin || info.phone}
                 style={sty.textInput}
                 placeholder={'手机号码'}
                 onChange={e => {
-                  this.setParams('phone', e.nativeEvent.text);
+                  this.setParams(
+                    isMine ? 'userLogin' : 'phone',
+                    e.nativeEvent.text,
+                  );
                 }}
               />
             </TextInputLayout>

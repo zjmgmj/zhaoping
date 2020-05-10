@@ -42,7 +42,35 @@ class ItemComp extends Component {
               {/* <Text>市场经理 | 互联网价值观</Text> */}
             </View>
           </View>
-          <Iconright color="#D3CECE" />
+          <View
+            style={{
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'flex-end',
+            }}>
+            <Text style={[baseStyle.textRed, {paddingBottom: 5}]}>
+              {item.positionRecordstatus === 0
+                ? '已投递'
+                : item.positionRecordstatus === 1
+                ? '已邀约'
+                : item.positionRecordstatus === 2
+                ? '已面试'
+                : item.positionRecordstatus === 3
+                ? '未面试'
+                : item.positionRecordstatus === 4
+                ? '拒绝面试'
+                : item.positionRecordstatus === 5
+                ? '谈薪待入职'
+                : item.positionRecordstatus === 6
+                ? '已雇佣'
+                : item.positionRecordstatus === 7
+                ? '过保'
+                : item.positionRecordstatus === 8
+                ? '入职未过保'
+                : ''}
+            </Text>
+            <Iconright color="#D3CECE" />
+          </View>
         </View>
         {item.positionRecordstatus === 0 ? (
           <View
@@ -66,19 +94,24 @@ class ItemComp extends Component {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                this.props.updatePositionRecord(1);
+                // this.props.updatePositionRecord(1);
+                navigation.navigate('InviteSet', {
+                  positionRecordId: item.positionRecordId,
+                  callBack: () => {
+                    this.props.refresh();
+                  },
+                });
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>邀请面试</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
-                // this.props.updatePositionRecord(item.userId);
                 console.log('查看简历模板');
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>查看简历模板</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         ) : item.positionRecordstatus === 1 ? (
           <View
@@ -102,14 +135,14 @@ class ItemComp extends Component {
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>未面试</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
                 console.log('----');
                 this.props.updatePositionRecord(4);
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>拒绝面试</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         ) : item.positionRecordstatus === 2 ? (
           <View
@@ -120,10 +153,29 @@ class ItemComp extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('----');
-                this.props.updatePositionRecord(6);
+                this.props.updatePositionRecord(5);
               }}
               style={sty.buttonSty}>
-              <Text style={baseStyle.textYellow}>确认录用</Text>
+              <Text style={baseStyle.textYellow}>谈薪待入职</Text>
+            </TouchableOpacity>
+          </View>
+        ) : item.positionRecordstatus === 5 ? (
+          <View
+            style={[
+              baseStyle.row,
+              {justifyContent: 'flex-end', marginTop: 10},
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('OnboardingSet', {
+                  positionRecordId: item.positionRecordId,
+                  callBack: () => {
+                    this.props.refresh();
+                  },
+                });
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>已雇佣 </Text>
             </TouchableOpacity>
           </View>
         ) : item.positionRecordstatus === 6 ? (
@@ -133,6 +185,22 @@ class ItemComp extends Component {
               {justifyContent: 'flex-end', marginTop: 10},
             ]}>
             <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                this.props.updatePositionRecord(7);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>过保</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('----');
+                this.props.updatePositionRecord(8);
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>入职未过保</Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
               onPress={() => {
                 console.log('----');
                 // this.props.updatePositionRecord(6);
@@ -154,7 +222,7 @@ class ItemComp extends Component {
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>设置入职时间</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         ) : null}
       </View>
