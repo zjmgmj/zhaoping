@@ -40,7 +40,8 @@ class rreview extends Component {
         resumeStatus: 0,
         resumeIntention: '',
         selfEvaluation: '',
-        id: 1,
+        // id: 3,
+        labels: '',
       },
       jobStatus: '',
       resumeStatus: '',
@@ -56,9 +57,15 @@ class rreview extends Component {
           value: 1,
         },
       ],
+      resumeId: null,
     };
   }
   UNSAFE_componentWillMount() {
+    const resumeId = this.props.navigation.getParam('id');
+    if (resumeId) {
+      this.setState({resumeId});
+      this.getDetail(resumeId);
+    }
     global.gettypelist('education', res => {
       // 学历
       this.setState({
@@ -67,10 +74,29 @@ class rreview extends Component {
     });
     global.gettypelist('resumeStatus', res => {
       // 简历设置
+      console.log('resumeStatus', res.data);
       this.setState({
         resumeStatusList: res.data,
       });
     });
+  }
+  getDetail(id) {
+    global.httpGet(
+      'resume/detail',
+      {id: id},
+      res => {
+        console.log('resume', res);
+        this.setState({
+          resume: res.data,
+        });
+        this.getResumeworkexpList(res.data.userId);
+        this.getResumeprojectexpList(res.data.userId);
+        this.getResumeschoolexpList(res.data.userId);
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
   getEducationName(id) {
     const education = this.state.educationList.find(item => {
@@ -82,11 +108,61 @@ class rreview extends Component {
       return '';
     }
   }
+  setResume(key, value) {
+    const resume = this.state.resume;
+    resume[key] = value;
+    this.setState({
+      resume: resume,
+    });
+  }
   getAge() {
     const nowDate = new Date().getTime();
     const birthDate = this.state.resume.birthDate;
     const date = nowDate - birthDate;
     return parseInt(date / 1000 / 60 / 60 / 24 / 365);
+  }
+  openPicked({list, key, valueKey, labelKey = 'label'}) {
+    TopviewGetInstance()
+      .add(
+        <Picker
+          list={list}
+          labelKey={labelKey}
+          valueKey={valueKey}
+          selected={this.state.resume[key]}
+          close={() => {
+            TopviewGetInstance().remove(this.state.pickId);
+          }}
+          selectedEvent={item => {
+            const resume = this.state.resume;
+            resume[key] = item[valueKey];
+            this.setState({
+              resume: resume,
+            });
+            TopviewGetInstance().remove(this.state.pickId);
+            this.updateResume();
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          pickId: id,
+        });
+      });
+  }
+  setWorkExperience(res) {
+    console.log(res);
+    const workExperienceList = this.state.workExperienceList;
+    workExperienceList.push(res);
+    this.setState({
+      workExperienceList: workExperienceList,
+    });
+  }
+  setProjectExperience(res) {
+    const projectExperienceList = this.state.projectExperienceList;
+    projectExperienceList.push(res);
+    this.setState({
+      projectExperienceList: projectExperienceList,
+    });
   }
   getJobStatus(key) {
     const jobStatus = this.state.resume.jobStatus;
@@ -98,8 +174,9 @@ class rreview extends Component {
   getResumeStatus(key) {
     const resumeStatus = this.state.resume.resumeStatus;
     const resumeStatusItem = this.state.resumeStatusList.find(item => {
-      return item.value === resumeStatus;
+      return item.id === resumeStatus;
     });
+    console.log('resumeStatusItem', resumeStatusItem);
     if (resumeStatusItem) {
       return resumeStatusItem[key];
     } else {
@@ -118,10 +195,71 @@ class rreview extends Component {
       },
     );
   }
+  getResumeschoolexpList(userId) {
+    global.httpGet(
+      'resumeschoolexp/list',
+      {userId: userId || this.state.resume.userId},
+      res => {
+        console.log('projectExperienceList', res);
+        this.setState({
+          educationalExpList: res.data,
+        });
+      },
+    );
+  }
+  getResumeworkexpList(userId) {
+    global.httpGet(
+      'resumeworkexp/list',
+      {userId: userId || this.state.resume.userId},
+      res => {
+        console.log('projectExperienceList', res);
+        this.setState({
+          workExperienceList: res.data,
+        });
+      },
+    );
+  }
+  getResumeprojectexpList(userId) {
+    global.httpGet(
+      'resumeprojectexp/list',
+      {userId: userId || this.state.resume.userId},
+      res => {
+        console.log('projectExperienceList', res);
+        this.setState({
+          projectExperienceList: res.data,
+        });
+      },
+    );
+  }
+  saveResume() {
+    global.httpPost(
+      'resume/save',
+      this.state.resume,
+      res => {
+        console.log(res);
+      },
+      err => {
+        console.log(err);
+      },
+    );
+  }
+  setParams(val, key) {
+    const params = this.state.resume;
+    params[key] = val;
+    this.setState({
+      resume: params,
+    });
+    this.updateResume();
+  }
   render() {
-    const resume = this.state.resume;
+    const {resume, resumeId} = this.state;
+    let labels = [];
+    if (resume.labels) {
+      labels = resume.labels.split(',');
+    }
+    console.log('labels', labels);
     return (
-      <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
+      <View style={[baseStyle.bgWhite]}>
         <Header
           title="简历预览"
           rightStyle={baseStyle.textYellow}
@@ -130,34 +268,35 @@ class rreview extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView>
-          <View style={{padding: 10}}>
+        <ScrollView style={{height: baseStyle.screenHeight}}>
+          <View style={{padding: 10, marginBottom: 30}}>
             <View style={[sty.inforItem, sty.flexContentBetween]}>
               <View>
                 <View style={baseStyle.row}>
                   <Text>个人信息</Text>
-                  <Iconedit style={baseStyle.paddingLeft} size={20} />
+                  {/* <Iconedit style={baseStyle.paddingLeft} size={20} /> */}
                 </View>
                 <View style={baseStyle.paddingTop}>
                   <Text style={baseStyle.textGray}>
-                    {resume.workyear ? `${resume.workyear}年经验 |` : null}
-                    {resume.birthDate ? `${this.getAge()}岁 |` : null}
-                    本科
+                    {resume.workyear ? `${resume.workyear}年经验` : null}
+                    {resume.birthDate ? `  |  ${resume.age}岁` : null}
+                    {resume.educationName
+                      ? `  |  ${resume.educationName}`
+                      : null}
                   </Text>
                 </View>
               </View>
-              <Image
-                style={sty.authorImg}
-                source={require('../../images/author.png')}
-              />
+              <View style={baseStyle.authorBox}>
+                <Image style={baseStyle.authorImg} source={{uri: resume.pic}} />
+              </View>
             </View>
             <View style={[sty.inforItem, sty.flexContentBetween]}>
               <Text>求职状态</Text>
               <View style={sty.rigtSty}>
                 <Text style={baseStyle.textGray}>
-                  {this.getResumeStatus('dvalue')}
+                  {this.getResumeStatus('code')}
                 </Text>
-                <Iconright color="#999999" style={baseStyle.paddingLeft} />
+                {/* <Iconright color="#999999" style={baseStyle.paddingLeft} /> */}
               </View>
             </View>
             <View style={sty.inforItem}>
@@ -168,7 +307,6 @@ class rreview extends Component {
                   {flex: 1},
                 ]}>
                 <Text>职业意向</Text>
-                <Iconedit />
               </View>
               <Text style={[baseStyle.textGray, baseStyle.paddingTop]}>
                 {resume.resumeIntention || '请选择职业意向'}
@@ -177,45 +315,60 @@ class rreview extends Component {
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
                 <Text>技能标签</Text>
-                <Iconedit />
               </View>
               <View style={[baseStyle.row, baseStyle.paddingTop]}>
-                <Button
-                  size="sm"
-                  style={{borderColor: '#999999', marginRight: 10}}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={[{marginRight: 5}, baseStyle.textGray]}>
-                      添加标签
-                    </Text>
-                    <Iconadd />
-                  </View>
-                </Button>
-                <Text style={baseStyle.textGray}>定义你的个性化标签</Text>
+                {labels.length > 0
+                  ? labels.map((item, idx) => {
+                      return (
+                        <View
+                          key={idx}
+                          style={{
+                            borderColor: '#999999',
+                            borderWidth: 0.5,
+                            padding: 5,
+                            marginRight: 10,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <Text style={[{marginRight: 5}, baseStyle.textGray]}>
+                            {item}
+                          </Text>
+                        </View>
+                      );
+                    })
+                  : null}
               </View>
             </View>
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
                 <Text>工作经历</Text>
-                <IconcircleAdd />
               </View>
               {this.state.workExperienceList.map(item => {
                 return (
-                  <View style={baseStyle.paddingTop}>
-                    <View style={[sty.flexContentBetween]}>
-                      <Text>{item.companyName}</Text>
-                      <Text style={baseStyle.textGray}>
-                        {global.date2Month(new Date(item.servicetimeStart))}-
-                        {global.date2Month(new Date(item.servicetimeEnd))}
-                      </Text>
-                    </View>
-                    <View style={baseStyle.paddingTop}>
-                      <Text style={baseStyle.textGray}>
-                        {item.positionName} {item.depName}
-                      </Text>
-                    </View>
-                    <View style={baseStyle.paddingTop}>
-                      <Text style={baseStyle.textGray}>{item.jobDesc}</Text>
-                    </View>
+                  <View key={item.id} style={baseStyle.paddingTop}>
+                    {item.companyName ||
+                    item.servicetimeStart ||
+                    item.servicetimeEnd ? (
+                      <View style={[sty.flexContentBetween]}>
+                        <Text>{item.companyName}</Text>
+                        <Text style={baseStyle.textGray}>
+                          {global.date2Month(new Date(item.servicetimeStart))}-
+                          {global.date2Month(new Date(item.servicetimeEnd))}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {item.positionName || item.depName ? (
+                      <View style={baseStyle.paddingTop}>
+                        <Text style={baseStyle.textGray}>
+                          {item.positionName} {item.depName}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {item.jobDesc ? (
+                      <View style={baseStyle.paddingTop}>
+                        <Text style={baseStyle.textGray}>{item.jobDesc}</Text>
+                      </View>
+                    ) : null}
                   </View>
                 );
               })}
@@ -226,20 +379,25 @@ class rreview extends Component {
               </View>
               {this.state.projectExperienceList.map(item => {
                 return (
-                  <View style={baseStyle.paddingTop}>
-                    <View style={[sty.flexContentBetween]}>
-                      <Text>{item.projectName}</Text>
-                      <Text style={baseStyle.textGray}>
-                        {global.date2Month(new Date(item.projectStart))}-
-                        {global.date2Month(new Date(item.projectEnd))}
-                      </Text>
-                    </View>
-                    {/* <View style={baseStyle.paddingTop}>
-                    <Text style={baseStyle.textGray}>人力资源经理</Text>
-                  </View> */}
-                    <View style={baseStyle.paddingTop}>
-                      <Text style={baseStyle.textGray}>{item.projectDesc}</Text>
-                    </View>
+                  <View key={item.id} style={baseStyle.paddingTop}>
+                    {item.projectName ||
+                    item.projectStart ||
+                    item.projectEnd ? (
+                      <View style={[sty.flexContentBetween]}>
+                        <Text>{item.projectName}</Text>
+                        <Text style={baseStyle.textGray}>
+                          {global.date2Month(new Date(item.projectStart))}-
+                          {global.date2Month(new Date(item.projectEnd))}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {item.projectDesc ? (
+                      <View style={baseStyle.paddingTop}>
+                        <Text style={baseStyle.textGray}>
+                          {item.projectDesc}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 );
               })}
@@ -250,7 +408,7 @@ class rreview extends Component {
               </View>
               {this.state.educationalExpList.map(item => {
                 return (
-                  <View style={baseStyle.paddingTop}>
+                  <View key={item.id} style={baseStyle.paddingTop}>
                     <View style={[sty.flexContentBetween]}>
                       <Text>{item.schoolName}</Text>
                       <Text style={baseStyle.textGray}>

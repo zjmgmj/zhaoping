@@ -1,0 +1,59 @@
+<html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta
+     name="viewport"
+     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+   />
+
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="apple-mobile-web-app-capable" content="yes" />
+   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+   <title>地址选择</title>
+   <style>
+     body {
+       position: absolute;
+       top: 0;
+       bottom: 0;
+       left: 0;
+       right: 0;
+       margin: 0;
+     }
+     iframe {
+       width: 100%;
+       height: 100%;
+     }
+     * {
+       margin: 0;
+       padding: 0;
+       border: none;
+     }
+   </style>
+ </head>
+ <body>
+   <iframe
+     id="map"
+     src="https://m.amap.com/picker/?zoom=15&total=10&key=84da93e3e2fc135820d11287e5a57dd8"
+   ></iframe>
+
+   <script>
+     (function() {
+       var iframe = document.getElementById("map").contentWindow;
+       document.getElementById("map").onload = function() {
+         iframe.postMessage("hello", "https://m.amap.com/picker/");
+       };
+      // alert(JSON.stringify(window.frames))
+      // alert(JSON.stringify(window))
+       window.parent.addEventListener(
+         "message",
+         function(e) {
+           console.log('message', e)
+          alert(JSON.stringify(e.data))
+          window.ReactNativeWebView.postMessage(JSON.stringify(e.data));
+         },
+         false
+       );
+     })();
+   </script>
+ </body>
+</html>

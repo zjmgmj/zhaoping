@@ -1,11 +1,17 @@
-import {Platform, StyleSheet, Dimensions} from 'react-native';
+import {Platform, StyleSheet, Dimensions, StatusBar} from 'react-native';
 import {commonStyle} from './commonStyle';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
+const deviceScreenHeight = Dimensions.get('screen').height;
+const statusBarHeight = StatusBar.currentHeight;
+const deviceContentHeight = screenHeight - statusBarHeight;
 export const baseStyle = StyleSheet.create({
   /** 背景 **/
   screenWidth: screenWidth,
   screenHeight: screenHeight,
+  deviceScreenHeight,
+  deviceContentHeight,
+  statusBarHeight,
   relation: {
     position: 'relative',
   },
@@ -98,5 +104,65 @@ export const baseStyle = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, .3)',
     alignItems: 'center',
+  },
+  authorBox: {
+    width: 47,
+    height: 47,
+    borderRadius: 100,
+    overflow: 'hidden',
+    // borderColor: '#000',
+    // borderWidth: 0.5,
+  },
+  authorImg: {
+    width: 47,
+    height: 47,
+    resizeMode: 'contain',
+  },
+  authorBoxMin: {
+    width: 29,
+    height: 29,
+    borderRadius: 100,
+    overflow: 'hidden',
+  },
+  authorImgMin: {
+    width: 29,
+    height: 29,
+    resizeMode: 'contain',
+  },
+  authorName: {
+    fontSize: 16,
+  },
+  marginRight: {
+    marginRight: 10,
+  },
+  footBtn: {
+    position: 'absolute',
+    flex: 1,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  logoBox: {
+    width: 53,
+    height: 64,
+    overflow: 'hidden',
+    borderColor: '#979797',
+    borderWidth: 0.5,
+  },
+  logoImg: {
+    width: 53,
+    height: 64,
+    resizeMode: 'contain',
+  },
+  positionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingBottom: 5,
+  },
+  companyName: {
+    fontSize: 17,
+    fontWeight: 'bold',
   },
 });

@@ -14,10 +14,10 @@ import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
-// import Datepicker from 'beeshell/dist/components/Datepicker';
-import {Scrollpicker, BottomModal, TopviewGetInstance} from 'beeshell';
+import {TopviewGetInstance} from 'beeshell';
 import DatePicker from '../../components/DatePicker';
 import Picker from '../../components/picker';
+import {Button} from 'beeshell/dist/components/Button';
 
 @setStatusBar({
   translucent: true,
@@ -35,18 +35,13 @@ class WorkExperience extends Component {
         projectDesc: '',
         projectEnd: new Date(),
         projectStart: new Date(),
-        resumeId: this.props.navigation.getParam('id'),
+        resumeId: this.props.navigation.getParam('resumeId'),
       },
+      id: this.props.navigation.getParam('id'),
     };
   }
-  renderSafeArea() {
-    return (
-      <View style={{maxHeight: 30}}>
-        <View style={{flex: 1}}>
-          <View style={{height: 60}} />
-        </View>
-      </View>
-    );
+  UNSAFE_componentWillMount() {
+    this.getDetail();
   }
   setParams(key, value) {
     const form = this.state.form;
@@ -85,9 +80,29 @@ class WorkExperience extends Component {
         });
       });
   }
+  getDetail() {
+    global.httpGet('resumeprojectexp/detail', {id: this.state.id}, res => {
+      console.log('resumeprojectexp', res.data);
+      const resData = res.data;
+      this.setState({
+        form: resData,
+      });
+    });
+  }
+  delete() {
+    global.httpGet('resumeprojectexp/delete', {id: this.state.id}, res => {
+      console.log(res);
+      this.props.navigation.state.params.callBack('delete');
+      this.props.navigation.goBack();
+    });
+  }
   save() {
+    let url = 'resumeprojectexp/save';
+    if (this.state.form.id) {
+      url = 'resumeprojectexp/update';
+    }
     global.httpPost(
-      'resumeprojectexp/save',
+      url,
       this.state.form,
       res => {
         console.log('resumeprojectexp', res);
@@ -104,7 +119,7 @@ class WorkExperience extends Component {
     const hintColor = '#333';
     const form = this.state.form;
     return (
-      <View style={[baseStyle.bgWhite, {flex: 1}]}>
+      <View style={[baseStyle.bgWhite]}>
         <Header
           title="项目经历"
           right="保存"
@@ -118,15 +133,15 @@ class WorkExperience extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView style={baseStyle.content}>
+        <View
+          style={[baseStyle.content, {height: baseStyle.screenHeight - 30}]}>
           <View style={sty.inputBox}>
             <TextInputLayout
               hintColor={hintColor}
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue={form.projectName}
-                value={form.projectName}
+                value={form.projectName || ''}
                 style={sty.textInput}
                 placeholder={'项目名称'}
                 onChange={e => {
@@ -193,7 +208,37 @@ class WorkExperience extends Component {
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-        </ScrollView>
+          {form.id ? (
+            <View style={baseStyle.footBtn}>
+              <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
+                <Button
+                  onPress={() => {
+                    this.delete();
+                  }}
+                  style={[
+                    sty.subBtn,
+                    {
+                      flex: 1,
+                      borderColor: '#D9B06F',
+                      backgroundColor: '#FBF8F2',
+                      borderWidth: 0.5,
+                    },
+                  ]}
+                  textStyle={{color: '#D9B06F'}}>
+                  删除
+                </Button>
+                <Button
+                  onPress={() => {
+                    this.save();
+                  }}
+                  style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
+                  textStyle={{color: '#fff'}}>
+                  保存
+                </Button>
+              </View>
+            </View>
+          ) : null}
+        </View>
         <DatePicker
           ref={res => {
             this.datePickerRef = res;
@@ -210,6 +255,15 @@ class WorkExperience extends Component {
 
 export default WorkExperience;
 const sty = StyleSheet.create({
+  subBtn: {
+    width: 140,
+    paddingLeft: 0,
+    paddingRight: 0,
+    height: 40,
+    marginLeft: 5,
+    marginRight: 5,
+    borderRadius: 3,
+  },
   authorImg: {
     width: 44,
     height: 44,

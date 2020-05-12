@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   PixelRatio,
   Text,
-  TextInput,
   ScrollView,
 } from 'react-native';
 import {Button} from 'beeshell/dist/components/Button';
@@ -63,7 +62,9 @@ class ResumeItem extends Component {
           baseStyle.paddingTop,
         ]}>
         <View style={baseStyle.row}>
-          <Image source={{uri: item.pic}} style={sty.author} />
+          <View style={[baseStyle.authorBox, baseStyle.marginRight]}>
+            <Image source={{uri: item.pic}} style={baseStyle.authorImg} />
+          </View>
           <View>
             <View style={baseStyle.row}>
               <Text style={[baseStyle.fontBold, baseStyle.ft15]}>
@@ -78,9 +79,10 @@ class ResumeItem extends Component {
               <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
                 工作{item.workyear}年
               </Text>
-              {/* <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
-                上海长宁区
-              </Text> */}
+              <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
+                {item.cityName}
+                {item.regionName}
+              </Text>
             </View>
           </View>
         </View>
@@ -100,7 +102,7 @@ class Resume extends Component {
     this.state = {
       imgSource: [],
       videoSource: null,
-      list: [],
+      list: null,
       currentUser: null,
     };
   }
@@ -133,6 +135,9 @@ class Resume extends Component {
   }
   render() {
     const list = this.state.list;
+    if (!list) {
+      return false;
+    }
     return (
       <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
         <Header
@@ -151,7 +156,7 @@ class Resume extends Component {
                     this.props.navigation.navigate('ResumeAdd', {
                       id: item.id,
                       callBack: res => {
-                        console.log(res);
+                        this.getResumeList();
                       },
                     });
                   }}>
@@ -159,13 +164,31 @@ class Resume extends Component {
                 </TouchableOpacity>
               );
             })}
+            <View
+              style={[
+                baseStyle.row,
+                {justifyContent: 'center', marginTop: 20},
+              ]}>
+              <Button
+                style={[sty.notDataBtn, baseStyle.bgYellow]}
+                textStyle={baseStyle.textWhite}
+                onPress={() => {
+                  this.props.navigation.navigate('ResumeAdd', {
+                    callBack: res => {
+                      this.getResumeList();
+                    },
+                  });
+                }}>
+                添加简历
+              </Button>
+            </View>
           </ScrollView>
         ) : (
           <NotData
             onPressAdd={() => {
               this.props.navigation.navigate('ResumeAdd', {
                 callBack: res => {
-                  console.log(res);
+                  this.getResumeList();
                 },
               });
             }}
@@ -185,6 +208,7 @@ const sty = StyleSheet.create({
   author: {
     width: 47,
     height: 47,
+    resizeMode: 'contain',
   },
   notDataBox: {
     paddingTop: 100,

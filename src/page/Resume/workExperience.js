@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {
   View,
-  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -15,9 +14,10 @@ import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 // import Datepicker from 'beeshell/dist/components/Datepicker';
-import {Scrollpicker, BottomModal, TopviewGetInstance} from 'beeshell';
+import {TopviewGetInstance} from 'beeshell';
 import DatePicker from '../../components/DatePicker';
 import Picker from '../../components/picker';
+import {Button} from 'beeshell/dist/components/Button';
 
 @setStatusBar({
   translucent: true,
@@ -41,8 +41,9 @@ class WorkExperience extends Component {
         servicetimeEnd: new Date(),
         servicetimeIs: 0,
         servicetimeStart: new Date(),
-        resumeId: this.props.navigation.getParam('id'),
+        resumeId: this.props.navigation.getParam('resumeId'),
       },
+      id: this.props.navigation.getParam('id'),
     };
   }
   UNSAFE_componentWillMount() {
@@ -52,6 +53,7 @@ class WorkExperience extends Component {
       this.setState({
         salaryList: res.data,
       });
+      this.getDetail();
     });
   }
   renderSafeArea() {
@@ -88,6 +90,7 @@ class WorkExperience extends Component {
             const form = this.state.form;
             form.salaryId = item.id;
             form.salaryName = item.dvalue;
+            form.monthlySalary = item.id;
             // valList
             this.setState({
               form: form,
@@ -102,13 +105,44 @@ class WorkExperience extends Component {
         });
       });
   }
+  getDetail() {
+    global.httpGet('resumeworkexp/detail', {id: this.state.id}, res => {
+      console.log('resumeworkexp', res.data);
+      const resData = res.data;
+      const salaryList = this.state.salaryList;
+      const salary = salaryList.find(item => {
+        return item.id === resData.monthlySalary;
+      });
+      if (salary) {
+        resData.salaryName = salary.dvalue;
+      }
+      this.setState({
+        form: resData,
+      });
+    });
+  }
+  delete() {
+    global.httpGet('resumeworkexp/delete', {id: this.state.id}, res => {
+      console.log(res);
+      this.props.navigation.state.params.callBack('delete');
+      this.props.navigation.goBack();
+    });
+  }
   save() {
+    let url = 'resumeworkexp/save';
+    if (this.state.form.id) {
+      url = 'resumeworkexp/update';
+    }
     global.httpPost(
-      'resumeworkexp/save',
+      url,
       this.state.form,
       res => {
-        console.log('resumeworkexp', res);
-        this.props.navigation.state.params.callBack(this.state.form);
+        const callBack = this.props.navigation.state.params.callBack;
+        if (this.state.form.id) {
+          callBack('update');
+        } else {
+          callBack(this.state.form);
+        }
         this.props.navigation.goBack();
       },
       err => {
@@ -134,15 +168,15 @@ class WorkExperience extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView style={baseStyle.content}>
+        <View
+          style={[baseStyle.content, {height: baseStyle.screenHeight - 30}]}>
           <View style={sty.inputBox}>
             <TextInputLayout
               hintColor={hintColor}
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue={form.companyName}
-                value={form.companyName}
+                value={form.companyName || ''}
                 style={sty.textInput}
                 placeholder={'公司名称'}
                 onChange={e => {
@@ -158,8 +192,7 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue={form.positionName}
-                value={form.positionName}
+                value={form.positionName || ''}
                 style={sty.textInput}
                 placeholder={'职位名称'}
                 onChange={e => {
@@ -175,8 +208,7 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                defaultValue={form.depName}
-                value={form.depName}
+                value={form.depName || ''}
                 onChange={e => {
                   this.setParams('depName', e.nativeEvent.text);
                 }}
@@ -227,7 +259,6 @@ class WorkExperience extends Component {
           </View>
           <TouchableOpacity
             onPress={() => {
-              // this.basicModal.open();
               this.openPicked({
                 list: this.state.salaryList,
               });
@@ -238,7 +269,6 @@ class WorkExperience extends Component {
               focusColor={iconRightFontColor}
               style={sty.inputLayout}>
               <TextInput
-                // defaultValue=""
                 value={this.state.form.salaryName}
                 style={sty.textInput}
                 placeholder={'年薪'}
@@ -265,7 +295,37 @@ class WorkExperience extends Component {
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-        </ScrollView>
+          {form.id ? (
+            <View style={baseStyle.footBtn}>
+              <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
+                <Button
+                  onPress={() => {
+                    this.delete();
+                  }}
+                  style={[
+                    sty.subBtn,
+                    {
+                      flex: 1,
+                      borderColor: '#D9B06F',
+                      backgroundColor: '#FBF8F2',
+                      borderWidth: 0.5,
+                    },
+                  ]}
+                  textStyle={{color: '#D9B06F'}}>
+                  删除
+                </Button>
+                <Button
+                  onPress={() => {
+                    this.save();
+                  }}
+                  style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
+                  textStyle={{color: '#fff'}}>
+                  完成
+                </Button>
+              </View>
+            </View>
+          ) : null}
+        </View>
         <DatePicker
           ref={res => {
             this.datePickerRef = res;
@@ -275,23 +335,6 @@ class WorkExperience extends Component {
             this.setParams(key, date);
           }}
         />
-        <BottomModal
-          ref={c => {
-            this.basicModal = c;
-          }}
-          title="请选择"
-          cancelable={true}>
-          <View style={{paddingVertical: 15}}>
-            <Scrollpicker
-              style={{paddingHorizontal: 0}}
-              list={[['15000元/月', '10000元/月']]}
-              onChange={data => {
-                console.log(data);
-              }}
-            />
-          </View>
-          {this.renderSafeArea()}
-        </BottomModal>
       </View>
     );
   }
@@ -299,6 +342,15 @@ class WorkExperience extends Component {
 
 export default WorkExperience;
 const sty = StyleSheet.create({
+  subBtn: {
+    width: 140,
+    paddingLeft: 0,
+    paddingRight: 0,
+    height: 40,
+    marginLeft: 5,
+    marginRight: 5,
+    borderRadius: 3,
+  },
   authorImg: {
     width: 44,
     height: 44,

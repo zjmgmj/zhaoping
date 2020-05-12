@@ -18,6 +18,7 @@ import {Iconright} from '../../iconfont/Iconright';
 import {TopviewGetInstance} from 'beeshell';
 import DatePicker from '../../components/DatePicker';
 import Picker from '../../components/picker';
+import {Button} from 'beeshell/dist/components/Button';
 
 @setStatusBar({
   translucent: true,
@@ -35,8 +36,9 @@ class EducationalExperience extends Component {
         schoolName: '',
         schoolEnd: new Date(),
         schoolStart: new Date(),
-        resumeId: this.props.navigation.getParam('id'),
+        resumeId: this.props.navigation.getParam('resumeId'),
       },
+      id: this.props.navigation.getParam('id'),
     };
   }
   UNSAFE_componentWillMount() {
@@ -46,16 +48,8 @@ class EducationalExperience extends Component {
       this.setState({
         educationList: res.data,
       });
+      this.getDetail();
     });
-  }
-  renderSafeArea() {
-    return (
-      <View style={{maxHeight: 30}}>
-        <View style={{flex: 1}}>
-          <View style={{height: 60}} />
-        </View>
-      </View>
-    );
   }
   openPicked({list, key, valueKey, labelKey = 'label'}) {
     console.log(list);
@@ -96,12 +90,31 @@ class EducationalExperience extends Component {
   getTime(time) {
     return global.dateMonth(new Date(time)).replace(/\//g, '.');
   }
+  getDetail() {
+    global.httpGet('resumeschoolexp/detail', {id: this.state.id}, res => {
+      console.log('resumeschoolexp', res.data);
+      const resData = res.data;
+      this.setState({
+        form: resData,
+      });
+    });
+  }
+  delete() {
+    global.httpGet('resumeschoolexp/delete', {id: this.state.id}, res => {
+      console.log(res);
+      this.props.navigation.state.params.callBack('delete');
+      this.props.navigation.goBack();
+    });
+  }
   save() {
+    let url = 'resumeschoolexp/save';
+    if (this.state.form.id) {
+      url = 'resumeschoolexp/update';
+    }
     global.httpPost(
-      'resumeschoolexp/save',
+      url,
       this.state.form,
       res => {
-        console.log('resumeschoolexp', res);
         this.props.navigation.state.params.callBack(this.state.form);
         this.props.navigation.goBack();
       },
@@ -124,7 +137,7 @@ class EducationalExperience extends Component {
     const iconRightFontColor = '#D3CECE';
     const form = this.state.form;
     return (
-      <View style={[baseStyle.bgWhite, {flex: 1}]}>
+      <View style={[baseStyle.bgWhite]}>
         <Header
           title="教育经历"
           right="保存"
@@ -137,7 +150,8 @@ class EducationalExperience extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView style={baseStyle.content}>
+        <ScrollView
+          style={[baseStyle.content, {height: baseStyle.screenHeight - 30}]}>
           <View style={sty.inputBox}>
             <View style={{flex: 1}}>
               <Text style={[sty.ftColor, baseStyle.ft12]}>学校名称</Text>
@@ -222,6 +236,36 @@ class EducationalExperience extends Component {
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
         </ScrollView>
+        {form.id ? (
+          <View style={baseStyle.footBtn}>
+            <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
+              <Button
+                onPress={() => {
+                  this.delete();
+                }}
+                style={[
+                  sty.subBtn,
+                  {
+                    flex: 1,
+                    borderColor: '#D9B06F',
+                    backgroundColor: '#FBF8F2',
+                    borderWidth: 0.5,
+                  },
+                ]}
+                textStyle={{color: '#D9B06F'}}>
+                删除
+              </Button>
+              <Button
+                onPress={() => {
+                  this.save();
+                }}
+                style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
+                textStyle={{color: '#fff'}}>
+                保存
+              </Button>
+            </View>
+          </View>
+        ) : null}
         <DatePicker
           ref={res => {
             this.datePickerRef = res;
@@ -238,6 +282,14 @@ class EducationalExperience extends Component {
 
 export default EducationalExperience;
 const sty = StyleSheet.create({
+  subBtn: {
+    paddingLeft: 0,
+    paddingRight: 0,
+    height: 40,
+    marginLeft: 5,
+    marginRight: 5,
+    borderRadius: 3,
+  },
   authorImg: {
     width: 44,
     height: 44,

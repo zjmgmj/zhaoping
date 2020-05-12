@@ -33,19 +33,24 @@ class Login extends Component {
     };
   }
   UNSAFE_componentWillMount() {
-    global.localStorage.get({key: 'currentUser'}).then(res => {
-      switch (res.userType) {
-        case 1:
-          this.props.navigation.navigate('HrMain');
-          break;
-        case 2:
-          this.props.navigation.navigate('Main');
-          break;
-        default:
-          console.log('登陆');
-          break;
-      }
-    });
+    global.localStorage
+      .get({key: 'currentUser'})
+      .then(res => {
+        switch (res.userType) {
+          case 1:
+            this.props.navigation.navigate('HrMain');
+            break;
+          case 2:
+            this.props.navigation.navigate('Main');
+            break;
+          default:
+            console.log('登陆');
+            break;
+        }
+      })
+      .catch(value => {
+        console.log('value');
+      });
   }
   getSencodes() {
     const me = this;

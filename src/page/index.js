@@ -56,6 +56,13 @@ import SkillTags from './HR/SkillTags';
 import Housekeeper from './HR/Housekeeper';
 import InviteSet from './HR/ResumeList/Invite';
 import OnboardingSet from './HR/ResumeList/OnboardingSet';
+import InterviewList from './Position/InterviewList';
+import CompanyAddress from './HR/AddCompany/companyAddress';
+import EntryInfor from './HR/Housekeeper/EntryInfor';
+import SkillDesc from './HR/Housekeeper/SkillDesc';
+import ProfessionalAdvisers from './HR/Housekeeper/ProfessionalAdvisers';
+import Applydesc from './HR/Housekeeper/applicationReason';
+import LoginHome from './Login/login';
 
 const personNavigator = {
   Home: {
@@ -188,13 +195,20 @@ const StackRouteConfigs = createStackNavigator(
     Housekeeper,
     InviteSet,
     OnboardingSet,
+    InterviewList,
+    CompanyAddress,
+    EntryInfor,
+    SkillDesc,
+    ProfessionalAdvisers,
+    Applydesc,
+    LoginHome,
   },
   {
     defaultNavigationOptions: {
       headerShown: false,
     },
     // initialRouteName: 'HrMain',
-    initialRouteName: 'Login',
+    initialRouteName: 'LoginHome',
   },
 );
 const MainComponent = createAppContainer(StackRouteConfigs);

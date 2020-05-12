@@ -65,10 +65,16 @@ class Progress extends Component {
               <InviteInterview currentUser={currentUser} />
             </View>
             <View tabLabel="面试进度">
-              <InterviewProgress currentUser={currentUser} />
+              <InterviewProgress
+                navigation={this.props.navigation}
+                currentUser={currentUser}
+              />
             </View>
             <View tabLabel="入职情况">
-              <OnboardingSituation currentUser={currentUser} />
+              <OnboardingSituation
+                navigation={this.props.navigation}
+                currentUser={currentUser}
+              />
               {/* <Text>入职情况</Text> */}
             </View>
           </ScrollableTabView>

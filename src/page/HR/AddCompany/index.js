@@ -211,9 +211,18 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               console.log('---');
+              this.props.navigation.navigate('CompanyAddress', {
+                callBack: res => {
+                  console.log('location', res);
+                  const location = res.location.split(',');
+                  this.setParams(location[0], 'longitude');
+                  this.setParams(location[1], 'latitude');
+                  this.setParams(res.address, 'address');
+                },
+              });
             }}
             style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>公司地址</Text>
@@ -229,7 +238,7 @@ class PostPosition extends Component {
               </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>联系人信息</Text>
             <View style={[baseStyle.row]}>

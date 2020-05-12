@@ -53,6 +53,8 @@ class ResumeInfo extends Component {
     if (this.props.navigation.getParam('from') === 'mine') {
       global.localStorage.get({key: 'currentUser'}).then(res => {
         console.log(res);
+        res.workingDate = res.workingDate ? Number(res.workingDate) : '';
+        res.birthDate = res.birthDate ? Number(res.birthDate) : '';
         this.setState({
           currentUser: res,
           info: res,
@@ -92,8 +94,9 @@ class ResumeInfo extends Component {
     const date = nowDate - workdateTime;
     const year = parseInt(date / 1000 / 60 / 60 / 24 / 365);
     params.workyear = year;
-    debugger;
-    console.log(params);
+    console.log('saveInfo', params);
+    params.workingDate = params.workingDate.toString();
+    params.birthDate = params.birthDate.toString();
     let url = '';
     if (this.props.navigation.getParam('from') === 'mine') {
       url = 'user/save';
@@ -272,7 +275,7 @@ class ResumeInfo extends Component {
               style={sty.inputLayout}>
               <TextInput
                 value={global.date2Str(this.state.info.workingDate)}
-                defaultValue={global.date2Str(this.state.info.workingDate)}
+                // defaultValue={global.date2Str(this.state.info.workingDate)}
                 style={sty.textInput}
                 placeholder={'参加工作时间'}
                 editable={false}

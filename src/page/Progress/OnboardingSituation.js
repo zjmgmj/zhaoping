@@ -50,7 +50,16 @@ class OnboardingSituation extends Component {
           total={total}
           data={list}
           renderItem={(item, idx) => {
-            return <Item item={item} key={idx} />;
+            return (
+              <Item
+                item={item}
+                key={idx}
+                navigation={this.props.navigation}
+                refresh={() => {
+                  this.refresh();
+                }}
+              />
+            );
           }}
           onEndReached={() => {
             const page = this.state.page + 1;

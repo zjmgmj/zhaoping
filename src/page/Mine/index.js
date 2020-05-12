@@ -221,11 +221,7 @@ class Mine extends Component {
               <View style={[baseStyle.flex, sty.headContent]}>
                 <View style={sty.authorImgBox}>
                   <Image
-                    source={
-                      currentUser.userPic
-                        ? {uri: currentUser.userPic}
-                        : require('../../images/author.png')
-                    }
+                    source={{uri: currentUser.userPic}}
                     style={sty.authorImg}
                   />
                 </View>

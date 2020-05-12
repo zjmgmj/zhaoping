@@ -185,3 +185,11 @@ export const uploadFile = callBack => {
     },
   });
 };
+
+export const getSexStr = code => {
+  const sexList = [{label: '男', value: 1}, {label: '女', value: 2}];
+  const valItem = sexList.find(item => {
+    return item.value === code;
+  });
+  return valItem ? valItem.label : '';
+};

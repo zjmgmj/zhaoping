@@ -17,6 +17,7 @@ import {
   getAge,
   gettypelistName,
   uploadFile,
+  getSexStr,
 } from '../utils/mixins';
 global.localStorage = localStorage;
 global.httpGet = httpGet;
@@ -33,3 +34,4 @@ global.dateMonth = dateMonth;
 global.date2Month = date2Month;
 global.getAge = getAge;
 global.gettypelistName = gettypelistName;
+global.getSexStr = getSexStr;

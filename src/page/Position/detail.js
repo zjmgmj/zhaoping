@@ -28,6 +28,7 @@ class Detail extends Component {
     super(props);
     this.state = {
       shareModal: false,
+      feedbacklist: [],
       detail: {
         currentUser: null,
       },
@@ -62,13 +63,14 @@ class Detail extends Component {
       'position/detail',
       {id: id},
       res => {
-        console.log('positionDetail', res);
         if (res.code === 1) {
           const resData = res.data;
+          console.log('positionDetail', resData);
           this.setState({
             detail: resData,
           });
           this.getCompany(resData.companyId);
+          this.getintfeedbacklist(resData.positionId);
           // this.gettypelist(resData.salaryId, 'salary', 'salaryName');
         }
       },
@@ -117,8 +119,21 @@ class Detail extends Component {
       shareModal: true,
     });
   }
+  getintfeedbacklist(positionId) {
+    const params = {
+      page: 1,
+      size: 2,
+      positionId: positionId,
+    };
+    global.httpGet('position/getintfeedbacklist', params, res => {
+      console.log('getintfeedbacklist', res);
+      this.setState({
+        feedbacklist: res.data.result,
+      });
+    });
+  }
   render() {
-    const {detail, company, currentUser, headHeight} = this.state;
+    const {detail, company, currentUser, feedbacklist} = this.state;
     if (!detail.id && !currentUser) {
       return false;
     }
@@ -127,7 +142,7 @@ class Detail extends Component {
       ? detail.positionBenefits.split(',')
       : [];
     return (
-      <View style={{backgroundColor: '#fff', height: baseStyle.screenHeight}}>
+      <View style={{backgroundColor: '#fff'}}>
         <ImageBackground
           style={sty.headSty}
           source={require('../../images/position_bg.png')}>
@@ -145,10 +160,12 @@ class Detail extends Component {
             isBorder={false}
           />
         </ImageBackground>
-        <ScrollView>
+        <ScrollView style={{height: baseStyle.deviceContentHeight - 65}}>
           <View style={[baseStyle.bgWhite, baseStyle.content]}>
             <View style={[baseStyle.row, baseStyle.justifyBetween]}>
-              <Text style={baseStyle.ft16}>{detail.positionName || ''}</Text>
+              <Text style={[{fontSize: 18, fontWeight: 'bold'}]}>
+                {detail.positionName || ''}
+              </Text>
               <Text style={baseStyle.textRed}>{detail.salaryName || ''}</Text>
             </View>
             <View style={[baseStyle.row, baseStyle.paddingTop]}>
@@ -175,7 +192,6 @@ class Detail extends Component {
                 baseStyle.paddingTop,
               ]}>
               <Text style={[baseStyle.textGray, baseStyle.ft12]}>
-                {/* 1天前发布 */}
                 {global.date2Str(detail.createDate)}
               </Text>
               <View style={sty.attentionBtn}>
@@ -185,47 +201,62 @@ class Detail extends Component {
               </View>
             </View>
           </View>
+          {currentUser.userType === 2 ? (
+            <View
+              style={[
+                baseStyle.bgWhite,
+                baseStyle.justifyBetween,
+                baseStyle.content,
+                baseStyle.row,
+                {marginTop: 5},
+              ]}>
+              <View style={[baseStyle.row]}>
+                <View style={baseStyle.authorBox}>
+                  <Image
+                    style={baseStyle.authorImg}
+                    source={{uri: detail.userPic}}
+                  />
+                </View>
+                <View style={baseStyle.paddingLeft}>
+                  <Text style={baseStyle.ft16}>
+                    {detail.userNickname || '暂无'}
+                  </Text>
+                  {/* <Text
+                  style={[baseStyle.ft12, baseStyle.textGray, {marginTop: 10}]}>
+                  {detail.companyName || ''}/{detail.userTitle || '暂无'}
+                </Text> */}
+                </View>
+              </View>
+              <Iconright color="#D3CECE" />
+            </View>
+          ) : null}
           <View
             style={[
               baseStyle.bgWhite,
-              baseStyle.justifyBetween,
-              baseStyle.content,
-              baseStyle.row,
-              {marginTop: 5},
+              {
+                marginTop: 20,
+                borderTopColor: '#FBFBFB',
+                borderTopWidth: 5,
+                paddingLeft: 10,
+                paddingRight: 10,
+                paddingBottom: 10,
+              },
             ]}>
-            <View style={[baseStyle.row]}>
-              <Image
-                style={sty.authorImg}
-                source={require('../../images/author.png')}
-              />
-              <View style={baseStyle.paddingLeft}>
-                <Text style={baseStyle.ft16}>
-                  {detail.userNickname || '暂无'}
-                </Text>
-                <Text
-                  style={[baseStyle.ft12, baseStyle.textGray, {marginTop: 10}]}>
-                  {detail.companyName || ''}/{detail.userTitle || '暂无'}
-                </Text>
-              </View>
-            </View>
-            <Iconright color="#D3CECE" />
-          </View>
-          <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 20}]}>
-            <Text style={baseStyle.ft16}>职位描述</Text>
+            <Text style={sty.positionTitle}>职位描述</Text>
             <Text style={baseStyle.paddingTop}>
               {detail.positionDesc || ''}
             </Text>
-            <Text style={{paddingTop: 20}}>学历要求：</Text>
+            <Text style={sty.positionTitleMin}>学历要求：</Text>
             <Text style={baseStyle.paddingTop}>
               {detail.educationName || ''}
             </Text>
-            <Text style={{paddingTop: 20}}>经验要求：</Text>
+            <Text style={sty.positionTitleMin}>经验要求：</Text>
             <Text style={baseStyle.paddingTop}>
               {detail.experienceName || ''}
             </Text>
             {detail.positionBenefits ? (
               <View>
-                <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位福利</Text>
+                <Text style={sty.positionTitle}>职位福利</Text>
                 <View style={[baseStyle.row, baseStyle.paddingTop]}>
                   {positionBenefits.map((item, idx) => {
                     return (
@@ -238,68 +269,83 @@ class Detail extends Component {
               </View>
             ) : null}
           </View>
-          {/* <View style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 10}]}>
-            <Text style={[baseStyle.ft16, {paddingTop: 20}]}>职位补充说明</Text>
+          {feedbacklist.length > 0 ? (
             <View
               style={[
-                baseStyle.borderBottom,
-                baseStyle.paddingBottom,
-                baseStyle.paddingTop,
+                baseStyle.bgWhite,
+                {paddingLeft: 10, paddingRight: 10},
+                {marginTop: 5, borderTopColor: '#FBFBFB', borderTopWidth: 5},
               ]}>
-              <View style={baseStyle.row}>
-                <Image
-                  source={require('../../images/author.png')}
-                  style={sty.authorImg}
-                />
-                <Text style={baseStyle.paddingLeft}>匿名用户</Text>
-              </View>
-              <Text style={baseStyle.paddingTop}>
-                公司整体要求蛮严格的，对学历要求挺高，面试官很专业
-                每个问题问的很仔细，也会引导，主要会问一些职业规划 等问题。
-              </Text>
+              <Text style={sty.positionTitle}>职位补充说明</Text>
+              {feedbacklist.map((item, idx) => {
+                return (
+                  <View
+                    key={item.id}
+                    style={[
+                      idx === 0 ? baseStyle.borderBottom : null,
+                      {paddingBottom: 20, paddingTop: 20},
+                    ]}>
+                    <View style={baseStyle.row}>
+                      <View style={baseStyle.authorBoxMin}>
+                        <Image
+                          style={baseStyle.authorImgMin}
+                          source={{uri: item.userPic}}
+                        />
+                      </View>
+                      <Text
+                        style={[baseStyle.paddingLeft, baseStyle.authorName]}>
+                        {item.isanonymous ? '匿名用户' : item.userNickname}
+                      </Text>
+                    </View>
+                    <Text style={baseStyle.paddingTop}>{item.intfeedback}</Text>
+                  </View>
+                );
+              })}
+
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('InterviewList', {
+                    positionId: detail.id,
+                  });
+                }}>
+                <Text style={[baseStyle.textYellow, {paddingBottom: 10}]}>
+                  查看全部面试经
+                </Text>
+              </TouchableOpacity>
             </View>
-            <View style={[baseStyle.paddingBottom, baseStyle.paddingTop]}>
-              <View style={baseStyle.row}>
-                <Image
-                  source={require('../../images/author.png')}
-                  style={sty.authorImg}
-                />
-                <Text style={baseStyle.paddingLeft}>匿名用户</Text>
-              </View>
-              <Text style={baseStyle.paddingTop}>
-                公司整体要求蛮严格的，对学历要求挺高，面试官很专业
-                每个问题问的很仔细，也会引导，主要会问一些职业规划 等问题。
-              </Text>
-            </View>
-            <View style={baseStyle.paddingTop}>
-              <Text style={baseStyle.textYellow}>查看全部面试经</Text>
-            </View>
-          </View> */}
+          ) : null}
+
           {company ? (
             <View
-              style={[baseStyle.bgWhite, baseStyle.content, {marginTop: 5}]}>
+              style={[
+                baseStyle.bgWhite,
+                baseStyle.content,
+                {marginTop: 5, borderTopColor: '#FBFBFB', borderTopWidth: 5},
+              ]}>
               <View style={[baseStyle.justifyBetween, baseStyle.row]}>
                 <View style={[baseStyle.row]}>
-                  <Image
-                    style={sty.authorImg}
-                    source={
-                      company.logo
-                        ? {uri: company.logo}
-                        : require('../../images/author.png')
-                    }
-                  />
+                  <View style={sty.logoBox}>
+                    <Image style={sty.logoImg} source={{uri: company.logo}} />
+                  </View>
                   <View style={baseStyle.paddingLeft}>
-                    <Text style={baseStyle.ft16}>{company.name}</Text>
-                    <Text
+                    <Text style={baseStyle.companyName}>{company.name}</Text>
+                    <View
                       style={[
+                        baseStyle.row,
                         baseStyle.ft12,
                         baseStyle.textGray,
                         {marginTop: 10},
                       ]}>
-                      {company.companySizeName}
-                      {company.unitQualificationName}
-                      {company.cityName}
-                    </Text>
+                      <Text style={baseStyle.marginRight}>
+                        {company.companySizeName}
+                      </Text>
+                      <Text style={baseStyle.marginRight}>
+                        {company.unitQualificationName}
+                      </Text>
+                      <Text style={baseStyle.marginRight}>
+                        {company.cityName}
+                      </Text>
+                    </View>
                   </View>
                 </View>
                 <Iconright color="#D3CECE" />
@@ -361,7 +407,27 @@ class Detail extends Component {
                 </Button>
               </View>
             </View>
-          ) : null}
+          ) : (
+            <View
+              style={[
+                baseStyle.bgWhite,
+                baseStyle.content,
+                baseStyle.row,
+                baseStyle.justifyBetween,
+                {
+                  borderTopColor: '#E8E7E7',
+                  borderTopWidth: 0.5,
+                  paddingTop: 15,
+                  paddingBottom: 15,
+                },
+              ]}>
+              <Button
+                style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
+                textStyle={{color: '#fff'}}>
+                该职位收到的简历
+              </Button>
+            </View>
+          )}
         </ScrollView>
         {/* <Share /> */}
         <Modal
@@ -521,5 +587,25 @@ const sty = StyleSheet.create({
     left: 87.5,
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  positionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingTop: 20,
+  },
+  positionTitleMin: {
+    fontSize: 15,
+    paddingTop: 15,
+  },
+  logoBox: {
+    height: 50,
+    width: 50,
+    borderRadius: 100,
+    overflow: 'hidden',
+  },
+  logoImg: {
+    height: 50,
+    width: 50,
+    resizeMode: 'contain',
   },
 });

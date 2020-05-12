@@ -144,13 +144,14 @@ class PositionList extends Component {
                   baseStyle.justifyBetween,
                 ]}>
                 <View style={[baseStyle.row, {flex: 1}]}>
-                  <Image
-                    style={sty.positionImg}
-                    // source={require('../images/position_1.png')}
-                    source={{uri: item.logo}}
-                  />
+                  <View style={baseStyle.logoBox}>
+                    <Image
+                      style={baseStyle.logoImg}
+                      source={{uri: item.logo}}
+                    />
+                  </View>
                   <View style={{paddingLeft: 15}}>
-                    <Text style={baseStyle.positionTitle}>
+                    <Text style={[baseStyle.positionTitle]}>
                       {item.positionName}
                     </Text>
                     <Text style={[baseStyle.ft13, baseStyle.textGray]}>

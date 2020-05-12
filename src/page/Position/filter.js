@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Title,
 } from 'react-native';
 import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';

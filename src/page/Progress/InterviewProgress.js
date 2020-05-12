@@ -53,8 +53,12 @@ class InterviewProgress extends Component {
           renderItem={(item, idx) => {
             return (
               <Item
+                navigation={this.props.navigation}
                 getSalaryName={() => {
                   this.props.getSalaryName(item.id);
+                }}
+                refresh={() => {
+                  this.refresh();
                 }}
                 item={item}
                 key={idx}

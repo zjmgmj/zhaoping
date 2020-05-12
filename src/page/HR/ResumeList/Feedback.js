@@ -10,6 +10,7 @@ import {
 import Header from '../../../components/Header';
 import {setStatusBar} from '../../../components/setStatusBar';
 import {baseStyle} from '../../../components/baseStyle';
+import {Switch} from 'beeshell/dist/components/Switch';
 
 @setStatusBar({
   translucent: true,
@@ -22,7 +23,14 @@ class Feedback extends Component {
       isFocus: false,
       content: '',
       height: 200,
+      isanonymous: 1,
     };
+  }
+  UNSAFE_componentWillMount() {
+    this.setState({
+      content: this.props.navigation.getParam('intfeedback'),
+      intfeedback: this.props.navigation.getParam('intfeedback'),
+    });
   }
   onChange = event => {
     this.setState({
@@ -38,10 +46,14 @@ class Feedback extends Component {
   refuse() {
     const userId = this.props.navigation.getParam('userId');
     const positionRecordId = this.props.navigation.getParam('positionRecordId');
+    const {content, isanonymous} = this.state;
+
+    debugger;
     const params = {
       id: positionRecordId,
       userId: userId,
-      intfeedback: this.state.content,
+      intfeedback: content,
+      isanonymous: isanonymous,
     };
     global.httpPost(
       'positionrecord/update',
@@ -57,7 +69,7 @@ class Feedback extends Component {
     );
   }
   render() {
-    const content = this.state.content;
+    const {content, intfeedback} = this.state;
     const placeholder = !content ? (
       <View
         style={{
@@ -67,23 +79,35 @@ class Feedback extends Component {
           zIndex: 1,
           height: 200,
           width: baseStyle.screenWidth - 20,
+          isanonymous: 0,
         }}>
         <Text style={baseStyle.textGray}>请输入面试反馈</Text>
       </View>
     ) : null;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
-        <Header
-          title="面试反馈"
-          fullScreen
-          right="确定"
-          onRightPress={() => {
-            this.refuse();
-          }}
-          onPressBack={() => {
-            this.props.navigation.goBack();
-          }}
-        />
+        {intfeedback ? (
+          <Header
+            title="面试反馈"
+            fullScreen
+            onPressBack={() => {
+              this.props.navigation.goBack();
+            }}
+          />
+        ) : (
+          <Header
+            title="面试反馈"
+            fullScreen
+            right="确定"
+            onRightPress={() => {
+              this.refuse();
+            }}
+            onPressBack={() => {
+              this.props.navigation.goBack();
+            }}
+          />
+        )}
+
         <ScrollView style={baseStyle.content}>
           <TouchableOpacity
             onPress={() => {
@@ -112,6 +136,22 @@ class Feedback extends Component {
             />
             {placeholder}
           </TouchableOpacity>
+          {!intfeedback ? (
+            <View
+              style={[
+                baseStyle.row,
+                baseStyle.justifyBetween,
+                {paddingTop: 20},
+              ]}>
+              <Text>是否匿名</Text>
+              <Switch
+                value={this.state.isanonymous}
+                onChange={value => {
+                  this.setState({isanonymous: value ? 1 : 0});
+                }}
+              />
+            </View>
+          ) : null}
         </ScrollView>
       </View>
     );

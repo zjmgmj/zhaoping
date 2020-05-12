@@ -168,26 +168,6 @@ class PostResumeList extends Component {
                 </TouchableOpacity>
               );
             })}
-            {/* <Radio
-              value={this.state.value}
-              iconPosition="right"
-              onChange={value => {
-                console.log('Radio', value);
-                this.setState({
-                  value,
-                });
-              }}>
-              {list.map(item => {
-                return (
-                  <Radio.Item
-                    value={item.id}
-                    renderItem={() => {
-                      return <ResumeItem item={item} />;
-                    }}
-                  />
-                );
-              })}
-            </Radio> */}
           </ScrollView>
         ) : (
           <NotData

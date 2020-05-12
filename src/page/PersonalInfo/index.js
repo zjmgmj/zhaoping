@@ -1,13 +1,5 @@
 import React, {Component} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
 import {baseStyle} from '../../components/baseStyle';

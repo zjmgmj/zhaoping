@@ -19,7 +19,8 @@ class Item extends Component {
   }
   updatePositionRecord(item, resumeTemp) {
     const params = {
-      positionId: item.positionId,
+      // positionId: item.positionId,
+      id: item.positionRecordId,
       userId: item.userId,
       status: item.status,
       resumeTemp: resumeTemp,
@@ -63,7 +64,13 @@ class Item extends Component {
             {global.date2Str(new Date(item.entryDate))}
           </Text>
         </View>
-        <Text style={baseStyle.textRed}>{item.salaryName}</Text>
+        <View style={[baseStyle.row, baseStyle.justifyBetween]}>
+          <Text style={baseStyle.textRed}>{item.salaryName}</Text>
+          <Text style={[baseStyle.textYellow]}>
+            {statusObj[item.positionRecordstatus]}
+          </Text>
+        </View>
+
         <View
           style={[
             baseStyle.row,
@@ -71,9 +78,6 @@ class Item extends Component {
             baseStyle.paddingTop,
           ]}>
           <Text style={{color: '#333333'}}>{item.companyName}</Text>
-          <Text style={[baseStyle.textYellow]}>
-            {statusObj[item.positionRecordstatus]}
-          </Text>
         </View>
         {item.positionRecordstatus === 1 ? (
           item.resumeTemp ? (
@@ -103,6 +107,27 @@ class Item extends Component {
               </View>
             </View>
           )
+        ) : item.positionRecordstatus === 2 ||
+          item.positionRecordstatus === 5 ||
+          item.positionRecordstatus === 6 ||
+          item.positionRecordstatus === 7 ||
+          item.positionRecordstatus === 8 ? (
+          <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
+            <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('Feedback', {
+                  intfeedback: item.intfeedback,
+                  positionRecordId: item.positionRecordId,
+                  userId: item.userId,
+                  callBack: res => {
+                    this.props.refresh();
+                  },
+                });
+              }}
+              style={sty.btn}>
+              <Text style={baseStyle.textYellow}>面试反馈</Text>
+            </TouchableOpacity>
+          </View>
         ) : null}
       </View>
     );
