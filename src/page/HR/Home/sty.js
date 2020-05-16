@@ -81,7 +81,7 @@ export const sty = StyleSheet.create({
   positionImg: {
     width: 53,
     height: 64,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   positionTag: {
     marginRight: 10,
@@ -96,5 +96,11 @@ export const sty = StyleSheet.create({
     width: 55,
     height: 55,
     resizeMode: 'contain',
+  },
+  tag: {
+    height: 20,
+    width: 20,
+    borderRadius: 100,
+    backgroundColor: '#D9B06F',
   },
 });

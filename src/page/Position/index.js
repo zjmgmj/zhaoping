@@ -26,6 +26,7 @@ class Position extends Component {
     this.state = {
       params: {},
       cityPickId: null,
+      filterNum: null,
     };
   }
   openCityPick() {
@@ -42,6 +43,13 @@ class Position extends Component {
             TopviewGetInstance().remove(this.state.cityPickId);
           }}
           selectedEvent={res => {
+            // const params = Object.assign(this.state.params, res);
+            // this.setState({
+            //   params,
+            // });
+            // this.getPositiontypeList(this.state.cardNum);
+            // TopviewGetInstance().remove(this.state.cityPickId);
+
             const params = Object.assign(this.state.params, res);
             this.setState({
               params,
@@ -85,19 +93,45 @@ class Position extends Component {
                   this.openCityPick();
                 }}
                 style={baseStyle.row}>
-                <Text style={{paddingRight: 5}}>城市</Text>
+                {/* <Text style={{paddingRight: 5}}>城市</Text> */}
+                <Text style={{paddingRight: 5}}>
+                  {this.state.params.cityName
+                    ? this.state.params.cityName
+                    : '城市'}
+                </Text>
                 <IconjiantouDown color="#B0ADAD" />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   this.props.navigation.navigate('PositionFilter', {
+                    filter: this.state.params,
                     callBack: res => {
-                      this.positionList.state.getPositionList(res);
+                      let filterNum = 0;
+                      Object.keys(res).forEach(key => {
+                        if (res[key]) {
+                          filterNum++;
+                        }
+                      });
+                      const params = this.state.params;
+                      Object.assign(params, res);
+                      this.setState({
+                        params: params,
+                        filterNum: filterNum,
+                      });
+                      // this.getPositiontypeList(this.state.cardNum, params);
+                      this.positionList.state.getPositionList(params);
                     },
                   });
                 }}
                 style={[baseStyle.paddingLeft, baseStyle.row]}>
                 <Text style={{paddingRight: 5}}>筛选</Text>
+                {this.state.filterNum ? (
+                  <View style={sty.tag}>
+                    <Text style={[baseStyle.textWhite, {textAlign: 'center'}]}>
+                      {this.state.filterNum}
+                    </Text>
+                  </View>
+                ) : null}
                 <IconjiantouDown color="#B0ADAD" />
               </TouchableOpacity>
             </View>
@@ -135,5 +169,11 @@ const sty = StyleSheet.create({
     position: 'absolute',
     bottom: -0.5,
     left: 0,
+  },
+  tag: {
+    height: 20,
+    width: 20,
+    borderRadius: 100,
+    backgroundColor: '#D9B06F',
   },
 });

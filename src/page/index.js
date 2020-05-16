@@ -1,8 +1,9 @@
 import React from 'react';
-// import localStorage from './storage';
+import localStorage from '../global/storage';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
+// import CardStackStyleInterpolator from 'react-navigation/src/views/CardStack/CardStackStyleInterpolator';
 import TabBarIcon from '../components/TabBarIcon';
 import Home from './Home';
 import Mine from './Mine';
@@ -63,6 +64,10 @@ import SkillDesc from './HR/Housekeeper/SkillDesc';
 import ProfessionalAdvisers from './HR/Housekeeper/ProfessionalAdvisers';
 import Applydesc from './HR/Housekeeper/applicationReason';
 import LoginHome from './Login/login';
+import ResumeDelivered from './HR/ResumeDelivered';
+import CompanyInfo from './companyInfo';
+import ResumeVideo from './Resume/ResumeVideo.js';
+import SetOnboardTime from './HR/SetOnboardTime';
 
 const personNavigator = {
   Home: {
@@ -146,71 +151,98 @@ const HrTabNavigator = createBottomTabNavigator(
   HrNavigator,
   TabNavigatorDefault,
 );
-const StackRouteConfigs = createStackNavigator(
-  {
-    Main: personTabNavigator,
-    HrMain: HrTabNavigator,
-    ReleaseDynamic,
-    Resume,
-    ResumeAdd,
-    ResumeInfo,
-    ResumeWorkExperience,
-    ResumeProjectExperience,
-    ResumeEducationalExperience,
-    ResumeJobStatus,
-    ResumePrivacySet,
-    ChallengePosition,
-    RecommendPosition,
-    PositionDetail,
-    PositionChooseBg,
-    InfoChat,
-    PositionFilter,
-    Progress,
-    FollowPosition,
-    Followig,
-    PersonalInfo,
-    Community,
-    Login,
-    Reg,
-    PostPosition,
-    PositionCategory,
-    PositionDes,
-    PositionBenefits,
-    PositionName,
-    RecruitmentResume,
-    ResumeList,
-    CompanyList,
-    AddCompany,
-    IndustryNews,
-    // IndustryRelease,
-    PersonInfo,
-    Dynamic,
-    Evaluation,
-    Rreview,
-    PostResumeList,
-    Refuse,
-    InviteInterview,
-    Feedback,
-    SkillTags,
-    Housekeeper,
-    InviteSet,
-    OnboardingSet,
-    InterviewList,
-    CompanyAddress,
-    EntryInfor,
-    SkillDesc,
-    ProfessionalAdvisers,
-    Applydesc,
-    LoginHome,
+
+// const TransitionConfiguration = () => ({
+//   screenInterpolator: sceneProps => {
+//     const {scene} = sceneProps;
+//     const {route} = scene;
+//     const params = route.params || {};
+//     const transition = params.transition || 'forHorizontal';
+//     return CardStackStyleInterpolator[transition](sceneProps);
+//   },
+// });
+const routes = {
+  Main: personTabNavigator,
+  HrMain: HrTabNavigator,
+  ReleaseDynamic,
+  Resume,
+  ResumeAdd,
+  ResumeInfo,
+  ResumeWorkExperience,
+  ResumeProjectExperience,
+  ResumeEducationalExperience,
+  ResumeJobStatus,
+  ResumePrivacySet,
+  ChallengePosition,
+  RecommendPosition,
+  PositionDetail,
+  PositionChooseBg,
+  InfoChat,
+  PositionFilter,
+  Progress,
+  FollowPosition,
+  Followig,
+  PersonalInfo,
+  Community,
+  Login,
+  Reg,
+  PostPosition,
+  PositionCategory,
+  PositionDes,
+  PositionBenefits,
+  PositionName,
+  RecruitmentResume,
+  ResumeList,
+  CompanyList,
+  AddCompany,
+  IndustryNews,
+  // IndustryRelease,
+  PersonInfo,
+  Dynamic,
+  Evaluation,
+  Rreview,
+  PostResumeList,
+  Refuse,
+  InviteInterview,
+  Feedback,
+  SkillTags,
+  Housekeeper,
+  InviteSet,
+  OnboardingSet,
+  InterviewList,
+  CompanyAddress,
+  EntryInfor,
+  SkillDesc,
+  ProfessionalAdvisers,
+  Applydesc,
+  LoginHome,
+  ResumeDelivered,
+  CompanyInfo,
+  ResumeVideo,
+  SetOnboardTime,
+};
+const StackRouteConfigs = createStackNavigator(routes, {
+  defaultNavigationOptions: {
+    headerShown: false,
   },
-  {
-    defaultNavigationOptions: {
-      headerShown: false,
-    },
-    // initialRouteName: 'HrMain',
-    initialRouteName: 'LoginHome',
+  initialRouteName: 'LoginHome',
+});
+const MainStackNavigator = createStackNavigator(routes, {
+  defaultNavigationOptions: {
+    headerShown: false,
   },
-);
+  initialRouteName: 'Main',
+});
+
 const MainComponent = createAppContainer(StackRouteConfigs);
 
+// global.localStorage
+//   .get({key: 'currentUser'})
+//   .then(res => {
+//     console.log(res);
+//     MainComponent = createAppContainer(MainStackNavigator);
+//   })
+//   .catch(value => {
+//     MainComponent = createAppContainer(StackRouteConfigs);
+//   });
 export default MainComponent;

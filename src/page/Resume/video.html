@@ -1,0 +1,74 @@
+<html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta
+     name="viewport"
+     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+   />
+
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="apple-mobile-web-app-capable" content="yes" />
+   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+   <title>地址选择</title>
+   <style>
+     body {
+       position: absolute;
+       top: 0;
+       bottom: 0;
+       left: 0;
+       right: 0;
+       margin: 0;
+     }
+     iframe {
+       width: 100%;
+       height: 100%;
+     }
+     * {
+       margin: 0;
+       padding: 0;
+       border: none;
+     }
+   </style>
+ </head>
+ <body>
+    <video id="video" style="width: 100%; height: 100%" autoplay src="https://xingyunbudongchan.oss-cn-beijing.aliyuncs.com/20200516162357384407384.mp4"></video>
+   <script>
+     (function() {
+      function launchFullscreen(element) {
+      //此方法不可以在異步任務中執行，否則火狐無法全屏
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.msRequestFullscreen){ 
+          element.msRequestFullscreen();  
+        } else if(element.oRequestFullscreen){
+          element.oRequestFullscreen();
+      }
+      else if(element.webkitRequestFullscreen)
+        {
+          element.webkitRequestFullScreen();
+        }else{
+          var docHtml  = document.documentElement;
+          var docBody  = document.body;
+          var videobox  = document.getElementById('videobox');
+          var  cssText = 'width:100%;height:100%;overflow:hidden;';
+          docHtml.style.cssText = cssText;
+          docBody.style.cssText = cssText;
+          videobox.style.cssText = cssText+';'+'margin:0px;padding:0px;';
+          document.IsFullScreen = true;
+        }
+      }
+      // launchFullscreen(document.getElementById('video'))
+       window.addEventListener(
+         "message",
+         function(e) {
+           console.log('message', e)
+          // window.ReactNativeWebView.postMessage(JSON.stringify(e.data));
+         },
+         false
+       );
+     })();
+   </script>
+ </body>
+</html>

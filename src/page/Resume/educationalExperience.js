@@ -37,18 +37,33 @@ class EducationalExperience extends Component {
         schoolEnd: new Date(),
         schoolStart: new Date(),
         resumeId: this.props.navigation.getParam('resumeId'),
+        id: this.props.navigation.getParam('id'),
       },
       id: this.props.navigation.getParam('id'),
     };
   }
   UNSAFE_componentWillMount() {
+    if (!this.props.navigation.getParam('type')) {
+      this.getDetail();
+    }
+    if (this.props.navigation.getParam('item')) {
+      this.setState({
+        form: this.props.navigation.getParam('item'),
+      });
+    }
     global.gettypelist('education', res => {
       // 学历
       console.log('educationList', res.data);
       this.setState({
         educationList: res.data,
       });
-      this.getDetail();
+      // if (this.props.navigation.getParam('item')) {
+      //   this.setState({
+      //     form: this.props.navigation.getParam('item'),
+      //   });
+      // } else {
+      //   this.getDetail();
+      // }
     });
   }
   openPicked({list, key, valueKey, labelKey = 'label'}) {
@@ -65,7 +80,9 @@ class EducationalExperience extends Component {
           }}
           selectedEvent={item => {
             const form = this.state.form;
-            form[key] = item[valueKey];
+            // form[key] = item[valueKey];
+            form.educationName = item[labelKey];
+            form.educationId = item[valueKey];
             this.setState({
               form: form,
             });
@@ -136,8 +153,9 @@ class EducationalExperience extends Component {
   render() {
     const iconRightFontColor = '#D3CECE';
     const form = this.state.form;
+    console.log('form', form);
     return (
-      <View style={[baseStyle.bgWhite]}>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
           title="教育经历"
           right="保存"
@@ -150,8 +168,7 @@ class EducationalExperience extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView
-          style={[baseStyle.content, {height: baseStyle.screenHeight - 30}]}>
+        <ScrollView style={[baseStyle.content, {flex: 1}]}>
           <View style={sty.inputBox}>
             <View style={{flex: 1}}>
               <Text style={[sty.ftColor, baseStyle.ft12]}>学校名称</Text>
@@ -176,7 +193,7 @@ class EducationalExperience extends Component {
               onPress={() => {
                 this.openPicked({
                   list: this.state.educationList,
-                  key: 'educationId',
+                  key: 'educationName',
                   valueKey: 'id',
                   labelKey: 'dvalue',
                 });
@@ -184,10 +201,7 @@ class EducationalExperience extends Component {
               style={{flex: 1}}>
               <Text style={[sty.ftColor, baseStyle.ft12]}>学历</Text>
               <TextInput
-                defaultValue={this.getEducationName(
-                  this.state.form.educationId,
-                )}
-                value={this.getEducationName(this.state.form.educationId)}
+                value={this.state.form.educationName}
                 style={sty.textInput}
                 placeholderTextColor="#666666"
                 placeholder={'如：本科'}
@@ -235,37 +249,38 @@ class EducationalExperience extends Component {
             </View>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-        </ScrollView>
-        {form.id ? (
-          <View style={baseStyle.footBtn}>
-            <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
-              <Button
-                onPress={() => {
-                  this.delete();
-                }}
-                style={[
-                  sty.subBtn,
-                  {
-                    flex: 1,
-                    borderColor: '#D9B06F',
-                    backgroundColor: '#FBF8F2',
-                    borderWidth: 0.5,
-                  },
-                ]}
-                textStyle={{color: '#D9B06F'}}>
-                删除
-              </Button>
-              <Button
-                onPress={() => {
-                  this.save();
-                }}
-                style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
-                textStyle={{color: '#fff'}}>
-                保存
-              </Button>
+          {form.id ? (
+            <View style={[baseStyle.footBtnRel, {paddingTop: 15}]}>
+              <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
+                <Button
+                  onPress={() => {
+                    this.delete();
+                  }}
+                  style={[
+                    sty.subBtn,
+                    {
+                      flex: 1,
+                      borderColor: '#D9B06F',
+                      backgroundColor: '#FBF8F2',
+                      borderWidth: 0.5,
+                    },
+                  ]}
+                  textStyle={{color: '#D9B06F'}}>
+                  删除
+                </Button>
+                <Button
+                  onPress={() => {
+                    this.save();
+                  }}
+                  style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
+                  textStyle={{color: '#fff'}}>
+                  保存
+                </Button>
+              </View>
             </View>
-          </View>
-        ) : null}
+          ) : null}
+        </ScrollView>
+
         <DatePicker
           ref={res => {
             this.datePickerRef = res;

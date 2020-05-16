@@ -169,14 +169,12 @@ class PositionList extends Component {
       list: [],
     };
   }
-  // UNSAFE_componentWillMount() {
-  //   this.getPositiontypeList();
-  // }
   componentDidMount() {
+    debugger;
     this.getPositiontypeList();
   }
   getSalaryName(id) {
-    console.log('this.props.salaryList', this.props.salaryList);
+    // console.log('this.props.salaryList', this.props.salaryList);
     const resSalary = this.props.salaryList.find(item => {
       return item.id === id;
     });
@@ -187,12 +185,9 @@ class PositionList extends Component {
     }
   }
   getPositiontypeList(cardActive) {
-    const currentUser = this.props.currentUser;
     const params = {
       page: 1,
       size: 10,
-      userId: currentUser.userId,
-      // positionType: 1,
     };
     if (cardActive === 2) {
       params.isrecommend = 1;
@@ -272,7 +267,10 @@ class PositionList extends Component {
                   <TouchableOpacity
                     key={item.id}
                     onPress={() => {
-                      navigate('PositionDetail', {id: item.id});
+                      navigate('PositionDetail', {
+                        id: item.id,
+                        companyId: item.companyId,
+                      });
                     }}
                     style={[
                       baseStyle.borderBottom,
@@ -322,8 +320,8 @@ class PositionList extends Component {
                         alignItems: 'flex-end',
                       }}>
                       <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
-                        {/* 18-20K */}
-                        {this.getSalaryName(item.salaryId)}
+                        {item.salaryName}
+                        {/* {this.getSalaryName(item.salaryId)} */}
                       </Text>
                       {/* <Text style={baseStyle.textYellow}>分享职位链接</Text> */}
                     </View>
@@ -350,6 +348,18 @@ class Home extends Component {
     };
   }
   UNSAFE_componentWillMount() {
+    global.localStorage
+      .get({key: 'currentUser'})
+      .then(res => {
+        console.log('currentUser', res);
+        this.setState({
+          currentUser: res,
+        });
+      })
+      .catch(err => {
+        console.log('currentUserErr', err);
+        this.props.navigation.navigate('Login');
+      });
     global.gettypelist('salary', res => {
       // 年薪
       this.setState({
@@ -357,28 +367,26 @@ class Home extends Component {
       });
     });
   }
-  componentDidMount() {
-    global.localStorage.get({key: 'currentUser'}).then(res => {
-      this.setState({
-        currentUser: res,
-      });
-    });
-  }
+  // componentDidMount() {
+  //   global.localStorage.get({key: 'currentUser'}).then(res => {
+  //     this.setState({
+  //       currentUser: res,
+  //     });
+  //   });
+  // }
   render() {
     return (
-      <ScrollView style={baseStyle.bgWhite}>
+      <ScrollView style={(baseStyle.bgWhite, {flex: 1})}>
         <Header isHeader={false} />
         <Banner />
         <View style={{backgroundColor: '#fff'}}>
           <Notice />
           <TabContent />
-          {this.state.currentUser ? (
-            <PositionList
-              salaryList={this.state.salaryList}
-              currentUser={this.state.currentUser}
-              navigate={this.props.navigation}
-            />
-          ) : null}
+          <PositionList
+            salaryList={this.state.salaryList}
+            currentUser={this.state.currentUser}
+            navigate={this.props.navigation}
+          />
         </View>
       </ScrollView>
     );

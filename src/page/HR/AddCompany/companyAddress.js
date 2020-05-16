@@ -23,6 +23,7 @@ class CompanyAddress extends Component {
       key: '84da93e3e2fc135820d11287e5a57dd8',
       center: '',
       keywords: '',
+      municipality: ['上海市', '北京市', '天津市', '重庆市'],
     };
   }
   UNSAFE_componentWillMount() {}
@@ -31,26 +32,69 @@ class CompanyAddress extends Component {
       Platform.OS == 'ios'
         ? require('./map.html')
         : {
-            uri: 'file:///android_asset/src/page/map/map.html',
-            // uri:
-            //   'http://192.168.0.101:5500/android/app/src/main/assets/src/page/map/map.html',
+            uri: 'http://114.55.169.95/yun_rest/map.html',
           };
     return source;
   }
+  httpGetArea(url) {
+    let opt = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+    console.log('httpGet', url);
+    //发起请求
+    fetch(url, opt)
+      .then(data => {
+        return data.json();
+      })
+      .then(response => {
+        if (response) {
+          console.log('response', response);
+          this.props.navigation.state.params.callBack({response});
+          this.props.navigation.goBack();
+        }
+      })
+      .catch(error => {
+        if (error) {
+          console(error);
+        }
+      });
+  }
   onMessage(nativeEvent) {
+    console.log('nativeEvent', nativeEvent);
+    // this.props.navigation.state.params.callBack();
+    // this.props.navigation.goBack();
+    console.log('global', global);
     const {data} = nativeEvent.nativeEvent;
     const key = 'ebd60e0204faedb11b2ba4214d9d0620';
-    const location = data.location;
-    console.log('data', data);
-    global.httpGet(
-      `https://restapi.amap.com/v3/geocode/regeo?location=${location}&key=${key}`,
-      {},
-      res => {
-        console.log('onMessage', res);
-      },
-    );
-    // this.props.navigation.state.params.callBack({data});
-    // this.props.navigation.goBack();
+    const dataObj = JSON.parse(data);
+    const location = dataObj.location;
+    const that = this;
+    const municipality = this.state.municipality;
+    const url = `https://restapi.amap.com/v3/geocode/regeo?location=${location}&key=${key}`;
+    global.httpGetLocation(url, res => {
+      console.log(res);
+      console.log('response', res);
+      const resData = res.regeocode;
+      const {addressComponent} = resData;
+      const areaData = {
+        provinceName: addressComponent.province,
+        cityName: addressComponent.city,
+        regionName: addressComponent.district,
+        district: addressComponent.district,
+        address: dataObj.address,
+        location: location,
+      };
+      if (municipality.indexOf(addressComponent.province) > -1) {
+        areaData.cityName = addressComponent.province;
+      }
+      console.log('areaData', JSON.stringify(areaData));
+      this.props.navigation.state.params.callBack(areaData);
+      this.props.navigation.goBack();
+    });
   }
   render() {
     return (
@@ -63,10 +107,7 @@ class CompanyAddress extends Component {
           javaScriptEnabled
           scalesPageToFit
           source={this.getSource()} //网络地址，放在本地会导致postmessage失效
-          onMessage={nativeEvent => {
-            const {data} = nativeEvent.nativeEvent;
-            console.log(data);
-          }}
+          onMessage={this.onMessage.bind(this)}
         />
       </View>
     );

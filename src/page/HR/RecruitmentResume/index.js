@@ -94,7 +94,7 @@ class RecruitmentResume extends Component {
   render() {
     const {total, list} = this.state;
     return (
-      <View style={[{flex: 1, backgroundColor: '#FBFBFB'}]}>
+      <View style={[{flex: 1, backgroundColor: '#fff'}]}>
         <Header
           title="招聘管理"
           onPressBack={() => {

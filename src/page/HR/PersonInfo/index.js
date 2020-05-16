@@ -45,10 +45,12 @@ class PersonInfo extends Component {
             style={sty.playBox}
             source={require('../../../images/person_info_bg.png')}>
             <View style={{flexDirection: 'column', justifyContent: 'center'}}>
-              <Image
-                source={require('../../../images/play_icon.png')}
-                style={{width: 64, height: 64, resizeMode: 'contain'}}
-              />
+              <View style={baseStyle.authorBox}>
+                <Image
+                  source={require('../../../images/play_icon.png')}
+                  style={[baseStyle.authorImg, {width: 64, height: 64}]}
+                />
+              </View>
             </View>
           </ImageBackground>
           <Text style={sty.personText}>

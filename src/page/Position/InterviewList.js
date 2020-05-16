@@ -24,17 +24,17 @@ class InterviewList extends Component {
     this.setState({
       positionId: this.props.navigation.getParam('positionId'),
     });
+    this.getPositiontypeList();
   }
   componentDidMount() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
       this.setState({
         currentUser: res,
       });
-      this.getPositiontypeList();
     });
   }
   getPositiontypeList(param = {}) {
-    const positionId = this.state.positionId;
+    const positionId = this.props.navigation.getParam('positionId');
     const obj = {
       page: 1,
       size: 10,
@@ -157,7 +157,7 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 60,
     height: 60,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   positionTag: {
     marginRight: 10,

@@ -42,7 +42,7 @@ class Progress extends Component {
   render() {
     const currentUser = this.state.currentUser;
     return (
-      <View style={[{flex: 1, backgroundColor: '#FBFBFB'}]}>
+      <View style={[{flex: 1, backgroundColor: '#fff'}]}>
         <Header
           title="职位进展"
           onPressBack={() => {

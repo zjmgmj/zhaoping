@@ -37,17 +37,28 @@ export const selectPhotoTapped = ({options, cb, isSource}) => {
       if (isSource) {
         return {uri: response.uri, data: response.data};
       } else {
-        global.uploadImage(
-          'upload/fileupload',
-          response,
-          res => {
-            console.log('res', res);
+        response.mediaType = defaultOptions.mediaType;
+        global.Loading.showLoading();
+        if (defaultOptions.mediaType === 'video') {
+          global.uploadVideo(response, res => {
+            console.log('uploadVideo----', res);
+            global.Loading.dismissLoading();
             cb(res.data);
-          },
-          err => {
-            console.log('err---->', err);
-          },
-        );
+          });
+        } else {
+          global.uploadImage(
+            'upload/fileupload',
+            response,
+            res => {
+              console.log('res', res);
+              global.Loading.dismissLoading();
+              cb(res.data);
+            },
+            err => {
+              console.log('err---->', err);
+            },
+          );
+        }
       }
       // You can also display the image using data:
       // let source = { uri: 'data:image/jpeg;base64,' + response.data };

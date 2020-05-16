@@ -11,6 +11,24 @@ import {Button} from 'beeshell/dist/components/Button';
 class Login extends Component {
   constructor(props) {
     super(props);
+    global.localStorage
+      .get({key: 'currentUser'})
+      .then(res => {
+        switch (res.userType) {
+          case 1:
+            this.props.navigation.navigate('HrMain');
+            break;
+          case 2:
+            this.props.navigation.navigate('Main');
+            break;
+          default:
+            console.log('登陆');
+            break;
+        }
+      })
+      .catch(value => {
+        console.log('value');
+      });
   }
   UNSAFE_componentWillMount() {
     global.localStorage

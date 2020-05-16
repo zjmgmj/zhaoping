@@ -64,8 +64,10 @@ class ResumeItem extends Component {
           baseStyle.paddingTop,
         ]}>
         <View style={baseStyle.row}>
-          <Image source={{uri: item.pic}} style={sty.author} />
-          <View>
+          <View style={baseStyle.authorBox}>
+            <Image source={{uri: item.pic}} style={baseStyle.authorImg} />
+          </View>
+          <View style={baseStyle.paddingLeft}>
             <View style={baseStyle.row}>
               <Text style={[baseStyle.fontBold, baseStyle.ft15]}>
                 {item.name}
@@ -103,7 +105,7 @@ class PostResumeList extends Component {
     this.state = {
       imgSource: [],
       videoSource: null,
-      list: [],
+      list: null,
       currentUser: null,
       activeId: null,
     };
@@ -138,8 +140,11 @@ class PostResumeList extends Component {
 
   render() {
     const list = this.state.list;
+    if (!list) {
+      return false;
+    }
     return (
-      <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
           fullScreen
           title="简历列表"
@@ -153,33 +158,35 @@ class PostResumeList extends Component {
             this.props.navigation.goBack();
           }}
         />
-        {list.length > 0 ? (
-          <ScrollView style={baseStyle.content}>
-            {list.map(item => {
-              return (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={() => {
-                    this.setState({
-                      activeId: item.id,
-                    });
-                  }}>
-                  <ResumeItem activeId={this.state.activeId} item={item} />
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        ) : (
-          <NotData
-            onPressAdd={() => {
-              this.props.navigation.navigate('ResumeAdd', {
-                callBack: res => {
-                  console.log(res);
-                },
-              });
-            }}
-          />
-        )}
+        <View style={{flex: 1, paddingLeft: 10, paddingRight: 10}}>
+          {list.length > 0 ? (
+            <ScrollView style={{flex: 1}}>
+              {list.map(item => {
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() => {
+                      this.setState({
+                        activeId: item.id,
+                      });
+                    }}>
+                    <ResumeItem activeId={this.state.activeId} item={item} />
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          ) : (
+            <NotData
+              onPressAdd={() => {
+                this.props.navigation.navigate('ResumeAdd', {
+                  callBack: res => {
+                    console.log(res);
+                  },
+                });
+              }}
+            />
+          )}
+        </View>
       </View>
     );
   }

@@ -53,8 +53,22 @@ class WorkExperience extends Component {
       this.setState({
         salaryList: res.data,
       });
-      this.getDetail();
     });
+    if (!this.props.navigation.getParam('type')) {
+      this.getDetail();
+    }
+    if (this.props.navigation.getParam('item')) {
+      this.setState({
+        form: this.props.navigation.getParam('item'),
+      });
+    }
+    // if (this.props.navigation.getParam('item')) {
+    //   this.setState({
+    //     form: this.props.navigation.getParam('item'),
+    //   });
+    // } else {
+    //   this.getDetail();
+    // }
   }
   renderSafeArea() {
     return (
@@ -109,13 +123,6 @@ class WorkExperience extends Component {
     global.httpGet('resumeworkexp/detail', {id: this.state.id}, res => {
       console.log('resumeworkexp', res.data);
       const resData = res.data;
-      const salaryList = this.state.salaryList;
-      const salary = salaryList.find(item => {
-        return item.id === resData.monthlySalary;
-      });
-      if (salary) {
-        resData.salaryName = salary.dvalue;
-      }
       this.setState({
         form: resData,
       });
@@ -296,7 +303,7 @@ class WorkExperience extends Component {
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
           {form.id ? (
-            <View style={baseStyle.footBtn}>
+            <View style={baseStyle.footBtnRel}>
               <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
                 <Button
                   onPress={() => {

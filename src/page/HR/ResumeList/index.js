@@ -14,6 +14,7 @@ import {baseStyle} from '../../../components/baseStyle';
 import Iconright from '../../../iconfont/Iconright';
 import {Longlist} from 'beeshell/dist/components/Longlist';
 import DatePicker from '../../../components/DatePicker';
+import {Dialog} from 'beeshell';
 
 class ItemComp extends Component {
   constructor(props) {
@@ -32,14 +33,47 @@ class ItemComp extends Component {
           style={[
             baseStyle.flex,
             baseStyle.justifyBetween,
-            {paddingBottom: 5, paddingTop: 10, alignItems: 'flex-end'},
+            {paddingBottom: 15, paddingTop: 15, alignItems: 'flex-end'},
           ]}>
           <View style={baseStyle.row}>
-            <Image style={sty.author} source={{uri: item.pic}} />
+            {/* <View style={baseStyle.authorBox}>
+              <Image style={baseStyle.authorImg} source={{uri: item.pic}} />
+            </View>
             <View style={baseStyle.paddingLeft}>
               <Text style={{marginBottom: 5}}>{item.name}</Text>
               <Text>{item.resumeIntention}</Text>
-              {/* <Text>市场经理 | 互联网价值观</Text> */}
+            </View> */}
+            <View style={[baseStyle.authorBox, baseStyle.marginRight]}>
+              <Image source={{uri: item.pic}} style={baseStyle.authorImg} />
+            </View>
+            <View>
+              <View style={baseStyle.row}>
+                <Text style={[baseStyle.fontBold, baseStyle.ft15]}>
+                  {item.name}
+                </Text>
+                <Text style={[baseStyle.ft13, {marginLeft: 10}]}>
+                  {item.positionName}
+                </Text>
+              </View>
+              <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                {item.age ? (
+                  <Text style={{marginRight: 10, paddingRight: 10}}>
+                    {item.age}岁
+                  </Text>
+                ) : null}
+                <Text
+                  style={[
+                    item.age ? sty.borderLeft : null,
+                    {paddingLeft: item.age ? 10 : 0},
+                  ]}>
+                  {item.experienceName}
+                </Text>
+                <Text
+                  style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
+                  {item.cityName}
+                  {item.regionName}
+                </Text>
+              </View>
             </View>
           </View>
           <View
@@ -122,7 +156,11 @@ class ItemComp extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('----');
-                this.props.updatePositionRecord(2);
+                // this.props.updatePositionRecord(2);
+                this.props.updatePositionRecord({
+                  status: 2,
+                  msg: '确认已面试？',
+                });
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>已面试</Text>
@@ -130,7 +168,11 @@ class ItemComp extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('----');
-                this.props.updatePositionRecord(3);
+                // this.props.updatePositionRecord(3);
+                this.props.updatePositionRecord({
+                  status: 3,
+                  msg: '确认未面试？',
+                });
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>未面试</Text>
@@ -153,7 +195,11 @@ class ItemComp extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('----');
-                this.props.updatePositionRecord(5);
+                // this.props.updatePositionRecord(5);
+                this.props.updatePositionRecord({
+                  status: 5,
+                  msg: '谈薪待入职',
+                });
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>谈薪待入职</Text>
@@ -175,7 +221,7 @@ class ItemComp extends Component {
                 });
               }}
               style={sty.buttonSty}>
-              <Text style={baseStyle.textYellow}>已雇佣 </Text>
+              <Text style={baseStyle.textYellow}>已雇佣</Text>
             </TouchableOpacity>
           </View>
         ) : item.positionRecordstatus === 6 ? (
@@ -187,7 +233,11 @@ class ItemComp extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('----');
-                this.props.updatePositionRecord(7);
+                // this.props.updatePositionRecord(7);
+                this.props.updatePositionRecord({
+                  status: 7,
+                  msg: '过保',
+                });
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>过保</Text>
@@ -195,7 +245,11 @@ class ItemComp extends Component {
             <TouchableOpacity
               onPress={() => {
                 console.log('----');
-                this.props.updatePositionRecord(8);
+                // this.props.updatePositionRecord(8);
+                this.props.updatePositionRecord({
+                  status: 8,
+                  msg: '入职未过保',
+                });
               }}
               style={sty.buttonSty}>
               <Text style={baseStyle.textYellow}>入职未过保</Text>
@@ -230,6 +284,8 @@ class ItemComp extends Component {
   }
 }
 
+let msg = '';
+
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
@@ -238,11 +294,14 @@ class ResumeList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      list: [],
+      list: null,
       page: 1,
       total: 0,
       positionId: null,
       positionRecordId: null,
+      update: {
+        msg: '',
+      },
     };
   }
   UNSAFE_componentWillMount() {
@@ -298,7 +357,8 @@ class ResumeList extends Component {
         });
       });
   }
-  updatePositionRecord(positionRecordId, status) {
+  updatePositionRecord() {
+    const {positionRecordId, status} = this.state.update;
     const params = {
       id: positionRecordId,
       status: status,
@@ -313,7 +373,8 @@ class ResumeList extends Component {
       res => {
         console.log(res);
         this.refresh();
-        Alert.alert('', '操作成功');
+        this._dialog.close();
+        // Alert.alert('', '操作成功');
       },
       err => {
         console.log(err);
@@ -322,8 +383,16 @@ class ResumeList extends Component {
   }
   render() {
     const {total, list} = this.state;
+    if (!list) {
+      return false;
+    }
+    console.log('list', list);
     return (
-      <View style={[baseStyle.content, {flex: 1, backgroundColor: '#fff'}]}>
+      <View
+        style={[
+          // baseStyle.content,
+          {flex: 1, backgroundColor: '#fff'},
+        ]}>
         <Header
           title="招聘简历"
           onPressBack={() => {
@@ -335,14 +404,34 @@ class ResumeList extends Component {
           ref={longList => {
             this.longList = longList;
           }}
+          style={[baseStyle.content, {flex: 1}]}
           total={total}
           data={list}
           renderItem={({item, index}) => {
             return (
-              <View style={baseStyle.borderBottom} key={item.id}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('Rreview', {
+                    id: item.resumeId,
+                  });
+                }}
+                style={baseStyle.borderBottom}
+                key={item.id}>
                 <ItemComp
-                  updatePositionRecord={status => {
-                    this.updatePositionRecord(item.positionRecordId, status);
+                  updatePositionRecord={res => {
+                    console.log('res----', res);
+                    this.setState(
+                      {
+                        update: {
+                          positionRecordId: item.positionRecordId,
+                          status: res.status,
+                          msg: res.msg,
+                        },
+                      },
+                      () => {
+                        this._dialog.open();
+                      },
+                    );
                   }}
                   refresh={() => {
                     this.refresh();
@@ -364,7 +453,7 @@ class ResumeList extends Component {
                   item={item}
                   navigation={this.props.navigation}
                 />
-              </View>
+              </TouchableOpacity>
             );
           }}
           onEndReached={() => {
@@ -394,6 +483,22 @@ class ResumeList extends Component {
             });
           }}
         />
+        <Dialog
+          ref={c => {
+            this._dialog = c;
+          }}
+          cancelable={true}
+          title="提示"
+          bodyText={this.state.update.msg}
+          cancelCallback={() => {
+            console.log('cancel');
+            this._dialog.close();
+          }}
+          confirmCallback={() => {
+            this.updatePositionRecord();
+            console.log('confirm');
+          }}
+        />
       </View>
     );
   }
@@ -402,6 +507,10 @@ class ResumeList extends Component {
 export default ResumeList;
 
 const sty = StyleSheet.create({
+  borderLeft: {
+    borderLeftWidth: 0.5,
+    borderLeftColor: '#979797',
+  },
   author: {
     width: 47,
     height: 47,

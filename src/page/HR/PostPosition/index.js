@@ -32,8 +32,8 @@ class PostPosition extends Component {
       salaryList: [],
       companyList: [],
       positionTypeList: [
-        {dvalue: '普通职位', id: 1},
-        {dvalue: '内推职位', id: 2},
+        {dvalue: '猎头职位', id: 1},
+        {dvalue: '普通职位', id: 2},
       ],
       params: {
         cityId: 0,
@@ -51,9 +51,9 @@ class PostPosition extends Component {
         positionDesc: '',
         positionName: '',
         positionRequirements: '',
-        positionTypeName: '内推职位',
+        positionTypeName: '普通职位',
         positionTypeId: 2,
-        positionType: 2, // 1=普通职位 2=内推职位
+        positionType: 2, // 1=猎头职位 2=普通职位
         provinceId: 0,
         regionId: 0,
         regionName: '',
@@ -142,7 +142,7 @@ class PostPosition extends Component {
     console.log(JSON.stringify(params));
     global.httpPost('position/save', params, res => {
       console.log(res);
-      // this.props.navigation.state.params.callBack();
+      this.props.navigation.state.params.callBack();
       this.props.navigation.goBack();
     });
   }
@@ -240,7 +240,7 @@ class PostPosition extends Component {
                 }>
                 {this.state.params.positionTypeName || '请选择'}
               </Text>
-              {/* <Text style={baseStyle.textYellow}>内推职位</Text> */}
+              {/* <Text style={baseStyle.textYellow}>普通职位</Text> */}
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
@@ -432,6 +432,7 @@ class PostPosition extends Component {
                 }>
                 {this.state.params.provinceName || '请选择'}
                 {this.state.params.cityName}
+                {this.state.params.regionName}
               </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>

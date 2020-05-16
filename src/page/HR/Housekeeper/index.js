@@ -255,6 +255,6 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 60,
     height: 60,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
 });

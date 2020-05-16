@@ -22,7 +22,11 @@ class Evaluation extends Component {
       selfEvaluation: '',
     };
   }
-
+  UNSAFE_componentWillMount() {
+    this.setState({
+      selfEvaluation: this.props.navigation.getParam('selfEvaluation'),
+    });
+  }
   render() {
     return (
       <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>

@@ -36,12 +36,21 @@ class WorkExperience extends Component {
         projectEnd: new Date(),
         projectStart: new Date(),
         resumeId: this.props.navigation.getParam('resumeId'),
+        id: this.props.navigation.getParam('id'),
       },
       id: this.props.navigation.getParam('id'),
     };
   }
   UNSAFE_componentWillMount() {
-    this.getDetail();
+    console.log('resumeId', this.props.navigation.getParam('resumeId'));
+    if (!this.props.navigation.getParam('type')) {
+      this.getDetail();
+    }
+    if (this.props.navigation.getParam('item')) {
+      this.setState({
+        form: this.props.navigation.getParam('item'),
+      });
+    }
   }
   setParams(key, value) {
     const form = this.state.form;
@@ -209,7 +218,7 @@ class WorkExperience extends Component {
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
           {form.id ? (
-            <View style={baseStyle.footBtn}>
+            <View style={baseStyle.footBtnRel}>
               <View style={[baseStyle.row, {marginTop: 20, marginBottom: 20}]}>
                 <Button
                   onPress={() => {

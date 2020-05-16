@@ -1,3 +1,5 @@
+import RNFetchBlob from 'rn-fetch-blob';
+import {Platform} from 'react-native';
 const baseUrl = 'http://114.55.169.95/yun_rest/';
 export const httpGet = (api, parameter = {}, success, failure = () => {}) => {
   //封装请求配置： 请求方法、请求头、请求体
@@ -65,13 +67,33 @@ export const httpPost = (url, parameter, success, failure = () => {}) => {
 
 export const uploadImage = (url, file, success, failure = () => {}) => {
   let formData = new FormData();
-  const fileData = {
+  console.log('file', JSON.stringify(file));
+  let fileData = {
     uri: file.uri,
     type: file.type,
     name: file.fileName,
     size: file.fileSize,
   };
+  // if (file.mediaType === 'video') {
+  //   const videoPath = file.path.split('/');
+  //   const videoType = file.path.split('.');
+  //   const videoData = {
+  //     name: 'video',
+  //     filename: videoPath[videoPath.length - 1],
+  //     data: RNFetchBlob.wrap(file.uri),
+  //     type: `video/${videoType[videoType.length - 1]}`,
+  //     // uri: file.uri,
+  //     // type: `video/${videoType[videoType.length - 1]}`,
+  //     // name: videoPath[videoPath.length - 1],
+  //     // data: RNFetchBlob.wrap(file.uri),
+  //     // size: 100,
+  //   };
+  //   console.log('videoData', JSON.stringify(videoData));
+  //   fileData = videoData;
+  // }
+
   formData.append('file', fileData);
+  formData.append('model', file.mediaType);
   fetch(baseUrl + url, {
     method: 'POST',
     headers: {
@@ -90,6 +112,82 @@ export const uploadImage = (url, file, success, failure = () => {}) => {
     .then(err => {
       console.log('err', err);
       failure(err);
+    });
+};
+
+export const uploadVideo = (file, cb = () => {}) => {
+  const url = 'upload/fileupload';
+  const videoPath = file.path.split('/');
+  const videoType = file.path.split('.');
+  let PATH = Platform.OS == 'ios' ? file.uri.replace('file:///', '') : file.uri;
+  // let PATH = Platform.OS == 'ios' ? file.uri.replace('file:///', '') : file.uri;
+  RNFetchBlob.fetch(
+    'POST',
+    'http://114.55.169.95/yun_rest/upload/fileupload',
+    {'Content-Type': 'multipart/form-data'},
+    {
+      type: `video/${videoType[videoType.length - 1]}`,
+      name: 'file',
+      filename: videoPath[videoPath.length - 1],
+      // type: 'video/mp4',
+      // name: 'file',
+      // filename: 'vid.mp4',
+      data: RNFetchBlob.wrap(PATH),
+    },
+  )
+    .then(data => {
+      console.log('data-------------', data);
+      return data.json();
+    })
+    .then(res => {
+      console.log('video-------------', res);
+      cb(res);
+    })
+    .catch(err => {
+      console.log('uploadVideoErr', err);
+    });
+};
+
+export const httpGetLocation = (
+  api,
+  // parameter = {},
+  success,
+  failure = () => {},
+) => {
+  //封装请求配置： 请求方法、请求头、请求体
+  // const params = [];
+  // Object.keys(parameter).forEach(key => {
+  //   params.push(`${key}=${parameter[key]}`);
+  // });
+  // const paramStr = params.toString().replace(/,/g, '&');
+  // let url = api;
+  // if (paramStr) {
+  //   url = url + '?' + paramStr;
+  // }
+
+  let opt = {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  };
+  console.log('httpGet', api);
+  //发起请求
+  fetch(api, opt)
+    .then(data => {
+      return data.json();
+    })
+    .then(response => {
+      if (response) {
+        console.log(response);
+        success(response);
+      }
+    })
+    .catch(error => {
+      if (error) {
+        failure(error);
+      }
     });
 };
 

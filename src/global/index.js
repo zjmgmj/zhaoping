@@ -5,6 +5,8 @@ import {
   // uploadFile,
   uploadImage,
   httpGetPromise,
+  httpGetLocation,
+  uploadVideo,
 } from '../utils/httpUtil';
 import {
   gettypelist,
@@ -18,6 +20,7 @@ import {
   gettypelistName,
   uploadFile,
   getSexStr,
+  Loading,
 } from '../utils/mixins';
 global.localStorage = localStorage;
 global.httpGet = httpGet;
@@ -35,3 +38,6 @@ global.date2Month = date2Month;
 global.getAge = getAge;
 global.gettypelistName = gettypelistName;
 global.getSexStr = getSexStr;
+global.httpGetLocation = httpGetLocation;
+global.Loading = Loading;
+global.uploadVideo = uploadVideo;

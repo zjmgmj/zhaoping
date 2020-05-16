@@ -28,11 +28,11 @@ class ChallengePosition extends Component {
           tabBarBackgroundColor="#3671ff"
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
-          <View tabLabel="普通职位">
+          <View tabLabel="猎头职位">
             <PositionList navigation={this.props.navigation} />
             {/* <Text>挑战职位</Text> */}
           </View>
-          <View tabLabel="内推职位">
+          <View tabLabel="普通职位">
             <PositionList navigation={this.props.navigation} />
           </View>
         </ScrollableTabView>

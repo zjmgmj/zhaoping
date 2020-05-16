@@ -32,7 +32,7 @@ class ChallengePosition extends Component {
             <PositionList positionType={1} navigation={this.props.navigation} />
             {/* <Text>挑战职位</Text> */}
           </View>
-          <View tabLabel="内推职位">
+          <View tabLabel="普通职位">
             <PositionList positionType={2} navigation={this.props.navigation} />
           </View>
         </ScrollableTabView>

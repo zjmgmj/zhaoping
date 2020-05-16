@@ -115,6 +115,7 @@ class PostPosition extends Component {
     if (this.state.params.id) {
       url = 'company/update';
     }
+    console.log('params', params);
     global.httpPost(url, params, res => {
       if (res.code === 1) {
         this.props.navigation.state.params.callBack();
@@ -162,6 +163,7 @@ class PostPosition extends Component {
   }
   render() {
     const iconRightFontColor = '#D6D0D0';
+    const {params} = this.state;
     return (
       <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
@@ -203,7 +205,7 @@ class PostPosition extends Component {
                   source={{
                     uri: this.state.params.logo,
                   }}
-                  style={{width: 20, height: 20, resizeMode: 'contain'}}
+                  style={{width: 20, height: 20, resizeMode: 'cover'}}
                 />
               ) : (
                 <Text style={baseStyle.textGray}>请上传</Text>
@@ -221,6 +223,9 @@ class PostPosition extends Component {
                   this.setParams(location[0], 'longitude');
                   this.setParams(location[1], 'latitude');
                   this.setParams(res.address, 'address');
+                  this.setParams(res.regionName, 'regionName');
+                  this.setParams(res.cityName, 'cityName');
+                  this.setParams(res.provinceName, 'provinceName');
                 },
               });
             }}
@@ -228,12 +233,12 @@ class PostPosition extends Component {
             <Text>公司地址</Text>
             <View style={[baseStyle.row]}>
               <Text
-                style={
-                  this.state.params.cityName
-                    ? baseStyle.textYellow
-                    : baseStyle.textGray
-                }>
-                {this.state.params.cityName || '请选择'}
+                numberOfLines={1}
+                style={[
+                  params.cityName ? baseStyle.textYellow : baseStyle.textGray,
+                  {width: 250, textAlign: 'right'},
+                ]}>
+                {params.cityName ? `${params.cityName}` : '请选择'}
                 {this.state.params.address}
               </Text>
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
@@ -241,11 +246,15 @@ class PostPosition extends Component {
           </TouchableOpacity>
           <View style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>联系人信息</Text>
-            <View style={[baseStyle.row]}>
+            <View style={[baseStyle.row, {flex: 1}]}>
               <TextInput
                 keyboardType="numeric"
                 placeholder="请填写"
+                value={this.state.params.contactsPhone}
                 style={[baseStyle.textYellow, sty.textInputSty]}
+                onChange={e => {
+                  this.setParams(e.nativeEvent.text, 'contactsPhone');
+                }}
               />
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
@@ -298,7 +307,7 @@ class PostPosition extends Component {
             }}
             style={[baseStyle.borderBottom, sty.inputBox]}>
             <Text>公司官网</Text>
-            <View style={[baseStyle.row]}>
+            <View style={[baseStyle.row, {flex: 1}]}>
               <TextInput
                 placeholder="请输入"
                 style={[baseStyle.textYellow, sty.textInputSty]}
@@ -354,6 +363,21 @@ class PostPosition extends Component {
               <Iconright color={iconRightFontColor} style={sty.Iconright} />
             </View>
           </TouchableOpacity>
+          <View style={[baseStyle.borderBottom, sty.inputBox]}>
+            <Text>公司简介</Text>
+            <View style={[baseStyle.row, {flex: 1}]}>
+              <TextInput
+                placeholder="请填写"
+                multiline
+                value={this.state.params.introduction}
+                style={[baseStyle.textYellow, sty.textInputSty]}
+                onChange={e => {
+                  this.setParams(e.nativeEvent.text, 'introduction');
+                }}
+              />
+              <Iconright color={iconRightFontColor} style={sty.Iconright} />
+            </View>
+          </View>
           <Button
             onPress={() => {
               this.savePosition();
@@ -417,7 +441,8 @@ const sty = StyleSheet.create({
   },
   textInputSty: {
     textAlign: 'right',
-    width: 300,
+    // width: 300,
+    flex: 1,
     padding: 0,
   },
 });

@@ -4,9 +4,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  PixelRatio,
   Text,
-  TextInput,
   ScrollView,
   Alert,
 } from 'react-native';
@@ -40,7 +38,6 @@ class Resume extends Component {
         resumeStatus: 0,
         resumeIntention: '',
         selfEvaluation: '',
-        // id: 3,
         labels: '',
       },
       jobStatus: '',
@@ -65,6 +62,9 @@ class Resume extends Component {
     if (resumeId) {
       this.setState({resumeId});
       this.getDetail(resumeId);
+      this.getResumeworkexpList(resumeId);
+      this.getResumeprojectexpList(resumeId);
+      this.getResumeschoolexpList(resumeId);
     }
     global.gettypelist('education', res => {
       // 学历
@@ -89,14 +89,14 @@ class Resume extends Component {
         this.setState({
           resume: res.data,
         });
-        this.getResumeworkexpList(res.data.userId);
-        this.getResumeprojectexpList(res.data.userId);
-        this.getResumeschoolexpList(res.data.userId);
       },
       err => {
         console.log(err);
       },
     );
+    // this.getResumeworkexpList(id);
+    // this.getResumeprojectexpList(id);
+    // this.getResumeschoolexpList(id);
   }
   getEducationName(id) {
     const education = this.state.educationList.find(item => {
@@ -195,41 +195,29 @@ class Resume extends Component {
       },
     );
   }
-  getResumeschoolexpList(userId) {
-    global.httpGet(
-      'resumeschoolexp/list',
-      {userId: userId || this.state.resume.userId},
-      res => {
-        console.log('projectExperienceList', res);
-        this.setState({
-          educationalExpList: res.data,
-        });
-      },
-    );
+  getResumeschoolexpList(id) {
+    global.httpGet('resumeschoolexp/list', {resumeId: id}, res => {
+      console.log('projectExperienceList', res);
+      this.setState({
+        educationalExpList: res.data,
+      });
+    });
   }
-  getResumeworkexpList(userId) {
-    global.httpGet(
-      'resumeworkexp/list',
-      {userId: userId || this.state.resume.userId},
-      res => {
-        console.log('projectExperienceList', res);
-        this.setState({
-          workExperienceList: res.data,
-        });
-      },
-    );
+  getResumeworkexpList(id) {
+    global.httpGet('resumeworkexp/list', {resumeId: id}, res => {
+      console.log('projectExperienceList', res);
+      this.setState({
+        workExperienceList: res.data,
+      });
+    });
   }
-  getResumeprojectexpList(userId) {
-    global.httpGet(
-      'resumeprojectexp/list',
-      {userId: userId || this.state.resume.userId},
-      res => {
-        console.log('projectExperienceList', res);
-        this.setState({
-          projectExperienceList: res.data,
-        });
-      },
-    );
+  getResumeprojectexpList(id) {
+    global.httpGet('resumeprojectexp/list', {resumeId: id}, res => {
+      console.log('projectExperienceList', res);
+      this.setState({
+        projectExperienceList: res.data,
+      });
+    });
   }
   saveResume() {
     global.httpPost(
@@ -266,7 +254,7 @@ class Resume extends Component {
     }
     console.log('labels', labels);
     return (
-      <View style={[baseStyle.bgWhite]}>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
           title={resumeId ? '编辑简历' : '添加简历'}
           right={resumeId ? '预览简历' : null}
@@ -284,7 +272,7 @@ class Resume extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView style={{height: baseStyle.screenHeight}}>
+        <ScrollView style={{flex: 1}}>
           <View style={{padding: 10}}>
             <TouchableOpacity
               onPress={() => {
@@ -301,7 +289,7 @@ class Resume extends Component {
               style={[sty.inforItem, sty.flexContentBetween]}>
               <View>
                 <View style={baseStyle.row}>
-                  <Text>个人信息</Text>
+                  <Text style={sty.title}>个人信息</Text>
                   <Iconedit style={baseStyle.paddingLeft} size={20} />
                 </View>
                 <View style={baseStyle.paddingTop}>
@@ -328,7 +316,7 @@ class Resume extends Component {
                 });
               }}
               style={[sty.inforItem, sty.flexContentBetween]}>
-              <Text>求职状态</Text>
+              <Text style={sty.title}>求职状态</Text>
               <View style={sty.rigtSty}>
                 <Text style={baseStyle.textGray}>
                   {this.getResumeStatus('code')}
@@ -351,7 +339,7 @@ class Resume extends Component {
                   baseStyle.paddingBottom,
                   {flex: 1},
                 ]}>
-                <Text>职业意向</Text>
+                <Text style={sty.title}>职业意向</Text>
                 <Iconedit />
               </View>
               <Text style={[baseStyle.textGray, baseStyle.paddingTop]}>
@@ -370,7 +358,7 @@ class Resume extends Component {
               }}
               style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>技能标签</Text>
+                <Text style={sty.title}>技能标签</Text>
                 <Iconedit />
               </View>
               <View style={[baseStyle.row, baseStyle.paddingTop]}>
@@ -430,24 +418,26 @@ class Resume extends Component {
                   this.props.navigation.navigate('ResumeWorkExperience', {
                     resumeId: resume.id,
                     callBack: res => {
-                      this.setWorkExperience(res);
+                      this.getResumeworkexpList(resume.id);
+                      // this.setWorkExperience(res);
                     },
                   });
                 }}
                 style={sty.flexContentBetween}>
-                <Text>工作经历</Text>
+                <Text style={sty.title}>工作经历</Text>
                 <IconcircleAdd />
               </TouchableOpacity>
               {this.state.workExperienceList.map(item => {
                 return (
                   <TouchableOpacity
                     onPress={() => {
-                      console.log('id', item.id);
                       this.props.navigation.navigate('ResumeWorkExperience', {
                         resumeId: resume.id,
                         id: item.id,
+                        type: 'add',
+                        item: item,
                         callBack: res => {
-                          this.getResumeworkexpList();
+                          this.getResumeworkexpList(resume.id);
                         },
                       });
                     }}
@@ -489,30 +479,36 @@ class Resume extends Component {
             <View style={sty.inforItem}>
               <TouchableOpacity
                 onPress={() => {
+                  if (!resume.id) {
+                    Alert.alert('提示', '请先完善个人信息');
+                    return false;
+                  }
                   this.props.navigation.navigate('ResumeProjectExperience', {
-                    id: resume.id,
+                    resumeId: resume.id,
+                    type: 'add',
                     callBack: res => {
                       console.log('callBack', res);
-                      this.setProjectExperience(res);
+                      // this.setProjectExperience(res);
+                      this.getResumeprojectexpList(resume.id);
                     },
                   });
                 }}
                 style={sty.flexContentBetween}>
-                <Text>项目经历</Text>
+                <Text style={sty.title}>项目经历</Text>
                 <IconcircleAdd />
               </TouchableOpacity>
               {this.state.projectExperienceList.map(item => {
                 return (
                   <TouchableOpacity
                     onPress={() => {
-                      console.log('id', item.id);
                       this.props.navigation.navigate(
                         'ResumeProjectExperience',
                         {
                           resumeId: resume.id,
+                          item: item,
                           id: item.id,
                           callBack: res => {
-                            this.getResumeprojectexpList();
+                            this.getResumeprojectexpList(resume.id);
                           },
                         },
                       );
@@ -553,20 +549,22 @@ class Resume extends Component {
                   this.props.navigation.navigate(
                     'ResumeEducationalExperience',
                     {
-                      id: resume.id,
+                      resumeId: resume.id,
+                      type: 'add',
                       callBack: res => {
-                        const educationalExpList = this.state
-                          .educationalExpList;
-                        educationalExpList.push(res);
-                        this.setState({
-                          educationalExpList: educationalExpList,
-                        });
+                        this.getResumeschoolexpList(resume.id);
+                        // const educationalExpList = this.state
+                        //   .educationalExpList;
+                        // educationalExpList.push(res);
+                        // this.setState({
+                        //   educationalExpList: educationalExpList,
+                        // });
                       },
                     },
                   );
                 }}
                 style={sty.flexContentBetween}>
-                <Text>教育经历</Text>
+                <Text style={sty.title}>教育经历</Text>
                 <IconcircleAdd />
               </TouchableOpacity>
               {this.state.educationalExpList.map(item => {
@@ -574,13 +572,17 @@ class Resume extends Component {
                   <TouchableOpacity
                     onPress={() => {
                       console.log('id', item.id);
+                      debugger;
                       this.props.navigation.navigate(
                         'ResumeEducationalExperience',
                         {
                           resumeId: resume.id,
+                          item: item,
                           id: item.id,
                           callBack: res => {
-                            this.getResumeschoolexpList();
+                            debugger;
+                            console.log(res);
+                            this.getResumeschoolexpList(resume.id);
                           },
                         },
                       );
@@ -629,7 +631,7 @@ class Resume extends Component {
                   });
                 }}
                 style={sty.flexContentBetween}>
-                <Text>自我评价</Text>
+                <Text style={sty.title}>自我评价</Text>
                 <Iconedit />
               </TouchableOpacity>
               {resume.selfEvaluation ? (
@@ -660,11 +662,13 @@ class Resume extends Component {
                   });
                 }}
                 style={sty.flexContentBetween}>
-                <Text>简历设置</Text>
+                <Text style={sty.title}>简历设置</Text>
                 <Iconedit />
               </TouchableOpacity>
               <View style={baseStyle.paddingTop}>
-                <Text>{this.getJobStatus('label')}</Text>
+                <Text style={baseStyle.textGray}>
+                  {this.getJobStatus('label')}
+                </Text>
               </View>
             </View>
             {/* <TouchableOpacity style={[sty.inforItem, sty.flexContentBetween]}>
@@ -675,7 +679,13 @@ class Resume extends Component {
           <View
             style={[
               baseStyle.row,
-              {justifyContent: 'center', paddingBottom: 40, paddingTop: 20},
+              {
+                justifyContent: 'center',
+                paddingBottom: 40,
+                paddingTop: 20,
+                paddingLeft: 20,
+                paddingRight: 20,
+              },
             ]}>
             {resumeId ? (
               <Button
@@ -782,5 +792,9 @@ const sty = StyleSheet.create({
   notDataImg: {
     width: 91.5,
     height: 84.5,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

@@ -7,13 +7,15 @@ import {
   PixelRatio,
   Text,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import {Button} from 'beeshell/dist/components/Button';
-import Header from '../../components/Header';
-import {setStatusBar} from '../../components/setStatusBar';
-import {baseStyle} from '../../components/baseStyle';
+import Header from '../../../components/Header';
+import {setStatusBar} from '../../../components/setStatusBar';
+import {baseStyle} from '../../../components/baseStyle';
 // import editResume from './editResume';
-import Iconright from '../../iconfont/Iconright';
+import Iconright from '../../../iconfont/Iconright';
+import Iconsearch from '../../../iconfont/Iconsearch';
 
 class NotData extends Component {
   constructor(props) {
@@ -25,21 +27,13 @@ class NotData extends Component {
         <View>
           <Image
             style={sty.notDataImg}
-            source={require('../../images/not_data.png')}
+            source={require('../../../images/not_data.png')}
           />
         </View>
         <View>
           <View style={sty.notDataMsg}>
             <Text>当前暂时无简历</Text>
           </View>
-          <Button
-            style={[sty.notDataBtn, baseStyle.bgYellow]}
-            textStyle={baseStyle.textWhite}
-            onPress={() => {
-              this.props.onPressAdd();
-            }}>
-            添加简历
-          </Button>
         </View>
       </View>
     );
@@ -75,14 +69,23 @@ class ResumeItem extends Component {
               </Text>
             </View>
             <View style={[baseStyle.row, baseStyle.paddingTop]}>
-              <Text>{global.getAge(item.birthDate)}岁</Text>
-              <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
-                工作{item.workyear}年
-              </Text>
-              <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
-                {item.cityName}
-                {item.regionName}
-              </Text>
+              {item.age ? <Text>{item.age}岁</Text> : null}
+              {item.experienceName ? (
+                <Text
+                  style={[
+                    item.age ? sty.borderLeft : null,
+                    {marginLeft: item.age ? 10 : 0, paddingLeft: 10},
+                  ]}>
+                  {item.experienceName}
+                </Text>
+              ) : null}
+              {item.cityName ? (
+                <Text
+                  style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
+                  {item.cityName}
+                  {item.regionName}
+                </Text>
+              ) : null}
             </View>
           </View>
         </View>
@@ -96,7 +99,7 @@ class ResumeItem extends Component {
   translucent: true,
   backgroundColor: 'transparent',
 })
-class Resume extends Component {
+class ResumeDelivered extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -104,6 +107,7 @@ class Resume extends Component {
       videoSource: null,
       list: null,
       currentUser: null,
+      searchVal: '',
     };
   }
   UNSAFE_componentWillMount() {
@@ -116,14 +120,14 @@ class Resume extends Component {
   }
   getResumeList() {
     global.httpGet(
-      'resume/list',
+      'positionrecord/list',
       {
         page: 1,
-        size: 10,
-        userId: this.state.currentUser.userId,
+        size: 20,
+        hruserId: this.state.currentUser.userId,
       },
       res => {
-        console.log('resumeList', res);
+        console.log('positionrecord', res);
         this.setState({
           list: res.data.result,
         });
@@ -139,67 +143,60 @@ class Resume extends Component {
       return false;
     }
     return (
-      <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
           fullScreen
+          title="已投递简历"
           onPressBack={() => {
             this.props.navigation.goBack();
           }}
         />
-        {list.length > 0 ? (
-          <ScrollView style={baseStyle.content}>
-            {list.map(item => {
-              return (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={() => {
-                    this.props.navigation.navigate('ResumeAdd', {
-                      id: item.id,
-                      callBack: res => {
-                        this.getResumeList();
-                      },
-                    });
-                  }}>
-                  <ResumeItem item={item} />
-                </TouchableOpacity>
-              );
-            })}
-            <View
-              style={[
-                baseStyle.row,
-                {justifyContent: 'center', marginTop: 20},
-              ]}>
-              <Button
-                style={[sty.notDataBtn, baseStyle.bgYellow]}
-                textStyle={baseStyle.textWhite}
-                onPress={() => {
-                  this.props.navigation.navigate('ResumeAdd', {
-                    callBack: res => {
-                      this.getResumeList();
-                    },
-                  });
-                }}>
-                添加简历
-              </Button>
-            </View>
-          </ScrollView>
-        ) : (
-          <NotData
-            onPressAdd={() => {
-              this.props.navigation.navigate('ResumeAdd', {
-                callBack: res => {
-                  this.getResumeList();
-                },
-              });
-            }}
-          />
-        )}
+        {/* <View style={baseStyle.content}>
+          <View style={[baseStyle.row, sty.searchBox]}>
+            <Iconsearch />
+            <TextInput
+              placeholder="搜索职位"
+              value={this.state.searchVal}
+              style={[baseStyle.paddingLeft, {flex: 1}]}
+              onChange={e => {
+                this.setState({
+                  searchVal: e.nativeEvent.text,
+                });
+              }}
+              onEndEditing={res => {
+                console.log('onEndEditing', res);
+                // console.log(searchVal)
+              }}
+            />
+          </View>
+        </View> */}
+        <View style={[{flex: 1}]}>
+          {list.length > 0 ? (
+            <ScrollView style={{flex: 1, paddingLeft: 10, paddingRight: 10}}>
+              {list.map(item => {
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() => {
+                      this.props.navigation.navigate('Rreview', {
+                        id: item.resumeId,
+                      });
+                    }}>
+                    <ResumeItem item={item} />
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          ) : (
+            <NotData />
+          )}
+        </View>
       </View>
     );
   }
 }
 
-export default Resume;
+export default ResumeDelivered;
 const sty = StyleSheet.create({
   borderLeft: {
     borderLeftWidth: 0.5,
@@ -230,5 +227,12 @@ const sty = StyleSheet.create({
   notDataImg: {
     width: 91.5,
     height: 84.5,
+  },
+  searchBox: {
+    backgroundColor: '#FBF8F2',
+    borderRadius: 20,
+    paddingLeft: 15,
+    paddingRight: 15,
+    height: 40,
   },
 });

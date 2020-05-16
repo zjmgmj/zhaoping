@@ -225,7 +225,6 @@ class Chat extends Component {
     this.sendMsg(message);
   }
   sendMsg(message) {
-    debugger;
     let promise = tim.sendMessage(message);
     promise
       .then(imResponse => {
@@ -243,7 +242,6 @@ class Chat extends Component {
       log: event.nativeEvent.data,
     });
     const res = JSON.parse(event.nativeEvent.data);
-    debugger;
     if (res.type === 'record') {
       this._record();
     } else if (res.type === 'recordStop') {

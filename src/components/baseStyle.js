@@ -116,7 +116,7 @@ export const baseStyle = StyleSheet.create({
   authorImg: {
     width: 47,
     height: 47,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   authorBoxMin: {
     width: 29,
@@ -127,7 +127,7 @@ export const baseStyle = StyleSheet.create({
   authorImgMin: {
     width: 29,
     height: 29,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   authorName: {
     fontSize: 16,
@@ -143,9 +143,15 @@ export const baseStyle = StyleSheet.create({
     right: 0,
     paddingLeft: 20,
     paddingRight: 20,
+    zIndex: 1,
+  },
+  footBtnRel: {
+    flex: 1,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   logoBox: {
-    width: 53,
+    width: 54,
     height: 64,
     overflow: 'hidden',
     borderColor: '#979797',
@@ -154,7 +160,7 @@ export const baseStyle = StyleSheet.create({
   logoImg: {
     width: 53,
     height: 64,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   positionTitle: {
     fontSize: 16,

@@ -66,13 +66,13 @@ class RecruitmentManagement extends Component {
         // },
         {
           icon: require('../../../images/setting_icon.png'),
-          title: '设置入职状态',
-          url: 'FollowPosition',
+          title: '设置入职时间',
+          url: 'SetOnboardTime',
         },
         {
           icon: require('../../../images/checked_icon.png'),
           title: '已投递简历',
-          url: 'FollowPosition',
+          url: 'ResumeDelivered',
         },
       ],
     };
@@ -171,7 +171,7 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 60,
     height: 60,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   headContent: {
     paddingTop: 20,

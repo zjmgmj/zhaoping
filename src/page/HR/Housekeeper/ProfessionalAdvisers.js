@@ -68,8 +68,13 @@ class ProfessionalAdvisers extends Component {
                 baseStyle.paddingBottom,
                 baseStyle.borderBottom,
               ]}>
-              <Image source={{uri: detail.userPic}} style={sty.authorImg} />
-              <View>
+              <View style={baseStyle.authorBox}>
+                <Image
+                  source={{uri: detail.userPic}}
+                  style={baseStyle.authorImg}
+                />
+              </View>
+              <View style={baseStyle.paddingLeft}>
                 <Text>{detail.userNickname}</Text>
                 <View style={[baseStyle.row, {marginTop: 10}]}>
                   {detail.userSex === 2 ? (
@@ -192,7 +197,7 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 60,
     height: 60,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   iconSize: {
     width: 20,

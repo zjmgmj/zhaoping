@@ -15,7 +15,7 @@ const sty = StyleSheet.create({
   positionImg: {
     width: 53,
     height: 64,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   positionTag: {
     marginRight: 10,

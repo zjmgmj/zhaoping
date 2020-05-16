@@ -48,7 +48,6 @@ class Feedback extends Component {
     const positionRecordId = this.props.navigation.getParam('positionRecordId');
     const {content, isanonymous} = this.state;
 
-    debugger;
     const params = {
       id: positionRecordId,
       userId: userId,

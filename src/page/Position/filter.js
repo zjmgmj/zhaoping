@@ -29,15 +29,66 @@ class Filter extends Component {
       experienceId: '',
       companySize: '',
       financingStage: '',
-      list: [],
+      list: null,
+      listObj: null,
+      type: {
+        experience: {
+          label: '经验要求',
+          prop: 'experienceId',
+        },
+        education: {
+          label: '学历要求',
+          prop: 'educationId',
+        },
+        salary: {
+          label: '薪资待遇',
+          prop: 'salaryId',
+        },
+        companySize: {label: '公司规模'},
+        financingStage: {label: '融资阶段'},
+      },
     };
   }
   UNSAFE_componentWillMount() {
-    this.getDictionary('education', '学历要求', 'educationId');
-    this.getDictionary('salary', '薪资待遇', 'salaryId');
-    this.getDictionary('experience', '经验要求', 'experienceId');
-    this.getDictionary('companySize', '公司规模');
-    this.getDictionary('financingStage', '融资阶段');
+    const filter = this.props.navigation.getParam('filter');
+    const filterState = this.state;
+    Object.assign(filterState, filter);
+    this.getTypeList();
+  }
+  getTypeList() {
+    const type = this.state.type;
+    global.httpGet('dictionary/gettypealllist', {}, res => {
+      const typeList = res.data;
+      console.log('gettypealllist', typeList);
+      const obj = {};
+      const list = [];
+      typeList.map(item => {
+        if (!obj[item.dvalueen]) {
+          obj[item.dvalueen] = {
+            label: type[item.dvalueen].label,
+            prop: type[item.dvalueen].prop || item.dvalueen,
+            list: [],
+          };
+        }
+        obj[item.dvalueen].list.push(item);
+      });
+      list.push(obj.experience);
+      list.push(obj.education);
+      list.push(obj.salary);
+      list.push(obj.companySize);
+      list.push(obj.financingStage);
+      this.setState({list: list});
+    });
+  }
+  getFilterList(key) {
+    global.localStorage.get({key: key}).then(res => {
+      const obj = {};
+      obj[key] = JSON.parse(res);
+      // this.setState(obj);
+      const list = this.state.list;
+      list.push(obj);
+      this.setState({list: list});
+    });
   }
   getDictionary(key, label, prop) {
     global.gettypelist(
@@ -61,10 +112,11 @@ class Filter extends Component {
   }
   render() {
     const {list} = this.state;
-    console.log('list', list);
-    debugger;
+    if (!list) {
+      return false;
+    }
     return (
-      <View style={{backgroundColor: '#fff', height: baseStyle.screenHeight}}>
+      <View style={{backgroundColor: '#fff', flex: 1}}>
         <Header
           title="职位筛选"
           fullScreen
@@ -85,8 +137,11 @@ class Filter extends Component {
                       <TouchableOpacity
                         onPress={() => {
                           const obj = {};
-                          debugger;
-                          obj[`${item.prop}`] = listItem.id;
+                          if (this.state[`${item.prop}`] == listItem.id) {
+                            obj[`${item.prop}`] = null;
+                          } else {
+                            obj[`${item.prop}`] = listItem.id;
+                          }
                           this.setState(obj);
                         }}
                         key={listItem.id}>

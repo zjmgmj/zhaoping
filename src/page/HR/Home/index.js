@@ -30,7 +30,16 @@ class PositionList extends Component {
       positionList_1: [],
       positionList_2: [],
       cityPickId: null,
-      params: {},
+      params: {
+        page: 1,
+        size: 10,
+        // userId: currentUser.userId,
+        // positionType: type,
+      },
+      getPositiontypeListFun: card => {
+        return this.getPositiontypeList(card);
+      },
+      filterNum: null,
     };
   }
   UNSAFE_componentWillMount() {
@@ -42,27 +51,21 @@ class PositionList extends Component {
       this.getPositiontypeList(1);
     });
   }
-  getPositiontypeList(type, params) {
+  getPositiontypeList(type) {
     this.setState({
       positionType: type,
     });
-
     const currentUser = this.state.currentUser;
-    const obj = {
-      page: 1,
-      size: 10,
-      userId: currentUser.userId,
-      positionType: type,
-    };
-    let param = obj;
-    if (params) {
-      Object.keys(params).forEach(key => {
-        params[key] = params[key].toString();
-      });
-      param = Object.assign(obj, params);
-    }
-    console.log('param', param);
-    global.httpGet('position/list', param, res => {
+    const params = this.state.params;
+    params.userId = currentUser.userId;
+    params.positionType = type;
+    Object.keys(params).forEach(key => {
+      if (!params[key]) {
+        delete params[key];
+      }
+    });
+    console.log('params', params);
+    global.httpGet('position/list', params, res => {
       const obj = {};
       obj[`positionList_${type}`] = res.data.result;
       this.setState({
@@ -89,7 +92,7 @@ class PositionList extends Component {
             this.setState({
               params,
             });
-            this.getPositiontypeList(this.state.cardNum, params);
+            this.getPositiontypeList(this.state.cardNum);
             TopviewGetInstance().remove(this.state.cityPickId);
           }}
         />,
@@ -110,10 +113,8 @@ class PositionList extends Component {
             <View style={baseStyle.row}>
               <TouchableOpacity
                 onPress={() => {
-                  // this.props.onTab(1);
                   this.setState({
                     cardNum: 1,
-                    // list: this.props.positionList_1,
                   });
                   this.getPositiontypeList(1);
                 }}
@@ -127,15 +128,13 @@ class PositionList extends Component {
                       ? baseStyle.textBlack
                       : baseStyle.textGray
                   }>
-                  普通职位
+                  猎头职位
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  // this.props.onTab(2);
                   this.setState({
                     cardNum: 2,
-                    // list: this.props.positionList_2,
                   });
                   this.getPositiontypeList(2);
                 }}
@@ -149,7 +148,7 @@ class PositionList extends Component {
                       ? baseStyle.textBlack
                       : baseStyle.textGray
                   }>
-                  内推职位
+                  普通职位
                 </Text>
               </TouchableOpacity>
             </View>
@@ -159,20 +158,44 @@ class PositionList extends Component {
                   this.openCityPick();
                 }}
                 style={baseStyle.row}>
-                <Text style={{paddingRight: 5}}>城市</Text>
+                <Text style={{paddingRight: 5}}>
+                  {this.state.params.cityName
+                    ? this.state.params.cityName
+                    : '城市'}
+                </Text>
                 <IconjiantouDown color="#B0ADAD" />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   navigate('PositionFilter', {
+                    filter: this.state.params,
                     callBack: res => {
-                      console.log('res', res);
-                      this.getPositiontypeList(this.state.cardNum, res);
+                      console.log('rescallBack', res);
+                      let filterNum = 0;
+                      Object.keys(res).forEach(key => {
+                        if (res[key]) {
+                          filterNum++;
+                        }
+                      });
+                      const params = this.state.params;
+                      Object.assign(params, res);
+                      this.setState({
+                        params: params,
+                        filterNum: filterNum,
+                      });
+                      this.getPositiontypeList(this.state.cardNum, params);
                     },
                   });
                 }}
                 style={[baseStyle.paddingLeft, baseStyle.row]}>
                 <Text style={{paddingRight: 5}}>筛选</Text>
+                {this.state.filterNum ? (
+                  <View style={sty.tag}>
+                    <Text style={[baseStyle.textWhite, {textAlign: 'center'}]}>
+                      {this.state.filterNum}
+                    </Text>
+                  </View>
+                ) : null}
                 <IconjiantouDown color="#B0ADAD" />
               </TouchableOpacity>
             </View>
@@ -185,7 +208,10 @@ class PositionList extends Component {
                   <TouchableOpacity
                     key={item.id}
                     onPress={() => {
-                      navigate('PositionDetail', {id: item.id});
+                      navigate('PositionDetail', {
+                        id: item.id,
+                        companyId: item.companyId,
+                      });
                     }}
                     style={[
                       baseStyle.borderBottom,
@@ -208,7 +234,10 @@ class PositionList extends Component {
                         <View style={[baseStyle.row, {marginTop: 3}]}>
                           {item.cityName ? (
                             <View style={sty.positionTag}>
-                              <Text style={sty.textGray}>{item.cityName}</Text>
+                              <Text style={sty.textGray}>
+                                {item.cityName}
+                                {item.regionName}
+                              </Text>
                             </View>
                           ) : null}
                           {item.experienceName ? (
@@ -237,7 +266,7 @@ class PositionList extends Component {
                       <Text style={[{color: '#AC3E40'}, baseStyle.fontBold]}>
                         {item.salaryName}
                       </Text>
-                      <Text style={baseStyle.textYellow}>分享职位链接</Text>
+                      {/* <Text style={baseStyle.textYellow}>分享职位链接</Text> */}
                     </View>
                   </TouchableOpacity>
                 );
@@ -265,7 +294,7 @@ class Home extends Component {
 
   render() {
     return (
-      <View style={(baseStyle.bgWhite, {height: baseStyle.screenHeight})}>
+      <View style={(baseStyle.bgWhite, {flex: 1})}>
         <Header isHeader={false} />
         <ScrollView>
           <Banner />
@@ -274,6 +303,9 @@ class Home extends Component {
               // onTab={val => {
               //   this.getPositiontypeList(val);
               // }}
+              ref={ref => {
+                this.positionList = ref;
+              }}
               navigate={this.props.navigation}
             />
           </View>
@@ -281,7 +313,12 @@ class Home extends Component {
         <TouchableOpacity
           onPress={() => {
             this.props.navigation.navigate('PostPosition', {
-              callBack: () => {},
+              callBack: () => {
+                console.log('this.positionList', this.positionList);
+                this.positionList.state.getPositiontypeListFun(
+                  this.positionList.state.cardNum,
+                );
+              },
             });
           }}
           style={{position: 'absolute', bottom: 64, right: 20}}>

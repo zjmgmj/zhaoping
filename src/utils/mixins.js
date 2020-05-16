@@ -193,3 +193,16 @@ export const getSexStr = code => {
   });
   return valItem ? valItem.label : '';
 };
+
+export const Loading = {
+  showLoading(timeOut = 10000) {
+    global.mLoadingComponentRef && global.mLoadingComponentRef.showLoading();
+    // this.timerLoading = setTimeout(() => {
+    //   this.dismissLoading();
+    // }, timeOut);
+  },
+  dismissLoading() {
+    global.mLoadingComponentRef && global.mLoadingComponentRef.dismissLoading();
+    this.timerLoading && clearTimeout(this.timerLoading);
+  },
+};

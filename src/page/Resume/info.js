@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  ImageBackground,
   // SafeAreaView,
 } from 'react-native';
 import {TextInputLayout} from 'rn-textinputlayout';
@@ -14,6 +15,9 @@ import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
+import {Button} from 'beeshell/dist/components/Button';
+// import Video from 'react-native-video';
+
 // import Datepicker from 'beeshell/dist/components/Datepicker';
 import {
   Scrollpicker,
@@ -23,6 +27,7 @@ import {
 } from 'beeshell';
 import {selectPhotoTapped} from '../../components/SelectPhotoTapped';
 import Picker from '../../components/picker';
+// import Loading from './Loading';
 
 @setStatusBar({
   translucent: true,
@@ -38,12 +43,11 @@ class ResumeInfo extends Component {
       sexList: [{label: '男', value: 1}, {label: '女', value: 2}],
       info: {
         pic: '',
-        userSex: 0,
         birthDate: new Date().getTime(),
         workingDate: new Date().getTime(),
-        sex: 2,
         phone: '',
         wechat: '',
+        sex: 2,
         userId: null,
       },
       currentUser: null,
@@ -62,12 +66,9 @@ class ResumeInfo extends Component {
         this.setParams('userId', res.userId);
       });
     } else {
-      Object.assign(this.state.info, this.props.navigation.getParam('data'));
+      // Object.assign(this.state.info, this.props.navigation.getParam('data'));
       this.setState({
-        info: Object.assign(
-          this.state.info,
-          this.props.navigation.getParam('data'),
-        ),
+        info: this.props.navigation.getParam('data'),
       });
       global.localStorage.get({key: 'currentUser'}).then(res => {
         this.setState({
@@ -95,14 +96,17 @@ class ResumeInfo extends Component {
     const year = parseInt(date / 1000 / 60 / 60 / 24 / 365);
     params.workyear = year;
     console.log('saveInfo', params);
-    params.workingDate = params.workingDate.toString();
-    params.birthDate = params.birthDate.toString();
+    // params.workingDate = params.workingDate.toString();
+    // params.birthDate = params.birthDate.toString();
     let url = '';
     if (this.props.navigation.getParam('from') === 'mine') {
+      params.userSex = params.sex;
       url = 'user/save';
       if (params.userId) {
         url = 'user/update';
       }
+      // params.workingDate = params.workingDate.toString();
+      // params.birthDate = params.birthDate.toString();
     } else {
       url = 'resume/save';
       if (params.id) {
@@ -115,7 +119,6 @@ class ResumeInfo extends Component {
       params,
       res => {
         console.log('resume', res);
-        params.id = res.data;
         this.props.navigation.state.params.callBack(params);
         this.props.navigation.goBack();
         if (this.props.navigation.getParam('from') === 'mine') {
@@ -143,7 +146,7 @@ class ResumeInfo extends Component {
     const valItem = this.state.sexList.find(item => {
       return item.value === this.state.info.sex;
     });
-    return valItem.label;
+    return valItem ? valItem.label : null;
   }
   openPicked({list, key, valueKey}) {
     TopviewGetInstance()
@@ -206,17 +209,19 @@ class ResumeInfo extends Component {
             }}
             style={[sty.flexContentBetween, sty.inforItem]}>
             <Text>头像</Text>
-            {info.pic || info.userPic ? (
-              <Image
-                style={sty.authorImg}
-                source={{uri: info.pic || info.userPic}}
-              />
-            ) : (
-              <Image
-                style={sty.authorImg}
-                source={require('../../images/author.png')}
-              />
-            )}
+            <View style={baseStyle.authorBox}>
+              {info.pic || info.userPic ? (
+                <Image
+                  style={baseStyle.authorImg}
+                  source={{uri: info.pic || info.userPic}}
+                />
+              ) : (
+                <Image
+                  style={baseStyle.authorImg}
+                  source={require('../../images/author.png')}
+                />
+              )}
+            </View>
           </TouchableOpacity>
           <View style={sty.inputBox}>
             <TextInputLayout
@@ -237,7 +242,7 @@ class ResumeInfo extends Component {
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               this.openPicked({
                 list: this.state.sexList,
@@ -259,53 +264,75 @@ class ResumeInfo extends Component {
               />
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
-          </TouchableOpacity> */}
-          <TouchableOpacity
-            onPress={() => {
-              this.setState({
-                pickDate: global.date2Str(this.state.info.workingDate),
-                pickKey: 'workingDate',
-              });
-              this.dateModal.open();
-            }}
-            style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
-              <TextInput
-                value={global.date2Str(this.state.info.workingDate)}
-                // defaultValue={global.date2Str(this.state.info.workingDate)}
-                style={sty.textInput}
-                placeholder={'参加工作时间'}
-                editable={false}
-              />
-            </TextInputLayout>
-            <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              this.setState({
-                pickDate: global.date2Str(this.state.info.birthDate),
-                pickKey: 'birthDate',
-              });
-              this.dateModal.open();
-            }}
-            style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
-              <TextInput
-                value={global.date2Str(this.state.info.birthDate)}
-                defaultValue={global.date2Str(this.state.info.birthDate)}
-                style={sty.textInput}
-                placeholder={'出生年月'}
-                editable={false}
-              />
-            </TextInputLayout>
-            <Iconright color={iconRightFontColor} style={sty.Iconright} />
-          </TouchableOpacity>
+          {this.props.navigation.getParam('from') !== 'mine' ? (
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({
+                    pickDate: global.date2Str(this.state.info.workingDate),
+                    pickKey: 'workingDate',
+                  });
+                  this.dateModal.open();
+                }}
+                style={sty.inputBox}>
+                <TextInputLayout
+                  hintColor={hintColor}
+                  focusColor={iconRightFontColor}
+                  style={sty.inputLayout}>
+                  <TextInput
+                    value={global.date2Str(this.state.info.workingDate)}
+                    // defaultValue={global.date2Str(this.state.info.workingDate)}
+                    style={sty.textInput}
+                    placeholder={'参加工作时间'}
+                    editable={false}
+                  />
+                </TextInputLayout>
+                <Iconright color={iconRightFontColor} style={sty.Iconright} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({
+                    pickDate: global.date2Str(this.state.info.birthDate),
+                    pickKey: 'birthDate',
+                  });
+                  this.dateModal.open();
+                }}
+                style={sty.inputBox}>
+                <TextInputLayout
+                  hintColor={hintColor}
+                  focusColor={iconRightFontColor}
+                  style={sty.inputLayout}>
+                  <TextInput
+                    value={global.date2Str(this.state.info.birthDate)}
+                    defaultValue={global.date2Str(this.state.info.birthDate)}
+                    style={sty.textInput}
+                    placeholder={'出生年月'}
+                    editable={false}
+                  />
+                </TextInputLayout>
+                <Iconright color={iconRightFontColor} style={sty.Iconright} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={sty.inputBox}>
+              <TextInputLayout
+                hintColor={hintColor}
+                focusColor={iconRightFontColor}
+                style={sty.inputLayout}>
+                <TextInput
+                  value={info.userTitle || ''}
+                  style={sty.textInput}
+                  placeholder={'职位'}
+                  onChange={e => {
+                    this.setParams('userTitle', e.nativeEvent.text);
+                  }}
+                />
+              </TextInputLayout>
+              <Iconright color={iconRightFontColor} style={sty.Iconright} />
+            </View>
+          )}
+
           <View style={sty.inputBox}>
             <TextInputLayout
               hintColor={hintColor}
@@ -325,40 +352,134 @@ class ResumeInfo extends Component {
             </TextInputLayout>
             <Iconright color={iconRightFontColor} style={sty.Iconright} />
           </View>
-          <View style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
-              <TextInput
-                defaultValue={info.email}
-                value={info.email}
-                style={sty.textInput}
-                placeholder={'电子邮箱'}
-                onChange={e => {
-                  this.setParams('email', e.nativeEvent.text);
-                }}
-              />
-            </TextInputLayout>
-            <Iconright color={iconRightFontColor} style={sty.Iconright} />
-          </View>
-          <View style={sty.inputBox}>
-            <TextInputLayout
-              hintColor={hintColor}
-              focusColor={iconRightFontColor}
-              style={sty.inputLayout}>
-              <TextInput
-                defaultValue={info.wechat}
-                value={info.wechat}
-                onChange={e => {
-                  this.setParams('wechat', e.nativeEvent.text);
-                }}
-                style={sty.textInput}
-                placeholder={'微信号码'}
-              />
-            </TextInputLayout>
-            <Iconright color={iconRightFontColor} style={sty.Iconright} />
-          </View>
+          {this.props.navigation.getParam('from') !== 'mine' ? (
+            <View>
+              <View style={sty.inputBox}>
+                <TextInputLayout
+                  hintColor={hintColor}
+                  focusColor={iconRightFontColor}
+                  style={sty.inputLayout}>
+                  <TextInput
+                    defaultValue={info.email}
+                    value={info.email}
+                    style={sty.textInput}
+                    placeholder={'电子邮箱'}
+                    onChange={e => {
+                      this.setParams('email', e.nativeEvent.text);
+                    }}
+                  />
+                </TextInputLayout>
+                <Iconright color={iconRightFontColor} style={sty.Iconright} />
+              </View>
+              <View style={sty.inputBox}>
+                <TextInputLayout
+                  hintColor={hintColor}
+                  focusColor={iconRightFontColor}
+                  style={sty.inputLayout}>
+                  <TextInput
+                    defaultValue={info.wechat}
+                    value={info.wechat}
+                    onChange={e => {
+                      this.setParams('wechat', e.nativeEvent.text);
+                    }}
+                    style={sty.textInput}
+                    placeholder={'微信号码'}
+                  />
+                </TextInputLayout>
+                <Iconright color={iconRightFontColor} style={sty.Iconright} />
+              </View>
+            </View>
+          ) : (
+            <View>
+              <View style={sty.inputBox}>
+                <TextInputLayout
+                  hintColor={hintColor}
+                  focusColor={iconRightFontColor}
+                  style={sty.inputLayout}>
+                  <TextInput
+                    value={info.userIntroduction}
+                    multiline={true}
+                    onChange={e => {
+                      this.setParams('userIntroduction', e.nativeEvent.text);
+                    }}
+                    style={sty.textInput}
+                    placeholder={'个人信息'}
+                  />
+                </TextInputLayout>
+                <Iconright color={iconRightFontColor} style={sty.Iconright} />
+              </View>
+              <View style={{paddingTop: 20}}>
+                <Text>个人介绍视频</Text>
+                {info.video ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      flex: 1,
+                      marginTop: 10,
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        // console.log('ResumeVideo');
+                        // this.props.navigation.navigate('ResumeVideo');
+                      }}>
+                      <ImageBackground
+                        source={require('../../images/person_info_bg.png')}
+                        style={{
+                          width: 322.5,
+                          height: 187.5,
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                        }}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            flex: 1,
+                          }}>
+                          <Image
+                            source={require('../../images/play_icon.png')}
+                            style={{width: 64, height: 64}}
+                          />
+                        </View>
+                      </ImageBackground>
+                    </TouchableOpacity>
+                    {/* <Video
+                      source={{uri: info.video}} // Can be a URL or a local file.
+                      ref={ref => {
+                        this.player = ref;
+                      }} // Store reference
+                      // onBuffer={this.onBuffer} // Callback when remote video is buffering
+                      // onError={this.videoError} // Callback when video cannot be loaded
+                      style={sty.backgroundVideo}
+                    /> */}
+                  </View>
+                ) : (
+                  <Text style={[sty.textInput, {paddingTop: 10}]}>
+                    请上传视频
+                  </Text>
+                )}
+                <Button
+                  onPress={() => {
+                    selectPhotoTapped({
+                      me: this,
+                      options: {
+                        takePhotoButtonTitle: '拍摄',
+                        chooseFromLibraryButtonTitle: '选择视频',
+                        mediaType: 'video',
+                      },
+                      cb: res => {
+                        this.setParams('video', res);
+                      },
+                    });
+                  }}
+                  style={[sty.subBtn, {backgroundColor: '#D9B06F'}]}
+                  textStyle={{color: '#fff'}}>
+                  {info.video ? '重新上传视频介绍' : '上传视频'}
+                </Button>
+              </View>
+            </View>
+          )}
         </ScrollView>
         <BottomModal
           ref={c => {
@@ -411,7 +532,7 @@ const sty = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 100,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   flexContentBetween: {
     flexDirection: 'row',
@@ -442,5 +563,13 @@ const sty = StyleSheet.create({
   inputBox: {
     position: 'relative',
     paddingTop: 10,
+  },
+  subBtn: {
+    height: 40,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 30,
+    marginBottom: 40,
+    borderRadius: 3,
   },
 });

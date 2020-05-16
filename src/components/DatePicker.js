@@ -114,8 +114,10 @@ class DatePicker extends Component {
           const monthList = this.state.monthList;
           const date = [yearList[valueList[0]], monthList[valueList[1]]];
           const resVal = date.toString().replace(/,/g, '/');
+          console.log('resVal', resVal);
+          console.log('resValDate', new Date(resVal + '/05'));
           this.props.rightCallback({
-            date: new Date(resVal).getTime(),
+            date: new Date(resVal + '/05').getTime(),
             key: this.state.key,
           });
         }}

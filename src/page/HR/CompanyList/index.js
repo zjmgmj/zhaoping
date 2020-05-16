@@ -111,7 +111,7 @@ class CompanyList extends Component {
           {list.map(item => {
             return (
               <View
-                key={item}
+                key={item.id}
                 style={[
                   baseStyle.borderBottom,
                   baseStyle.paddingBottom,

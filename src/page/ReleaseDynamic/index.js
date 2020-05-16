@@ -132,7 +132,7 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 40,
     height: 40,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   textInputBoxSty: {
     flexDirection: 'row',

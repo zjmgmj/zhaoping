@@ -9,6 +9,7 @@ import {
   ScrollView,
   Modal,
   Alert,
+  Platform,
 } from 'react-native';
 import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
@@ -17,6 +18,7 @@ import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 import {IconShare} from '../../iconfont/IconShare';
 import {Iconedit} from '../../iconfont/Iconedit';
+import {WebView} from 'react-native-webview';
 
 @setStatusBar({
   barStyle: 'light-content',
@@ -34,15 +36,19 @@ class Detail extends Component {
       },
       company: null,
       headHeight: 0,
+      getNum: 0,
     };
   }
   UNSAFE_componentWillMount() {
+    global.Loading.showLoading();
     global.localStorage.get({key: 'currentUser'}).then(res => {
       this.setState({
         currentUser: res,
       });
     });
     this.getDetail();
+    this.getCompany();
+    this.getintfeedbacklist();
   }
   gettypelist(id, type, key) {
     global.gettypelist(type, res => {
@@ -61,17 +67,15 @@ class Detail extends Component {
     const id = this.props.navigation.getParam('id');
     global.httpGet(
       'position/detail',
-      {id: id},
+      {id: id, seluserId: this.state.currentUser.userId},
       res => {
         if (res.code === 1) {
           const resData = res.data;
           console.log('positionDetail', resData);
           this.setState({
             detail: resData,
+            getNum: this.state.getNum + 1,
           });
-          this.getCompany(resData.companyId);
-          this.getintfeedbacklist(resData.positionId);
-          // this.gettypelist(resData.salaryId, 'salary', 'salaryName');
         }
       },
       err => {
@@ -79,14 +83,16 @@ class Detail extends Component {
       },
     );
   }
-  getCompany(companyId) {
+  getCompany() {
+    const companyId = this.props.navigation.getParam('companyId');
     global.httpGet(
       'company/detail',
       {id: companyId},
       res => {
-        console.log(res);
+        console.log('getCompany', res);
         this.setState({
           company: res.data,
+          getNum: this.state.getNum + 1,
         });
       },
       err => {
@@ -107,7 +113,7 @@ class Detail extends Component {
       'positionrecord/save',
       params,
       res => {
-        Alert.alert(res.msg);
+        Alert.alert(res.data || '投递成功');
       },
       err => {
         console.log(err);
@@ -119,30 +125,51 @@ class Detail extends Component {
       shareModal: true,
     });
   }
-  getintfeedbacklist(positionId) {
+  getintfeedbacklist() {
     const params = {
       page: 1,
       size: 2,
-      positionId: positionId,
+      positionId: this.props.navigation.getParam('id'),
     };
     global.httpGet('position/getintfeedbacklist', params, res => {
       console.log('getintfeedbacklist', res);
       this.setState({
         feedbacklist: res.data.result,
+        getNum: this.state.getNum + 1,
       });
     });
   }
+  getSource() {
+    const source = {
+      uri: 'http://114.55.169.95/yun_rest/mapInfo.html',
+    };
+    return source;
+  }
+  onMessage() {}
   render() {
-    const {detail, company, currentUser, feedbacklist} = this.state;
-    if (!detail.id && !currentUser) {
+    const {detail, company, currentUser, feedbacklist, getNum} = this.state;
+    // if (!detail.id && !currentUser) {
+    //   return false;
+    // }
+    console.log('getNum', getNum);
+    if (getNum < 3) {
       return false;
     }
+    global.Loading.dismissLoading();
     console.log('currentUser', currentUser.userType);
     const positionBenefits = detail.positionBenefits
       ? detail.positionBenefits.split(',')
       : [];
     return (
-      <View style={{backgroundColor: '#fff'}}>
+      <ScrollView
+        style={[
+          {
+            backgroundColor: '#fff',
+            flexDirection: 'column',
+            flex: 1,
+            // height: baseStyle.deviceScreenHeight,
+          },
+        ]}>
         <ImageBackground
           style={sty.headSty}
           source={require('../../images/position_bg.png')}>
@@ -160,7 +187,7 @@ class Detail extends Component {
             isBorder={false}
           />
         </ImageBackground>
-        <ScrollView style={{height: baseStyle.deviceContentHeight - 65}}>
+        <View style={{flex: 1}}>
           <View style={[baseStyle.bgWhite, baseStyle.content]}>
             <View style={[baseStyle.row, baseStyle.justifyBetween]}>
               <Text style={[{fontSize: 18, fontWeight: 'bold'}]}>
@@ -169,9 +196,12 @@ class Detail extends Component {
               <Text style={baseStyle.textRed}>{detail.salaryName || ''}</Text>
             </View>
             <View style={[baseStyle.row, baseStyle.paddingTop]}>
-              {detail.workAddress ? (
+              {detail.cityName ? (
                 <View style={sty.positionTag}>
-                  <Text style={sty.textGray}>{detail.workAddress}</Text>
+                  <Text style={sty.textGray}>
+                    {detail.cityName}
+                    {detail.regionName}
+                  </Text>
                 </View>
               ) : null}
               {detail.experienceName ? (
@@ -202,13 +232,24 @@ class Detail extends Component {
             </View>
           </View>
           {currentUser.userType === 2 ? (
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('PersonalInfo', {
+                  id: detail.userId,
+                  userId: currentUser.userId,
+                });
+              }}
               style={[
                 baseStyle.bgWhite,
                 baseStyle.justifyBetween,
                 baseStyle.content,
                 baseStyle.row,
-                {marginTop: 5},
+                {
+                  marginTop: 5,
+                  paddingTop: 15,
+                  borderTopColor: '#FBFBFB',
+                  borderTopWidth: 5,
+                },
               ]}>
               <View style={[baseStyle.row]}>
                 <View style={baseStyle.authorBox}>
@@ -221,22 +262,26 @@ class Detail extends Component {
                   <Text style={baseStyle.ft16}>
                     {detail.userNickname || '暂无'}
                   </Text>
-                  {/* <Text
-                  style={[baseStyle.ft12, baseStyle.textGray, {marginTop: 10}]}>
-                  {detail.companyName || ''}/{detail.userTitle || '暂无'}
-                </Text> */}
+                  <Text
+                    style={[
+                      baseStyle.ft12,
+                      baseStyle.textGray,
+                      {marginTop: 10},
+                    ]}>
+                    {detail.userTitle}
+                  </Text>
                 </View>
               </View>
               <Iconright color="#D3CECE" />
-            </View>
+            </TouchableOpacity>
           ) : null}
           <View
             style={[
               baseStyle.bgWhite,
               {
-                marginTop: 20,
+                marginTop: 10,
                 borderTopColor: '#FBFBFB',
-                borderTopWidth: 5,
+                borderTopWidth: 10,
                 paddingLeft: 10,
                 paddingRight: 10,
                 paddingBottom: 10,
@@ -257,7 +302,12 @@ class Detail extends Component {
             {detail.positionBenefits ? (
               <View>
                 <Text style={sty.positionTitle}>职位福利</Text>
-                <View style={[baseStyle.row, baseStyle.paddingTop]}>
+                <View
+                  style={[
+                    baseStyle.row,
+                    baseStyle.paddingTop,
+                    {flexWrap: 'wrap'},
+                  ]}>
                   {positionBenefits.map((item, idx) => {
                     return (
                       <View key={idx} style={sty.positionTag}>
@@ -269,51 +319,58 @@ class Detail extends Component {
               </View>
             ) : null}
           </View>
-          {feedbacklist.length > 0 ? (
-            <View
-              style={[
-                baseStyle.bgWhite,
-                {paddingLeft: 10, paddingRight: 10},
-                {marginTop: 5, borderTopColor: '#FBFBFB', borderTopWidth: 5},
-              ]}>
-              <Text style={sty.positionTitle}>职位补充说明</Text>
-              {feedbacklist.map((item, idx) => {
-                return (
-                  <View
-                    key={item.id}
-                    style={[
-                      idx === 0 ? baseStyle.borderBottom : null,
-                      {paddingBottom: 20, paddingTop: 20},
-                    ]}>
-                    <View style={baseStyle.row}>
-                      <View style={baseStyle.authorBoxMin}>
-                        <Image
-                          style={baseStyle.authorImgMin}
-                          source={{uri: item.userPic}}
-                        />
+          {/* {feedbacklist.length > 0 ? ( */}
+          <View
+            style={[
+              baseStyle.bgWhite,
+              {paddingLeft: 10, paddingRight: 10},
+              {marginTop: 5, borderTopColor: '#FBFBFB', borderTopWidth: 5},
+            ]}>
+            <Text style={sty.positionTitle}>职位补充说明</Text>
+            {feedbacklist.length > 0 ? (
+              <View>
+                {feedbacklist.map((item, idx) => {
+                  return (
+                    <View
+                      key={item.id}
+                      style={[
+                        idx === 0 ? baseStyle.borderBottom : null,
+                        {paddingBottom: 20, paddingTop: 20},
+                      ]}>
+                      <View style={baseStyle.row}>
+                        <View style={baseStyle.authorBoxMin}>
+                          <Image
+                            style={baseStyle.authorImgMin}
+                            source={{uri: item.userPic}}
+                          />
+                        </View>
+                        <Text
+                          style={[baseStyle.paddingLeft, baseStyle.authorName]}>
+                          {item.isanonymous ? '匿名用户' : item.userNickname}
+                        </Text>
                       </View>
-                      <Text
-                        style={[baseStyle.paddingLeft, baseStyle.authorName]}>
-                        {item.isanonymous ? '匿名用户' : item.userNickname}
+                      <Text style={baseStyle.paddingTop}>
+                        {item.intfeedback}
                       </Text>
                     </View>
-                    <Text style={baseStyle.paddingTop}>{item.intfeedback}</Text>
-                  </View>
-                );
-              })}
-
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate('InterviewList', {
-                    positionId: detail.id,
-                  });
-                }}>
-                <Text style={[baseStyle.textYellow, {paddingBottom: 10}]}>
-                  查看全部面试经
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
+                  );
+                })}
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate('InterviewList', {
+                      positionId: detail.id,
+                    });
+                  }}>
+                  <Text style={[baseStyle.textYellow, {paddingBottom: 10}]}>
+                    查看全部面试经
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <Text style={{paddingTop: 10}}>暂无</Text>
+            )}
+          </View>
+          {/* ) : null} */}
 
           {company ? (
             <View
@@ -322,10 +379,19 @@ class Detail extends Component {
                 baseStyle.content,
                 {marginTop: 5, borderTopColor: '#FBFBFB', borderTopWidth: 5},
               ]}>
-              <View style={[baseStyle.justifyBetween, baseStyle.row]}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('CompanyInfo', {
+                    id: company.id,
+                  });
+                }}
+                style={[baseStyle.justifyBetween, baseStyle.row]}>
                 <View style={[baseStyle.row]}>
-                  <View style={sty.logoBox}>
-                    <Image style={sty.logoImg} source={{uri: company.logo}} />
+                  <View style={[baseStyle.logoBox, {borderWidth: 0}]}>
+                    <Image
+                      style={baseStyle.logoImg}
+                      source={{uri: company.logo}}
+                    />
                   </View>
                   <View style={baseStyle.paddingLeft}>
                     <Text style={baseStyle.companyName}>{company.name}</Text>
@@ -349,7 +415,25 @@ class Detail extends Component {
                   </View>
                 </View>
                 <Iconright color="#D3CECE" />
-              </View>
+              </TouchableOpacity>
+              <WebView
+                ref={ref => {
+                  this.webview = ref;
+                }}
+                javaScriptEnabled
+                scalesPageToFit
+                style={{height: 129, marginTop: 10}}
+                source={this.getSource()} //网络地址，放在本地会导致postmessage失效
+                onMessage={this.onMessage.bind(this)}
+                onLoad={() => {
+                  this.webview.postMessage(
+                    JSON.stringify({
+                      dest: `${company.longitude},${company.latitude}`,
+                      destName: company.address,
+                    }),
+                  );
+                }}
+              />
             </View>
           ) : null}
           {currentUser.userType == 2 ? (
@@ -422,13 +506,18 @@ class Detail extends Component {
                 },
               ]}>
               <Button
+                onPress={() => {
+                  this.props.navigation.navigate('ResumeList', {
+                    positionId: detail.id,
+                  });
+                }}
                 style={[sty.subBtn, {flex: 1, backgroundColor: '#D9B06F'}]}
                 textStyle={{color: '#fff'}}>
                 该职位收到的简历
               </Button>
             </View>
           )}
-        </ScrollView>
+        </View>
         {/* <Share /> */}
         <Modal
           animationType="fade"
@@ -522,7 +611,7 @@ class Detail extends Component {
             </View>
           </TouchableOpacity>
         </Modal>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -545,7 +634,7 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 60,
     height: 60,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   positionTag: {
     marginRight: 10,
@@ -554,6 +643,7 @@ const sty = StyleSheet.create({
     paddingRight: 4,
     paddingTop: 3,
     paddingBottom: 3,
+    marginBottom: 3,
     backgroundColor: '#F1F3FC',
   },
   attentionBtn: {
@@ -600,12 +690,13 @@ const sty = StyleSheet.create({
   logoBox: {
     height: 50,
     width: 50,
-    borderRadius: 100,
+    // borderRadius: 100,
     overflow: 'hidden',
   },
   logoImg: {
     height: 50,
     width: 50,
-    resizeMode: 'contain',
+    // resizeMode: 'contain',
+    resizeMode: 'cover',
   },
 });

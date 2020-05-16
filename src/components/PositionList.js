@@ -16,7 +16,7 @@ const sty = StyleSheet.create({
   positionImg: {
     width: 53,
     height: 64,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   positionTag: {
     marginRight: 10,
@@ -40,6 +40,10 @@ class PositionList extends Component {
       getPositionList: res => {
         return this.getPositiontypeList(res);
       },
+      params: {
+        page: 1,
+        size: 10,
+      },
     };
   }
   UNSAFE_componentWillMount() {
@@ -59,13 +63,19 @@ class PositionList extends Component {
     });
   }
   getPositiontypeList(param = {}) {
-    const currentUser = this.state.currentUser;
-    const obj = {
-      page: 1,
-      size: 10,
-      userId: currentUser.userId,
-    };
-    const params = Object.assign(obj, param);
+    // const currentUser = this.state.currentUser;
+    // const obj = {
+    //   page: 1,
+    //   size: 10,
+    //   // userId: currentUser.userId,
+    // };
+    const initParam = this.state.params;
+    const params = Object.assign(initParam, param);
+    Object.keys(params).forEach(key => {
+      if (!params[key]) {
+        delete params[key];
+      }
+    });
     if (this.props.positionType) {
       params.positionType = this.props.positionType;
     }
@@ -92,13 +102,14 @@ class PositionList extends Component {
     }
   }
   refresh() {
-    const currentUser = this.state.currentUser;
-    const params = {
-      page: this.state.page,
-      size: 10,
-      userId: currentUser.userId,
-      positionType: this.props.positionType,
-    };
+    // const currentUser = this.state.currentUser;
+    // const params = {
+    //   page: this.state.page,
+    //   size: 10,
+    //   userId: currentUser.userId,
+    //   positionType: this.props.positionType,
+    // };
+    const params = this.state.params;
     if (this.props.isrecommend) {
       params.isrecommend = 1;
     }
@@ -135,6 +146,7 @@ class PositionList extends Component {
                 onPress={() => {
                   this.props.navigation.navigate('PositionDetail', {
                     id: item.id,
+                    companyId: item.companyId,
                   });
                 }}
                 style={[
@@ -166,7 +178,10 @@ class PositionList extends Component {
                       <View style={[baseStyle.row]}>
                         {item.cityName ? (
                           <View style={sty.positionTag}>
-                            <Text style={sty.textGray}>{item.cityName}</Text>
+                            <Text style={sty.textGray}>
+                              {item.cityName}
+                              {item.regionName}
+                            </Text>
                           </View>
                         ) : null}
                         {item.experienceName ? (
@@ -199,18 +214,17 @@ class PositionList extends Component {
             );
           }}
           onEndReached={() => {
-            const page = this.state.page + 1;
-            this.setState({
-              page: page,
-            });
+            const params = this.state.params;
+            params.page++;
+            this.setState(params);
             console.log('onEndReached');
             return this.refresh();
           }}
           onRefresh={() => {
             console.log('onRefresh');
-            this.setState({
-              page: 1,
-            });
+            const params = this.state.params;
+            params.page = 1;
+            this.setState(params);
             return this.refresh();
           }}
         />

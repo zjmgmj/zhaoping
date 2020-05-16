@@ -58,7 +58,15 @@ class Mine extends Component {
         {
           icon: require('../../images/person_icon.png'),
           title: '个人信息',
-          url: 'PersonInfo',
+          handler: () => {
+            this.props.navigation.navigate('ResumeInfo', {
+              from: 'mine',
+              callBack: res => {
+                console.log(res);
+                this.getCurrentUser();
+              },
+            });
+          },
         },
         {
           icon: require('../../images/qiye_icon.png'),
@@ -113,6 +121,20 @@ class Mine extends Component {
       ],
       menuList: [
         {
+          icon: require('../../images/person_icon.png'),
+          title: '个人信息',
+          handler: () => {
+            this.props.navigation.navigate('ResumeInfo', {
+              from: 'mine',
+              callBack: res => {
+                console.log(res);
+                this.getCurrentUser();
+              },
+            });
+          },
+          // url: 'PersonInfo',
+        },
+        {
           icon: require('../../images/xin_icon.png'),
           title: '关注职位',
           url: 'FollowPosition',
@@ -142,6 +164,7 @@ class Mine extends Component {
         {
           icon: require('../../images/kf_icon.png'),
           title: '申请专属顾问',
+          url: 'EntryInfor',
         },
         {
           icon: require('../../images/qiehuan_icon.png'),
@@ -168,7 +191,11 @@ class Mine extends Component {
         },
       ],
       cardList: [
-        {title: '账户', icon: require('../../images/jianli_icon.png'), url: ''},
+        {
+          title: '账户',
+          icon: require('../../images/account_icon.png'),
+          url: '',
+        },
         {
           title: '简历',
           icon: require('../../images/jianli_icon.png'),
@@ -219,10 +246,10 @@ class Mine extends Component {
               source={require('../../images/mine_bg.png')}>
               <Header isHeader={false} />
               <View style={[baseStyle.flex, sty.headContent]}>
-                <View style={sty.authorImgBox}>
+                <View style={baseStyle.authorBox}>
                   <Image
                     source={{uri: currentUser.userPic}}
-                    style={sty.authorImg}
+                    style={baseStyle.authorImg}
                   />
                 </View>
                 <View
@@ -245,14 +272,28 @@ class Mine extends Component {
                     </TouchableOpacity>
                   ) : (
                     <View>
-                      <View>
-                        <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
-                          <Text>人力资源经理</Text>
-                          <Text style={sty.pLpr}> | </Text>
-                          <Text>深圳房多多科技公司</Text>
+                      <View style={baseStyle.row}>
+                        <Text
+                          style={[
+                            baseStyle.ft12,
+                            baseStyle.textWhite,
+                            baseStyle.paddingRight,
+                          ]}>
+                          {currentUser.userTitle}
                         </Text>
+                        {currentUser.userSex === 2 ? (
+                          <Image
+                            source={require('../../images/girl_icon.png')}
+                            style={sty.iconSize}
+                          />
+                        ) : (
+                          <Image
+                            source={require('../../images/man_icon.png')}
+                            style={sty.iconSize}
+                          />
+                        )}
                       </View>
-                      <View>
+                      {/* <View>
                         <Text style={[baseStyle.ft12, baseStyle.textWhite]}>
                           <Text>28岁</Text>
                           <Text style={sty.pLpr}> | </Text>
@@ -260,7 +301,7 @@ class Mine extends Component {
                           <Text style={sty.pLpr}> | </Text>
                           <Text>上海长宁区</Text>
                         </Text>
-                      </View>
+                      </View> */}
                     </View>
                   )}
                 </View>
@@ -353,12 +394,15 @@ const sty = StyleSheet.create({
     height: 75,
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     marginLeft: 10,
     marginRight: 10,
+    width: 63,
   },
   cardItemTitle: {
-    position: 'absolute',
-    bottom: 0,
+    paddingTop: 5,
+    // position: 'absolute',
+    // bottom: 0,
   },
   tabBoxSty: {
     flexDirection: 'row',
@@ -378,8 +422,9 @@ const sty = StyleSheet.create({
     paddingBottom: 10,
   },
   tabImg: {
-    width: 63,
-    height: 63,
+    width: 35,
+    height: 35,
+    resizeMode: 'contain',
   },
   headSty: {
     width: baseStyle.screenWidth,
@@ -395,7 +440,7 @@ const sty = StyleSheet.create({
   authorImg: {
     width: 60,
     height: 60,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   headContent: {
     paddingTop: 20,

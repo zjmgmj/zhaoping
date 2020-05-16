@@ -10,16 +10,9 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {Button} from 'beeshell/dist/components/Button';
 import Header from '../../components/Header';
 import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
-import {Iconedit} from '../../iconfont/Iconedit';
-import {Iconright} from '../../iconfont/Iconright';
-import {Iconadd} from '../../iconfont/Iconadd';
-import {IconcircleAdd} from '../../iconfont/IconcircleAdd';
-import {TopviewGetInstance} from 'beeshell';
-import Picker from '../../components/picker';
 
 @setStatusBar({
   translucent: true,
@@ -40,7 +33,6 @@ class rreview extends Component {
         resumeStatus: 0,
         resumeIntention: '',
         selfEvaluation: '',
-        // id: 3,
         labels: '',
       },
       jobStatus: '',
@@ -65,6 +57,9 @@ class rreview extends Component {
     if (resumeId) {
       this.setState({resumeId});
       this.getDetail(resumeId);
+      this.getResumeworkexpList(resumeId);
+      this.getResumeprojectexpList(resumeId);
+      this.getResumeschoolexpList(resumeId);
     }
     global.gettypelist('education', res => {
       // 学历
@@ -89,9 +84,9 @@ class rreview extends Component {
         this.setState({
           resume: res.data,
         });
-        this.getResumeworkexpList(res.data.userId);
-        this.getResumeprojectexpList(res.data.userId);
-        this.getResumeschoolexpList(res.data.userId);
+        // this.getResumeworkexpList(id);
+        // this.getResumeprojectexpList(id);
+        // this.getResumeschoolexpList(id);
       },
       err => {
         console.log(err);
@@ -121,34 +116,6 @@ class rreview extends Component {
     const date = nowDate - birthDate;
     return parseInt(date / 1000 / 60 / 60 / 24 / 365);
   }
-  openPicked({list, key, valueKey, labelKey = 'label'}) {
-    TopviewGetInstance()
-      .add(
-        <Picker
-          list={list}
-          labelKey={labelKey}
-          valueKey={valueKey}
-          selected={this.state.resume[key]}
-          close={() => {
-            TopviewGetInstance().remove(this.state.pickId);
-          }}
-          selectedEvent={item => {
-            const resume = this.state.resume;
-            resume[key] = item[valueKey];
-            this.setState({
-              resume: resume,
-            });
-            TopviewGetInstance().remove(this.state.pickId);
-            this.updateResume();
-          }}
-        />,
-      )
-      .then(id => {
-        this.setState({
-          pickId: id,
-        });
-      });
-  }
   setWorkExperience(res) {
     console.log(res);
     const workExperienceList = this.state.workExperienceList;
@@ -169,7 +136,7 @@ class rreview extends Component {
     const jobStatusItem = this.state.jobStatusList.find(item => {
       return item.value === jobStatus;
     });
-    return jobStatusItem[key];
+    return jobStatusItem ? jobStatusItem[key] : null;
   }
   getResumeStatus(key) {
     const resumeStatus = this.state.resume.resumeStatus;
@@ -183,73 +150,29 @@ class rreview extends Component {
       return '';
     }
   }
-  updateResume() {
-    global.httpPost(
-      'resume/update',
-      this.state.resume,
-      res => {
-        console.log(res);
-      },
-      err => {
-        console.log(err);
-      },
-    );
-  }
-  getResumeschoolexpList(userId) {
-    global.httpGet(
-      'resumeschoolexp/list',
-      {userId: userId || this.state.resume.userId},
-      res => {
-        console.log('projectExperienceList', res);
-        this.setState({
-          educationalExpList: res.data,
-        });
-      },
-    );
-  }
-  getResumeworkexpList(userId) {
-    global.httpGet(
-      'resumeworkexp/list',
-      {userId: userId || this.state.resume.userId},
-      res => {
-        console.log('projectExperienceList', res);
-        this.setState({
-          workExperienceList: res.data,
-        });
-      },
-    );
-  }
-  getResumeprojectexpList(userId) {
-    global.httpGet(
-      'resumeprojectexp/list',
-      {userId: userId || this.state.resume.userId},
-      res => {
-        console.log('projectExperienceList', res);
-        this.setState({
-          projectExperienceList: res.data,
-        });
-      },
-    );
-  }
-  saveResume() {
-    global.httpPost(
-      'resume/save',
-      this.state.resume,
-      res => {
-        console.log(res);
-      },
-      err => {
-        console.log(err);
-      },
-    );
-  }
-  setParams(val, key) {
-    const params = this.state.resume;
-    params[key] = val;
-    this.setState({
-      resume: params,
+  getResumeschoolexpList(id) {
+    global.httpGet('resumeschoolexp/list', {resumeId: id}, res => {
+      console.log('projectExperienceList', res);
+      this.setState({
+        educationalExpList: res.data,
+      });
     });
-    this.updateResume();
+  }
+  getResumeworkexpList(id) {
+    global.httpGet('resumeworkexp/list', {resumeId: id}, res => {
+      console.log('projectExperienceList', res);
+      this.setState({
+        workExperienceList: res.data,
+      });
+    });
+  }
+  getResumeprojectexpList(id) {
+    global.httpGet('resumeprojectexp/list', {resumeId: id}, res => {
+      console.log('projectExperienceList', res);
+      this.setState({
+        projectExperienceList: res.data,
+      });
+    });
   }
   render() {
     const {resume, resumeId} = this.state;
@@ -259,7 +182,7 @@ class rreview extends Component {
     }
     console.log('labels', labels);
     return (
-      <View style={[baseStyle.bgWhite]}>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header
           title="简历预览"
           rightStyle={baseStyle.textYellow}
@@ -268,13 +191,21 @@ class rreview extends Component {
             this.props.navigation.goBack();
           }}
         />
-        <ScrollView style={{height: baseStyle.screenHeight}}>
-          <View style={{padding: 10, marginBottom: 30}}>
+        <ScrollView style={{flex: 1}}>
+          <View style={{padding: 10, marginBottom: 10}}>
             <View style={[sty.inforItem, sty.flexContentBetween]}>
               <View>
                 <View style={baseStyle.row}>
-                  <Text>个人信息</Text>
-                  {/* <Iconedit style={baseStyle.paddingLeft} size={20} /> */}
+                  {/* <Text style={sty.title}>个人信息</Text> */}
+                  <Text style={[sty.title]}>{resume.name}</Text>
+                  {resume.sex ? (
+                    <View style={[baseStyle.row, {paddingLeft: 5}]}>
+                      <Text style={sty.title}>/</Text>
+                      <Text style={[baseStyle.textGray, baseStyle.ft13]}>
+                        {global.getSexStr(resume.sex)}
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
                 <View style={baseStyle.paddingTop}>
                   <Text style={baseStyle.textGray}>
@@ -291,7 +222,7 @@ class rreview extends Component {
               </View>
             </View>
             <View style={[sty.inforItem, sty.flexContentBetween]}>
-              <Text>求职状态</Text>
+              <Text style={sty.title}>求职状态</Text>
               <View style={sty.rigtSty}>
                 <Text style={baseStyle.textGray}>
                   {this.getResumeStatus('code')}
@@ -306,7 +237,7 @@ class rreview extends Component {
                   baseStyle.paddingBottom,
                   {flex: 1},
                 ]}>
-                <Text>职业意向</Text>
+                <Text style={sty.title}>职业意向</Text>
               </View>
               <Text style={[baseStyle.textGray, baseStyle.paddingTop]}>
                 {resume.resumeIntention || '请选择职业意向'}
@@ -314,7 +245,7 @@ class rreview extends Component {
             </View>
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>技能标签</Text>
+                <Text style={sty.title}>技能标签</Text>
               </View>
               <View style={[baseStyle.row, baseStyle.paddingTop]}>
                 {labels.length > 0
@@ -341,7 +272,7 @@ class rreview extends Component {
             </View>
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>工作经历</Text>
+                <Text style={sty.title}>工作经历</Text>
               </View>
               {this.state.workExperienceList.map(item => {
                 return (
@@ -375,7 +306,7 @@ class rreview extends Component {
             </View>
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>项目经历</Text>
+                <Text style={sty.title}>项目经历</Text>
               </View>
               {this.state.projectExperienceList.map(item => {
                 return (
@@ -404,7 +335,7 @@ class rreview extends Component {
             </View>
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>教育经历</Text>
+                <Text style={sty.title}>教育经历</Text>
               </View>
               {this.state.educationalExpList.map(item => {
                 return (
@@ -430,7 +361,7 @@ class rreview extends Component {
             </View>
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>自我评价</Text>
+                <Text style={sty.title}>自我评价</Text>
               </View>
               {resume.selfEvaluation ? (
                 <View style={baseStyle.paddingTop}>
@@ -451,7 +382,7 @@ class rreview extends Component {
             </View> */}
             <View style={sty.inforItem}>
               <View style={sty.flexContentBetween}>
-                <Text>简历设置</Text>
+                <Text style={sty.title}>简历设置</Text>
               </View>
               <View style={baseStyle.paddingTop}>
                 <Text>{this.getJobStatus('label')}</Text>
@@ -536,5 +467,9 @@ const sty = StyleSheet.create({
   notDataImg: {
     width: 91.5,
     height: 84.5,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

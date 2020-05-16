@@ -60,7 +60,6 @@ class EntryInfor extends Component {
   }
   getUserInfo() {}
   save() {
-    debugger;
     console.log('this.state.params', this.state.params);
     global.httpPost('user/update', this.state.params, res => {
       console.log(res);
@@ -276,7 +275,7 @@ const sty = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 100,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   flexContentBetween: {
     flexDirection: 'row',

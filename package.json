@@ -14,7 +14,6 @@
     "@react-native-community/masked-view": "^0.1.7",
     "@react-native-community/viewpager": "^3.3.0",
     "beeshell": "^2.0.11",
-    "cos-js-sdk-v5": "^0.5.26",
     "hoist-non-react-statics": "^3.3.2",
     "react": "16.9.0",
     "react-native": "0.61.5",

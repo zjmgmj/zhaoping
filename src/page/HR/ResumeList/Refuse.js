@@ -128,7 +128,7 @@ class Refuse extends Component {
             }}
             style={[sty.subBtn, {backgroundColor: '#D9B06F', marginTop: 20}]}
             textStyle={{color: '#fff'}}>
-            简历委托
+            确定
           </Button>
         </ScrollView>
       </View>
