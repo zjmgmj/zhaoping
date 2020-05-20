@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {Image, Text, View, ScrollView, TouchableOpacity} from 'react-native';
+import {
+  Image,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  DeviceEventEmitter,
+} from 'react-native';
 import {setStatusBar} from '../../../components/setStatusBar';
 import {TopviewGetInstance} from 'beeshell';
 import {baseStyle} from '../../../components/baseStyle';
@@ -51,6 +58,11 @@ class PositionList extends Component {
       this.getPositiontypeList(1);
     });
   }
+  componentDidMount() {
+    // 注册事件通知
+    DeviceEventEmitter.emit('tabName');
+    //tabName:通知的名称 param：发送的消息（传参）
+  }
   getPositiontypeList(type) {
     this.setState({
       positionType: type,
@@ -58,6 +70,7 @@ class PositionList extends Component {
     const currentUser = this.state.currentUser;
     const params = this.state.params;
     params.userId = currentUser.userId;
+    debugger;
     params.positionType = type;
     Object.keys(params).forEach(key => {
       if (!params[key]) {
@@ -84,8 +97,12 @@ class PositionList extends Component {
       .add(
         <CitySelected
           selected={selected}
+          isRegion={false}
           close={() => {
             TopviewGetInstance().remove(this.state.cityPickId);
+            this.setState({
+              cityPickId: null,
+            });
           }}
           selectedEvent={res => {
             const params = Object.assign(this.state.params, res);
@@ -94,6 +111,9 @@ class PositionList extends Component {
             });
             this.getPositiontypeList(this.state.cardNum);
             TopviewGetInstance().remove(this.state.cityPickId);
+            this.setState({
+              cityPickId: null,
+            });
           }}
         />,
       )
@@ -155,7 +175,14 @@ class PositionList extends Component {
             <View style={baseStyle.row}>
               <TouchableOpacity
                 onPress={() => {
-                  this.openCityPick();
+                  if (this.state.cityPickId) {
+                    TopviewGetInstance().remove(this.state.cityPickId);
+                    this.setState({
+                      cityPickId: null,
+                    });
+                  } else {
+                    this.openCityPick();
+                  }
                 }}
                 style={baseStyle.row}>
                 <Text style={{paddingRight: 5}}>

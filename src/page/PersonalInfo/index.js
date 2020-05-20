@@ -21,7 +21,7 @@ class PersonalInfo extends Component {
     const id = this.props.navigation.getParam('id');
     const userId = this.props.navigation.getParam('userId');
     global.httpGet('user/detail', {id: id, seluserId: userId}, res => {
-      console.log('getDetail', res);
+      console.log('getDetail---', res);
       this.setState({
         userInfo: res.data,
       });

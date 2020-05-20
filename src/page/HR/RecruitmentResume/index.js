@@ -109,6 +109,7 @@ class RecruitmentResume extends Component {
           }}
           total={total}
           data={list}
+          style={{flex: 1}}
           renderItem={({item, index}) => {
             return (
               <View

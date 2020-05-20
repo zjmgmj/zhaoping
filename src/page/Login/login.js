@@ -1,9 +1,14 @@
 import React, {Component} from 'react';
-import {View, ImageBackground, StyleSheet, Text} from 'react-native';
+import {
+  View,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  DeviceEventEmitter,
+} from 'react-native';
 import {baseStyle} from '../../components/baseStyle';
 import {setStatusBar} from '../../components/setStatusBar';
 import {Button} from 'beeshell/dist/components/Button';
-
 @setStatusBar({
   translucent: true,
   backgroundColor: 'transparent',
@@ -49,6 +54,11 @@ class Login extends Component {
       .catch(value => {
         console.log('value');
       });
+  }
+  componentDidMount() {
+    // 注册事件通知
+    DeviceEventEmitter.emit('tabName');
+    //tabName:通知的名称 param：发送的消息（传参）
   }
   render() {
     return (

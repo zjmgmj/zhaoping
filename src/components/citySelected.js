@@ -51,6 +51,9 @@ class City extends Component {
 }
 
 export default class CitySelected extends Component {
+  static defaultProps = {
+    isRegion: true,
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -58,6 +61,7 @@ export default class CitySelected extends Component {
       provinceList: [],
       cityList: [],
       regionList: [],
+      isTap: false,
     };
   }
   selected(type, id) {
@@ -66,29 +70,76 @@ export default class CitySelected extends Component {
   UNSAFE_componentWillMount() {
     this.setState({
       selected: this.props.selected,
+      isTap: false,
     });
     global.httpGet('region/getregionlist', {pid: 1001000000}, res => {
       console.log('getregionlist', res);
+      const {provinceId} = this.props.selected;
+      const resData = res.data;
+      if (provinceId) {
+        let idx = null;
+        const findData = resData.find((item, index) => {
+          idx = index;
+          return item.regionId == provinceId;
+        });
+        debugger;
+        console.log('findData', findData);
+        if (findData) {
+          delete resData[idx];
+          resData.unshift(findData);
+        }
+      }
       this.setState({
-        provinceList: res.data,
+        provinceList: resData,
       });
     });
+    debugger;
+    const {provinceId, cityId} = this.props.selected;
+    if (provinceId) {
+      this.getCityList(provinceId, 'cityList');
+    }
+    if (cityId) {
+      this.getCityList(cityId, 'regionList');
+    }
   }
 
   getCityList(pid, key) {
+    const {provinceId, cityId, regionId} = this.props.selected;
+    console.log(provinceId);
+    console.log(cityId);
+    console.log(regionId);
     global.httpGet('region/getregionlist', {pid: pid}, res => {
-      console.log(res);
       if (res.data.length > 0) {
         const obj = {};
         obj[key] = res.data;
+        if (cityId || regionId) {
+          let idx = null;
+          const {cityId, regionId} = this.props.selected;
+          const id =
+            key === 'cityList'
+              ? cityId
+              : key === 'regionList'
+              ? regionId
+              : null;
+          const findData = obj[key].find((item, index) => {
+            idx = index;
+            return item.regionId == id;
+          });
+          console.log('findData', findData);
+          if (findData) {
+            delete obj[key][idx];
+            obj[key].unshift(findData);
+          }
+        }
         this.setState(obj);
-      } else {
+      } else if (this.state.isTap) {
         this.props.selectedEvent(this.state.selected);
       }
     });
   }
   render() {
     const {provinceList, cityList, regionList} = this.state;
+    const {isRegion} = this.props;
     if (provinceList.length === 0) {
       return false;
     }
@@ -96,11 +147,13 @@ export default class CitySelected extends Component {
       <TouchableOpacity
         style={[baseStyle.fullScreenMask]}
         onPress={() => {
-          console.log('close');
+          this.setState({
+            flog: 'close',
+          });
           this.props.close();
         }}>
         <View style={[baseStyle.row, sty.scrollViewBox]}>
-          <ScrollView style={[sty.scrollView, {left: 0}]}>
+          <ScrollView style={[sty.scrollView, {left: 0}, sty.col]}>
             {provinceList.map((item, idx) => {
               return (
                 <Province
@@ -112,15 +165,19 @@ export default class CitySelected extends Component {
                     const selected = this.state.selected;
                     selected.provinceId = item.regionId;
                     selected.provinceName = item.regionName;
-                    this.setState({selected});
+                    this.setState({
+                      selected,
+                      isTap: true,
+                      cityList: [],
+                      regionList: [],
+                    });
                     this.getCityList(res.regionId, 'cityList');
                   }}
                 />
               );
             })}
           </ScrollView>
-          <ScrollView
-            style={[sty.scrollView, sty.cityBox, {backgroundColor: '#F7F7F7'}]}>
+          <ScrollView style={[sty.scrollView, sty.cityBox]}>
             {cityList.map((item, idx) => {
               return (
                 <City
@@ -129,44 +186,49 @@ export default class CitySelected extends Component {
                   selected={this.selected('cityId', item.regionId)}
                   // selected={this.selected('provinceId', item.regionId)}
                   selectCity={res => {
-                    console.log('selectProvince', res);
-                    const selected = this.state.selected;
-                    selected.cityId = item.regionId;
-                    selected.cityName = item.regionName;
-                    selected.regionId = null;
-                    selected.regionName = '';
-                    this.setState({selected});
-                    this.getCityList(res.regionId, 'regionList');
-                  }}
-                  // selectCity={res => {
-                  //   const selected = this.state.selected;
-                  //   selected.cityId = item.regionId;
-                  //   selected.cityName = item.regionName;
-                  //   this.setState({selected});
-                  //   this.props.selectedEvent(selected);
-                  // }}
-                />
-              );
-            })}
-          </ScrollView>
-          <ScrollView style={[sty.scrollView, sty.cityBox]}>
-            {regionList.map((item, idx) => {
-              return (
-                <City
-                  key={idx}
-                  item={item}
-                  selected={this.selected('regionId', item.regionId)}
-                  selectCity={res => {
-                    const selected = this.state.selected;
-                    selected.regionId = item.regionId;
-                    selected.regionName = item.regionName;
-                    this.setState({selected});
-                    this.props.selectedEvent(selected);
+                    debugger;
+                    if (isRegion) {
+                      const selected = this.state.selected;
+                      selected.cityId = item.regionId;
+                      selected.cityName = item.regionName;
+                      selected.regionId = null;
+                      selected.regionName = '';
+                      this.setState({selected, isTap: true, regionList: []});
+                      this.getCityList(res.regionId, 'regionList');
+                    } else {
+                      debugger;
+                      const selected = this.state.selected;
+                      selected.cityId = item.regionId;
+                      selected.cityName = item.regionName;
+                      // this.setState({selected});
+                      this.setState({selected, isTap: true, flog: 'close'});
+                      this.props.selectedEvent(selected);
+                    }
                   }}
                 />
               );
             })}
           </ScrollView>
+          {isRegion ? (
+            <ScrollView style={[sty.scrollView, sty.cityBox]}>
+              {regionList.map((item, idx) => {
+                return (
+                  <City
+                    key={idx}
+                    item={item}
+                    selected={this.selected('regionId', item.regionId)}
+                    selectCity={res => {
+                      const selected = this.state.selected;
+                      selected.regionId = item.regionId;
+                      selected.regionName = item.regionName;
+                      this.setState({selected, flog: 'close'});
+                      this.props.selectedEvent(selected);
+                    }}
+                  />
+                );
+              })}
+            </ScrollView>
+          ) : null}
         </View>
       </TouchableOpacity>
     );
@@ -174,13 +236,15 @@ export default class CitySelected extends Component {
 }
 
 const sty = StyleSheet.create({
+  col: {
+    flex: 1,
+  },
   scrollView: {
     // maxHeight: (baseStyle.screenHeight / 5) * 4,
     height: 300,
     backgroundColor: '#fff',
     // position: 'absolute',
-    // width: baseStyle.screenWidth / 3,
-    flex: 1,
+    width: baseStyle.screenWidth / 3,
     bottom: 0,
     // padding: 15,
     paddingTop: 10,

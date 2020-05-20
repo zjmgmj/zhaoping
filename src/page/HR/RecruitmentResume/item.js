@@ -17,10 +17,12 @@ class Item extends Component {
             baseStyle.justifyBetween,
             baseStyle.paddingBottom,
           ]}>
-          <Text>{item.positionName}</Text>
-          <Text style={[baseStyle.textGray, baseStyle.ft12]}>03-05</Text>
+          <Text style={baseStyle.positionTitle}>{item.positionName}</Text>
+          <Text style={[baseStyle.textGray, baseStyle.ft12]}>
+            {global.date2Str(new Date(item.createDate))}
+          </Text>
         </View>
-        <Text style={baseStyle.textRed}>18-20K</Text>
+        <Text style={baseStyle.textRed}>{item.salaryName}</Text>
         <Text style={{color: '#333333', marginTop: 10}}>
           {item.companyName}
         </Text>

@@ -58,7 +58,11 @@ export default class Loading extends Component {
         style={{
           flex: 1,
           width: width,
-          height: height,
+          // height: height,
+          bottom: 0,
+          left: 0,
+          top: 0,
+          right: 0,
           position: 'absolute',
           // backgroundColor:'red',
           backgroundColor: '#10101099',

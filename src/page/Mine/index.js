@@ -74,6 +74,11 @@ class Mine extends Component {
           url: 'CompanyList',
         },
         {
+          icon: require('../../images/rec_icon.png'),
+          title: '招聘管理',
+          url: 'RecruitmentManagement',
+        },
+        {
           icon: require('../../images/yun_icon.png'),
           title: '专属管家',
           url: 'Housekeeper',
@@ -164,7 +169,8 @@ class Mine extends Component {
         {
           icon: require('../../images/kf_icon.png'),
           title: '申请专属顾问',
-          url: 'EntryInfor',
+          url: 'Housekeeper',
+          // url: 'EntryInfor',
         },
         {
           icon: require('../../images/qiehuan_icon.png'),

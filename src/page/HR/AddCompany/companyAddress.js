@@ -33,6 +33,7 @@ class CompanyAddress extends Component {
         ? require('./map.html')
         : {
             uri: 'http://114.55.169.95/yun_rest/map.html',
+            // uri: 'http://192.168.0.101:5500/src/page/HR/AddCompany/map.html',
           };
     return source;
   }
@@ -64,13 +65,12 @@ class CompanyAddress extends Component {
       });
   }
   onMessage(nativeEvent) {
-    console.log('nativeEvent', nativeEvent);
-    // this.props.navigation.state.params.callBack();
-    // this.props.navigation.goBack();
-    console.log('global', global);
     const {data} = nativeEvent.nativeEvent;
     const key = 'ebd60e0204faedb11b2ba4214d9d0620';
     const dataObj = JSON.parse(data);
+    if (dataObj.type) {
+      this.props.navigation.goBack();
+    }
     const location = dataObj.location;
     const that = this;
     const municipality = this.state.municipality;

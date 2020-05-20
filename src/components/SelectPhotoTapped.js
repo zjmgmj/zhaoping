@@ -39,7 +39,7 @@ export const selectPhotoTapped = ({options, cb, isSource}) => {
       } else {
         response.mediaType = defaultOptions.mediaType;
         global.Loading.showLoading();
-        if (defaultOptions.mediaType === 'video') {
+        if (defaultOptions.mediaType == 'video') {
           global.uploadVideo(response, res => {
             console.log('uploadVideo----', res);
             global.Loading.dismissLoading();

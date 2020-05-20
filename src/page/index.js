@@ -68,6 +68,7 @@ import ResumeDelivered from './HR/ResumeDelivered';
 import CompanyInfo from './companyInfo';
 import ResumeVideo from './Resume/ResumeVideo.js';
 import SetOnboardTime from './HR/SetOnboardTime';
+import NewsDetail from './HR/IndustryNews/newDetail';
 
 const personNavigator = {
   Home: {
@@ -80,6 +81,14 @@ const personNavigator = {
     screen: Position,
     navigationOptions: () => ({
       tabBarLabel: '职位',
+      // tabBarOnPress: obj => {
+      //   console.log('tabBarOnPress', obj);
+      //   // 任务数据redux修改，点击每次查询
+      //   if (obj.scene.route.params && obj.scene.route.params.queryList) {
+      //     obj.scene.route.params.queryList(); //查询数据
+      //   }
+      //   obj.jumpToIndex(obj.scene.index); //跳转B页面
+      // },
     }),
   },
   Dynamic: {
@@ -108,18 +117,36 @@ const HrNavigator = {
       tabBarLabel: '首页',
     }),
   },
-  RecruitmentManagement: {
-    screen: RecruitmentManagement,
+  // RecruitmentManagement: {
+  //   screen: RecruitmentManagement,
+  //   navigationOptions: () => ({
+  //     tabBarLabel: '招聘管理',
+  //   }),
+  // },
+  Position: {
+    screen: Position,
     navigationOptions: () => ({
-      tabBarLabel: '招聘管理',
+      tabBarLabel: '职位',
     }),
   },
-  AddressBook: {
-    screen: AddressBook,
+  Dynamic: {
+    screen: Dynamic,
     navigationOptions: () => ({
-      tabBarLabel: '通讯录',
+      tabBarLabel: '动态',
     }),
   },
+  Info: {
+    screen: Info,
+    navigationOptions: () => ({
+      tabBarLabel: '消息',
+    }),
+  },
+  // AddressBook: {
+  //   screen: AddressBook,
+  //   navigationOptions: () => ({
+  //     tabBarLabel: '通讯录',
+  //   }),
+  // },
   Mine: {
     screen: Mine,
     navigationOptions: ({navigation}) => ({
@@ -164,6 +191,7 @@ const HrTabNavigator = createBottomTabNavigator(
 const routes = {
   Main: personTabNavigator,
   HrMain: HrTabNavigator,
+  RecruitmentManagement,
   ReleaseDynamic,
   Resume,
   ResumeAdd,
@@ -220,6 +248,7 @@ const routes = {
   CompanyInfo,
   ResumeVideo,
   SetOnboardTime,
+  NewsDetail,
 };
 const StackRouteConfigs = createStackNavigator(routes, {
   defaultNavigationOptions: {
@@ -227,12 +256,12 @@ const StackRouteConfigs = createStackNavigator(routes, {
   },
   initialRouteName: 'LoginHome',
 });
-const MainStackNavigator = createStackNavigator(routes, {
-  defaultNavigationOptions: {
-    headerShown: false,
-  },
-  initialRouteName: 'Main',
-});
+// const MainStackNavigator = createStackNavigator(routes, {
+//   defaultNavigationOptions: {
+//     headerShown: false,
+//   },
+//   initialRouteName: 'Main',
+// });
 
 const MainComponent = createAppContainer(StackRouteConfigs);
 

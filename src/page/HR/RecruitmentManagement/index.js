@@ -79,42 +79,48 @@ class RecruitmentManagement extends Component {
   }
   render() {
     return (
-      <ScrollView>
-        <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
-          <Header isHeader={false} />
-          <ImageBackground
-            style={sty.headSty}
-            source={require('../../../images/recruitment_management_bg.png')}>
-            <Text
-              style={[
-                baseStyle.textWhite,
-                {fontSize: 25, fontWeight: 'bold', textAlign: 'center'},
-              ]}>
-              大型招聘
-            </Text>
-            <Text
-              style={[
-                baseStyle.textWhite,
-                {fontSize: 15, textAlign: 'center', marginTop: 5},
-              ]}>
-              百万人才库 在线交流
-            </Text>
-          </ImageBackground>
-          <View style={{padding: 10}}>
-            {this.state.menuList.map((item, idx) => {
-              return (
-                <TouchableOpacity
-                  key={idx}
-                  onPress={() => {
-                    this.props.navigation.navigate(item.url);
-                  }}>
-                  <MineList item={item} />
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
+        {/* <Header isHeader={false} /> */}
+        <Header
+          title="招聘管理"
+          onPressBack={() => {
+            this.props.navigation.goBack();
+          }}
+          fullScreen
+          isBorder={false}
+        />
+        <ImageBackground
+          style={sty.headSty}
+          source={require('../../../images/recruitment_management_bg.png')}>
+          <Text
+            style={[
+              baseStyle.textWhite,
+              {fontSize: 25, fontWeight: 'bold', textAlign: 'center'},
+            ]}>
+            大型招聘
+          </Text>
+          <Text
+            style={[
+              baseStyle.textWhite,
+              {fontSize: 15, textAlign: 'center', marginTop: 5},
+            ]}>
+            百万人才库 在线交流
+          </Text>
+        </ImageBackground>
+        <View style={{padding: 10}}>
+          {this.state.menuList.map((item, idx) => {
+            return (
+              <TouchableOpacity
+                key={idx}
+                onPress={() => {
+                  this.props.navigation.navigate(item.url);
+                }}>
+                <MineList item={item} />
+              </TouchableOpacity>
+            );
+          })}
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }

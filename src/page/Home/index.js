@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {Image, Text, View, ScrollView, TouchableOpacity} from 'react-native';
-import {Tab} from 'beeshell';
 import {baseStyle} from '../../components/baseStyle';
 import {sty} from './sty';
 import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
 import {httpGet} from '../../utils/httpUtil';
+import HTMLView from 'react-native-htmlview';
 
 class Banner extends Component {
   UNSAFE_componentWillMount() {
@@ -51,110 +51,135 @@ class TabContent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: 1,
+      cardNum: 1,
+      list: [],
     };
   }
-  handleChange = (key, value) => {
-    this.setState({
-      value: value,
-      currentUser: null,
-    });
-  };
+  // handleChange = (key, cardNum) => {
+  //   this.setState({
+  //     cardNum: cardNum,
+  //     currentUser: null,
+  //   });
+  // };
   UNSAFE_componentWillMount() {
-    this.getNewList();
+    this.getNewList(this.state.cardNum);
   }
-  getNewList() {
+  getNewList(cardNum) {
     httpGet(
       'news/list',
-      {page: 1, size: 2},
+      {page: 1, size: 2, newsType: cardNum},
       res => {
         console.log('newsList', res);
+        this.setState({
+          list: res.data.result,
+        });
       },
       err => {
         console.log('newsListErr', err);
       },
     );
   }
+  getContent(content) {
+    const newContent = content
+      ? content
+          .replace(/<\/?[^>]*>/g, '')
+          .replace(/[|]*\n/, '')
+          .replace(/&npsp;/gi, '')
+      : '';
+    return newContent
+      ? newContent.length > 43
+        ? newContent.substr(0, 43) + '...'
+        : newContent
+      : '';
+  }
+  cardHandler(cardNum) {
+    this.setState({
+      cardNum: cardNum,
+    });
+    this.getNewList(cardNum);
+  }
   render() {
-    const renderList = [];
+    const list = this.state.list;
     return (
       <View>
-        <Tab
-          style={sty.tabContent}
-          value={this.state.value}
-          scrollable={true}
-          data={[{value: 1, label: '原创'}, {value: 2, label: '热门话题'}]}
-          activeColor="#D9B06F"
-          onChange={item => this.handleChange('value', item.value)}
-        />
-        <View style={{paddingLeft: 20, paddingRight: 20}}>
-          {this.state.value === 1 ? (
-            <View>
-              <View style={[sty.newItem, baseStyle.borderBottom]}>
-                <Image
-                  source={require('../../images/home_1.png')}
-                  style={sty.hotImg}
-                />
-                <View style={{paddingLeft: 10, flex: 1}}>
-                  <Text style={(baseStyle.ft14, baseStyle.fontBold)}>
-                    2020年就业趋势调研报告
-                  </Text>
-                  <Text style={sty.newDetail}>
-                    突如其来的新冠肺炎疫情打乱了人们的生活，漫长的“宅家”和延迟复工让职场人的职业规划发生了变化
-                  </Text>
-                </View>
-              </View>
-              <View style={sty.newItem}>
-                <Image
-                  source={require('../../images/home_1.png')}
-                  style={sty.hotImg}
-                />
-                <View style={{paddingLeft: 10, flex: 1}}>
-                  <Text style={(baseStyle.ft14, baseStyle.fontBold)}>
-                    2020年就业趋势调研报告
-                  </Text>
-                  <Text style={sty.newDetail}>
-                    突如其来的新冠肺炎疫情打乱了人们的生活，漫长的“宅家”和延迟复工让职场人的职业规划发生了变化
-                  </Text>
-                </View>
-              </View>
-            </View>
-          ) : (
-            <View>
-              <View
+        <View style={{padding: 15, paddingBottom: 0}}>
+          <View
+            style={[baseStyle.row, sty.positionTab, baseStyle.borderBottom]}>
+            <View style={baseStyle.row}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.cardHandler(1);
+                }}
                 style={[
-                  sty.newItem,
-                  {borderBottomWidth: 1, borderBottomColor: '#ccc'},
+                  sty.tabName,
+                  this.state.cardNum === 1 ? sty.tabNameActive : '',
                 ]}>
-                <Image
-                  source={require('../../images/home_1.png')}
-                  style={sty.hotImg}
-                />
-                <View style={{paddingLeft: 10, flex: 1}}>
-                  <Text style={(baseStyle.ft14, baseStyle.fontBold)}>
-                    2020年就业趋势调研报告
-                  </Text>
-                  <Text style={sty.newDetail}>
-                    突如其来的新冠肺炎疫情打乱了人们的生活，漫长的“宅家”和延迟复工让职场人的职业规划发生了变化
-                  </Text>
-                </View>
-              </View>
-              <View style={sty.newItem}>
-                <Image
-                  source={require('../../images/home_1.png')}
-                  style={sty.hotImg}
-                />
-                <View style={{paddingLeft: 10, flex: 1}}>
-                  <Text style={(baseStyle.ft14, baseStyle.fontBold)}>
-                    2020年就业趋势调研报告
-                  </Text>
-                  <Text style={sty.newDetail}>
-                    突如其来的新冠肺炎疫情打乱了人们的生活，漫长的“宅家”和延迟复工让职场人的职业规划发生了变化
-                  </Text>
-                </View>
-              </View>
+                <Text
+                  style={
+                    this.state.cardNum === 1
+                      ? baseStyle.textBlack
+                      : baseStyle.textGray
+                  }>
+                  原创
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  this.cardHandler(2);
+                }}
+                style={[
+                  sty.tabName,
+                  this.state.cardNum === 2 ? sty.tabNameActive : '',
+                ]}>
+                <Text
+                  style={
+                    this.state.cardNum === 2
+                      ? baseStyle.textBlack
+                      : baseStyle.textGray
+                  }>
+                  热门话题
+                </Text>
+              </TouchableOpacity>
             </View>
-          )}
+            <TouchableOpacity
+              onPress={() => {
+                // this.state.cardNum === 1
+                //   ? navigate('ChallengePosition')
+                //   : navigate('RecommendPosition');
+              }}>
+              <Text style={baseStyle.textYellow}>更多</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={{paddingLeft: 20, paddingRight: 20}}>
+          {list.map(item => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('NewsDetail', {
+                    id: item.id,
+                  });
+                }}
+                key={item.id}
+                style={[sty.newItem, baseStyle.borderBottom]}>
+                <Image source={{uri: item.coverImg}} style={sty.hotImg} />
+                <View style={{paddingLeft: 10, flex: 1, height: 58}}>
+                  <Text
+                    numberOfLines={10}
+                    style={(baseStyle.ft14, baseStyle.fontBold)}>
+                    {item.newsName
+                      ? item.newsName.length > 20
+                        ? item.newsName.substr(0, 20) + '...'
+                        : item.newsName
+                      : ''}
+                  </Text>
+                  <Text style={sty.newDetail}>
+                    {this.getContent(item.newsContent)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
     );
@@ -165,12 +190,11 @@ class PositionList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cardNum: 1,
+      cardNum: 2,
       list: [],
     };
   }
   componentDidMount() {
-    debugger;
     this.getPositiontypeList();
   }
   getSalaryName(id) {
@@ -192,7 +216,6 @@ class PositionList extends Component {
     if (cardActive === 2) {
       params.isrecommend = 1;
     }
-    console.log('params', params);
     global.httpGet('position/list', params, res => {
       console.log('positionList', res);
       this.setState({
@@ -215,7 +238,7 @@ class PositionList extends Component {
           <View
             style={[baseStyle.row, sty.positionTab, baseStyle.borderBottom]}>
             <View style={baseStyle.row}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   this.cardHandler(1);
                 }}
@@ -231,7 +254,7 @@ class PositionList extends Component {
                   }>
                   挑战职位
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity
                 onPress={() => {
                   this.cardHandler(2);
@@ -381,7 +404,7 @@ class Home extends Component {
         <Banner />
         <View style={{backgroundColor: '#fff'}}>
           <Notice />
-          <TabContent />
+          <TabContent navigation={this.props.navigation} />
           <PositionList
             salaryList={this.state.salaryList}
             currentUser={this.state.currentUser}

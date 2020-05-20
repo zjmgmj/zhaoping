@@ -79,7 +79,7 @@ export const sty = StyleSheet.create({
     fontSize: 20,
   },
   positionImg: {
-    width: 53,
+    width: 64,
     height: 64,
     resizeMode: 'cover',
   },

@@ -70,10 +70,19 @@ class ResumeItem extends Component {
             </View>
             <View style={[baseStyle.row, baseStyle.paddingTop]}>
               {item.age ? <Text>{item.age}岁</Text> : null}
-              {item.experienceName ? (
+              {item.workyear ? (
                 <Text
                   style={[
                     item.age ? sty.borderLeft : null,
+                    {marginLeft: item.age ? 10 : 0, paddingLeft: 10},
+                  ]}>
+                  工作{item.workyear}年
+                </Text>
+              ) : null}
+              {item.experienceName ? (
+                <Text
+                  style={[
+                    item.workyear || item.age ? sty.borderLeft : null,
                     {marginLeft: item.age ? 10 : 0, paddingLeft: 10},
                   ]}>
                   {item.experienceName}
@@ -112,6 +121,7 @@ class ResumeDelivered extends Component {
   }
   UNSAFE_componentWillMount() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
+      console.log('currentUser', res);
       this.setState({
         currentUser: res,
       });
@@ -120,11 +130,11 @@ class ResumeDelivered extends Component {
   }
   getResumeList() {
     global.httpGet(
-      'positionrecord/list',
+      'resume/getResumeSubmittedList',
       {
         page: 1,
         size: 20,
-        hruserId: this.state.currentUser.userId,
+        userId: this.state.currentUser.userId,
       },
       res => {
         console.log('positionrecord', res);
@@ -179,7 +189,7 @@ class ResumeDelivered extends Component {
                     key={item.id}
                     onPress={() => {
                       this.props.navigation.navigate('Rreview', {
-                        id: item.resumeId,
+                        id: item.id,
                       });
                     }}>
                     <ResumeItem item={item} />

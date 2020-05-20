@@ -28,9 +28,18 @@
        padding: 0;
        border: none;
      }
+     .back{
+       width: 30px;
+       height: 30px;
+       top: 5px;
+       left: 3px;
+       position: absolute;
+       opacity: 0;
+     }
    </style>
  </head>
  <body>
+  <div id="back" class="back"></div>
    <iframe
      id="map"
      src="https://m.amap.com/picker/?zoom=15&total=10&key=84da93e3e2fc135820d11287e5a57dd8"
@@ -42,17 +51,17 @@
        document.getElementById("map").onload = function() {
          iframe.postMessage("hello", "https://m.amap.com/picker/");
        };
-      // alert(JSON.stringify(window.frames))
-      // alert(JSON.stringify(window))
-       window.parent.addEventListener(
+       window.frames.addEventListener(
          "message",
          function(e) {
            console.log('message', e)
-          alert(JSON.stringify(e.data))
           window.ReactNativeWebView.postMessage(JSON.stringify(e.data));
          },
          false
        );
+       document.getElementById('back').onclick=function() {
+         window.ReactNativeWebView.postMessage(JSON.stringify({type: 'back'}));
+       }
      })();
    </script>
  </body>

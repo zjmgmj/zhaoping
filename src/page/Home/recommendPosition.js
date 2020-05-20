@@ -4,7 +4,7 @@ import ScrollableTabView from 'react-native-scrollable-tab-view';
 import TabBar from '../../components/TabBar';
 import {setStatusBar} from '../../components/setStatusBar';
 import Header from '../../components/Header';
-import PositionList from '../../components/PositionList';
+import PositionList from './PositionList';
 import {baseStyle} from '../../components/baseStyle';
 
 @setStatusBar({
@@ -29,11 +29,10 @@ class ChallengePosition extends Component {
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
           <View tabLabel="猎头职位">
-            <PositionList navigation={this.props.navigation} />
-            {/* <Text>挑战职位</Text> */}
+            <PositionList positionType={1} navigation={this.props.navigation} />
           </View>
           <View tabLabel="普通职位">
-            <PositionList navigation={this.props.navigation} />
+            <PositionList positionType={2} navigation={this.props.navigation} />
           </View>
         </ScrollableTabView>
       </View>

@@ -20,7 +20,7 @@ export const httpGet = (api, parameter = {}, success, failure = () => {}) => {
       'Content-Type': 'application/json',
     },
   };
-  console.log('httpGet', url);
+  // console.log('httpGet', url);
   //发起请求
   fetch(url, opt)
     .then(data => {
@@ -74,23 +74,26 @@ export const uploadImage = (url, file, success, failure = () => {}) => {
     name: file.fileName,
     size: file.fileSize,
   };
-  // if (file.mediaType === 'video') {
-  //   const videoPath = file.path.split('/');
-  //   const videoType = file.path.split('.');
-  //   const videoData = {
-  //     name: 'video',
-  //     filename: videoPath[videoPath.length - 1],
-  //     data: RNFetchBlob.wrap(file.uri),
-  //     type: `video/${videoType[videoType.length - 1]}`,
-  //     // uri: file.uri,
-  //     // type: `video/${videoType[videoType.length - 1]}`,
-  //     // name: videoPath[videoPath.length - 1],
-  //     // data: RNFetchBlob.wrap(file.uri),
-  //     // size: 100,
-  //   };
-  //   console.log('videoData', JSON.stringify(videoData));
-  //   fileData = videoData;
-  // }
+  if (file.mediaType === 'video') {
+    const videoPath = file.path.split('/');
+    const videoType = file.path.split('.');
+    let PATH =
+      Platform.OS == 'ios' ? file.uri.replace('file:///', '') : file.uri;
+    const videoData = {
+      name: 'video',
+      filename: videoPath[videoPath.length - 1],
+      // data: RNFetchBlob.wrap(file.uri),
+      size: 100,
+      uri: file.uri,
+      type: `video/${videoType[videoType.length - 1]}`,
+      // type: `video/${videoType[videoType.length - 1]}`,
+      // name: 'file',
+      // filename: videoPath[videoPath.length - 1],
+      // data: RNFetchBlob.wrap(PATH),
+    };
+    // console.log('videoData', JSON.stringify(videoData));
+    fileData = videoData;
+  }
 
   formData.append('file', fileData);
   formData.append('model', file.mediaType);
@@ -121,19 +124,26 @@ export const uploadVideo = (file, cb = () => {}) => {
   const videoType = file.path.split('.');
   let PATH = Platform.OS == 'ios' ? file.uri.replace('file:///', '') : file.uri;
   // let PATH = Platform.OS == 'ios' ? file.uri.replace('file:///', '') : file.uri;
+  const params = {
+    // type: `video/${videoType[videoType.length - 1]}`,
+    // name: 'file',
+    // filename: videoPath[videoPath.length - 1],
+    type: 'video/mp4',
+    name: 'file',
+    filename: 'vid.mp4',
+    // data: RNFetchBlob.wrap(PATH),
+    data: RNFetchBlob.wrap(RNFetchBlob.fs.asset(file.path)),
+  };
+  console.log('paramsVideo', params);
   RNFetchBlob.fetch(
     'POST',
     'http://114.55.169.95/yun_rest/upload/fileupload',
-    {'Content-Type': 'multipart/form-data'},
     {
-      type: `video/${videoType[videoType.length - 1]}`,
-      name: 'file',
-      filename: videoPath[videoPath.length - 1],
-      // type: 'video/mp4',
-      // name: 'file',
-      // filename: 'vid.mp4',
-      data: RNFetchBlob.wrap(PATH),
+      Authorization: 'Bearer access-token',
+      otherHeader: 'foo',
+      'Content-Type': 'multipart/form-data',
     },
+    [params],
   )
     .then(data => {
       console.log('data-------------', data);

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, Alert} from 'react-native';
+import {Text, View, StyleSheet, Alert, Image} from 'react-native';
 import {baseStyle} from '../../components/baseStyle';
 import RNFetchBlob from 'rn-fetch-blob';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -47,10 +47,30 @@ class Item extends Component {
       })
       .catch(err => console.log('err', err));
   }
+  userInfoElm(item) {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.props.navigation.navigate('Rreview', {
+            id: item.resumeId,
+          });
+        }}
+        style={baseStyle.row}>
+        <View style={baseStyle.authorBox}>
+          <Image source={{uri: item.pic}} style={baseStyle.authorImg} />
+        </View>
+        <View style={baseStyle.paddingLeft}>
+          <Text>{item.resumeIntention}</Text>
+          <Text>{item.name}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }
   render() {
     const item = this.props.item.item;
     console.log('职位进展item', item);
     const statusObj = this.state.statusObj;
+
     return (
       <View style={baseStyle.content}>
         <View
@@ -59,7 +79,7 @@ class Item extends Component {
             baseStyle.justifyBetween,
             baseStyle.paddingBottom,
           ]}>
-          <Text>{item.positionName}</Text>
+          <Text style={baseStyle.positionTitle}>{item.positionName}</Text>
           <Text style={[baseStyle.textGray, baseStyle.ft12]}>
             {global.date2Str(new Date(item.entryDate))}
           </Text>
@@ -79,56 +99,71 @@ class Item extends Component {
           ]}>
           <Text style={{color: '#333333'}}>{item.companyName}</Text>
         </View>
-        {item.positionRecordstatus === 1 ? (
-          item.resumeTemp ? (
+        <View
+          style={[
+            baseStyle.row,
+            baseStyle.justifyBetween,
+            baseStyle.paddingTop,
+          ]}>
+          {this.userInfoElm(item)}
+          {item.positionRecordstatus === 1 ? (
+            item.resumeTemp ? (
+              // <View
+              //   style={[
+              //     baseStyle.row,
+              //     baseStyle.justifyBetween,
+              //     baseStyle.paddingTop,
+              //   ]}>
+              //   {this.userInfoElm(item)}
+              <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.downFile(item);
+                  }}
+                  style={sty.btn}>
+                  <Text style={baseStyle.textYellow}>下载简历模板</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    global.uploadFile(res => {
+                      console.log('res', res);
+                      this.updatePositionRecord(item, res.data);
+                    });
+                  }}
+                  style={sty.btn}>
+                  <Text style={baseStyle.textYellow}>上传新简历</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
+                <View style={sty.btn}>
+                  <Text style={baseStyle.textYellow}>已邀面试</Text>
+                </View>
+              </View>
+            )
+          ) : item.positionRecordstatus === 2 ||
+            item.positionRecordstatus === 5 ||
+            item.positionRecordstatus === 6 ||
+            item.positionRecordstatus === 7 ||
+            item.positionRecordstatus === 8 ? (
             <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
               <TouchableOpacity
                 onPress={() => {
-                  this.downFile(item);
-                }}
-                style={sty.btn}>
-                <Text style={baseStyle.textYellow}>下载简历模板</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  global.uploadFile(res => {
-                    console.log('res', res);
-                    this.updatePositionRecord(item, res.data);
+                  this.props.navigation.navigate('Feedback', {
+                    intfeedback: item.intfeedback,
+                    positionRecordId: item.positionRecordId,
+                    userId: item.userId,
+                    callBack: res => {
+                      this.props.refresh();
+                    },
                   });
                 }}
                 style={sty.btn}>
-                <Text style={baseStyle.textYellow}>上传新简历</Text>
+                <Text style={baseStyle.textYellow}>面试反馈</Text>
               </TouchableOpacity>
             </View>
-          ) : (
-            <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
-              <View style={sty.btn}>
-                <Text style={baseStyle.textYellow}>已邀面试</Text>
-              </View>
-            </View>
-          )
-        ) : item.positionRecordstatus === 2 ||
-          item.positionRecordstatus === 5 ||
-          item.positionRecordstatus === 6 ||
-          item.positionRecordstatus === 7 ||
-          item.positionRecordstatus === 8 ? (
-          <View style={[baseStyle.row, {justifyContent: 'flex-end'}]}>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('Feedback', {
-                  intfeedback: item.intfeedback,
-                  positionRecordId: item.positionRecordId,
-                  userId: item.userId,
-                  callBack: res => {
-                    this.props.refresh();
-                  },
-                });
-              }}
-              style={sty.btn}>
-              <Text style={baseStyle.textYellow}>面试反馈</Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
+          ) : null}
+        </View>
       </View>
     );
   }

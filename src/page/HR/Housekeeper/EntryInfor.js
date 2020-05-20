@@ -48,7 +48,7 @@ class EntryInfor extends Component {
   }
   UNSAFE_componentWillMount() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
-      console.log(res);
+      console.log('currentUser', res);
       res.workingDate = res.workingDate ? Number(res.workingDate) : '';
       res.birthDate = res.birthDate ? Number(res.birthDate) : '';
       this.setState({
@@ -56,14 +56,31 @@ class EntryInfor extends Component {
         info: res,
       });
       this.setParams(res.userId, 'userId');
+      this.setParams(res.skillDesc, 'skillDesc');
+      this.setParams(res.skillLabel, 'skillLabel');
+
+      if (res.housekeeperStatus === 2) {
+        this.setParams(res.housekeeperStatus, 'housekeeperStatus');
+      }
     });
   }
   getUserInfo() {}
   save() {
-    console.log('this.state.params', this.state.params);
-    global.httpPost('user/update', this.state.params, res => {
+    const params = this.state.params;
+    if (this.state.info.housekeeperStatus === 2) {
+      delete params.housekeeperStatus;
+    }
+    console.log('params', params);
+    global.httpPost('user/update', params, res => {
       console.log(res);
-      Alert.alert('提示', '审核中');
+      if (res.code === 0) {
+        Alert.alert('提示', res.msg);
+      } else if (params.housekeeperStatus === 1) {
+        Alert.alert('提示', '审核中');
+      } else {
+        Alert.alert('提示', '操作成功');
+      }
+      this.props.navigation.state.params.callBack();
       this.props.navigation.goBack();
     });
   }
@@ -76,7 +93,7 @@ class EntryInfor extends Component {
   }
   getSexStr() {
     const valItem = this.state.sexList.find(item => {
-      return item.value === this.state.info.sex;
+      return item.value === this.state.info.userSex;
     });
     return valItem ? valItem.label : '';
   }
@@ -165,6 +182,7 @@ class EntryInfor extends Component {
           <TouchableOpacity
             onPress={() => {
               this.props.navigation.navigate('SkillDesc', {
+                skillDesc: this.state.params.skillDesc,
                 callBack: res => {
                   this.setParams(res, 'skillDesc');
                 },

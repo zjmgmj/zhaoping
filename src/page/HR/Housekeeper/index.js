@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   ImageBackground,
+  Alert,
   // SafeAreaView,
 } from 'react-native';
 import {Button} from 'beeshell/dist/components/Button';
@@ -112,17 +113,31 @@ class Housekeeper extends Component {
     super(props);
     this.state = {
       currentUser: null,
-      platformList: [],
-      list: [],
+      platformList: null,
+      list: null,
     };
   }
   UNSAFE_componentWillMount() {
     global.localStorage.get({key: 'currentUser'}).then(res => {
+      console.log('currentUser', res);
       this.setState({
         currentUser: res,
       });
+      this.getUpdateUserInfo(res.userId);
       this.getUserList();
       this.getList();
+    });
+  }
+  getUpdateUserInfo(userId) {
+    global.httpGet('user/detail', {id: userId}, res => {
+      console.log('user/detail', res.data);
+      const currentUser = this.state.currentUser;
+      const newCurrent = Object.assign(currentUser, res.data);
+      global.localStorage.set({
+        key: 'currentUser',
+        data: newCurrent,
+        expires: null,
+      });
     });
   }
   getUserList(changeIt) {
@@ -159,7 +174,7 @@ class Housekeeper extends Component {
   }
   render() {
     const {list, currentUser, platformList} = this.state;
-    if (!currentUser) {
+    if (!currentUser || !list || !platformList) {
       return false;
     }
     return (
@@ -214,11 +229,25 @@ class Housekeeper extends Component {
           </View>
           <Button
             onPress={() => {
-              this.props.navigation.navigate('EntryInfor');
+              if (currentUser.housekeeperStatus === 1) {
+                Alert.alert('提示', '审核中');
+              } else {
+                this.props.navigation.navigate('EntryInfor', {
+                  callBack: () => {
+                    this.getUpdateUserInfo(currentUser.userId);
+                    this.getUserList();
+                    this.getList();
+                  },
+                });
+              }
             }}
             style={sty.subBtn}
             textStyle={{color: '#fff'}}>
-            申请成为专属管家
+            {currentUser.housekeeperStatus === 1
+              ? '审核中'
+              : currentUser.housekeeperStatus === 2
+              ? '编辑专属管家'
+              : '申请成为专属管家'}
           </Button>
         </ScrollView>
       </View>

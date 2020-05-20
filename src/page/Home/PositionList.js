@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   DeviceEventEmitter,
 } from 'react-native';
-import {baseStyle} from './baseStyle';
+import {baseStyle} from '../../components/baseStyle';
 import {Longlist} from 'beeshell/dist/components/Longlist';
 
 const sty = StyleSheet.create({
@@ -51,6 +51,7 @@ class PositionList extends Component {
       params: {
         page: 1,
         size: 10,
+        positionType: this.props.positionType,
       },
       listener: null,
     };
@@ -64,13 +65,6 @@ class PositionList extends Component {
     });
   }
   componentDidMount() {
-    // this.getPositiontypeList();
-    // this.props.navigation.setParams({
-    //   queryData: () => {
-    //     this.getPositiontypeList();
-    //   },
-    // }); //在导航中添加查询数据的方法，设置一个钩子
-
     global.localStorage.get({key: 'currentUser'}).then(res => {
       this.setState({
         currentUser: res,
@@ -79,13 +73,6 @@ class PositionList extends Component {
     });
   }
 
-  componentWillUnmount() {
-    // 移除通知
-    // this.state.listener.remove();
-    // this.setState({
-    //   list: null,
-    // });
-  }
   getPositiontypeList(param = {}) {
     console.log('getPositiontypeList--------');
     // const currentUser = this.state.currentUser;

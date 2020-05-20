@@ -56,6 +56,7 @@ class ResumeSubmit extends Component {
                 getSalaryName={() => {
                   this.props.getSalaryName(item.id);
                 }}
+                navigation={this.props.navigation}
                 item={item}
                 key={idx}
               />

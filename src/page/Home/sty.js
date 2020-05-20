@@ -24,7 +24,7 @@ export const sty = StyleSheet.create({
   hotImg: {
     width: 78,
     height: 58,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   banner: {
     paddingLeft: 10,
@@ -79,7 +79,7 @@ export const sty = StyleSheet.create({
     fontSize: 20,
   },
   positionImg: {
-    width: 53,
+    width: 64,
     height: 64,
     // resizeMode: 'contain',
     resizeMode: 'cover',

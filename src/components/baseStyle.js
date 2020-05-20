@@ -151,14 +151,14 @@ export const baseStyle = StyleSheet.create({
     paddingRight: 20,
   },
   logoBox: {
-    width: 54,
+    width: 64,
     height: 64,
     overflow: 'hidden',
     borderColor: '#979797',
     borderWidth: 0.5,
   },
   logoImg: {
-    width: 53,
+    width: 64,
     height: 64,
     resizeMode: 'cover',
   },

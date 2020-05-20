@@ -20,7 +20,7 @@ class Dynamic extends Component {
           tabBarBackgroundColor="#3671ff"
           tabBarActiveTextColor="#fff"
           tabBarInactiveTextColor="#fff">
-          <View tabLabel="最新动态">
+          <View tabLabel="最新动态" style={{flex: 1}}>
             <News navigation={this.props.navigation} />
           </View>
           <View tabLabel="热门社群">

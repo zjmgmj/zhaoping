@@ -39,6 +39,7 @@ class Position extends Component {
       .add(
         <CitySelected
           selected={selected}
+          isRegion={false}
           close={() => {
             TopviewGetInstance().remove(this.state.cityPickId);
           }}
@@ -67,7 +68,7 @@ class Position extends Component {
   }
   render() {
     return (
-      <View style={[baseStyle.bgWhite, {height: baseStyle.screenHeight}]}>
+      <View style={[baseStyle.bgWhite, {flex: 1}]}>
         <Header isHeader={false} />
         <View style={baseStyle.content}>
           <View style={[baseStyle.row, sty.searchBox]}>

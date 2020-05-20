@@ -59,10 +59,16 @@ class Progress extends Component {
             tabBarInactiveTextColor="#fff"
             style={baseStyle.bgWhite}>
             <View tabLabel="已投简历">
-              <ResumeSubmit currentUser={currentUser} />
+              <ResumeSubmit
+                currentUser={currentUser}
+                navigation={this.props.navigation}
+              />
             </View>
             <View tabLabel="邀请面试">
-              <InviteInterview currentUser={currentUser} />
+              <InviteInterview
+                currentUser={currentUser}
+                navigation={this.props.navigation}
+              />
             </View>
             <View tabLabel="面试进度">
               <InterviewProgress

@@ -80,13 +80,10 @@ class rreview extends Component {
       'resume/detail',
       {id: id},
       res => {
-        console.log('resume', res);
+        console.log('resume----', res);
         this.setState({
           resume: res.data,
         });
-        // this.getResumeworkexpList(id);
-        // this.getResumeprojectexpList(id);
-        // this.getResumeschoolexpList(id);
       },
       err => {
         console.log(err);
@@ -213,6 +210,9 @@ class rreview extends Component {
                     {resume.birthDate ? `  |  ${resume.age}岁` : null}
                     {resume.educationName
                       ? `  |  ${resume.educationName}`
+                      : null}
+                    {resume.cityName || resume.regionName
+                      ? `  |  ${resume.cityName}${resume.regionName}`
                       : null}
                   </Text>
                 </View>

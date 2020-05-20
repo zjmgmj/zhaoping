@@ -51,9 +51,9 @@ class PostPosition extends Component {
         positionDesc: '',
         positionName: '',
         positionRequirements: '',
-        positionTypeName: '普通职位',
-        positionTypeId: 2,
-        positionType: 2, // 1=猎头职位 2=普通职位
+        positionTypeName: '猎头职位',
+        positionTypeId: 1,
+        positionType: 1, // 1=猎头职位 2=普通职位
         provinceId: 0,
         regionId: 0,
         regionName: '',

@@ -16,6 +16,7 @@ import {setStatusBar} from '../../components/setStatusBar';
 import {baseStyle} from '../../components/baseStyle';
 import {Iconright} from '../../iconfont/Iconright';
 import {Button} from 'beeshell/dist/components/Button';
+import CitySelected from '../../components/CitySelected';
 // import Video from 'react-native-video';
 
 // import Datepicker from 'beeshell/dist/components/Datepicker';
@@ -119,6 +120,9 @@ class ResumeInfo extends Component {
       params,
       res => {
         console.log('resume', res);
+        if (!params.id) {
+          params.id = res.data;
+        }
         this.props.navigation.state.params.callBack(params);
         this.props.navigation.goBack();
         if (this.props.navigation.getParam('from') === 'mine') {
@@ -172,6 +176,35 @@ class ResumeInfo extends Component {
       .then(id => {
         this.setState({
           pickId: id,
+        });
+      });
+  }
+  openCityPick() {
+    const {provinceId, cityId, regionId} = this.state.info;
+    const selected = {
+      provinceId: provinceId || '',
+      cityId: cityId || '',
+      regionId: regionId || '',
+    };
+    TopviewGetInstance()
+      .add(
+        <CitySelected
+          selected={selected}
+          close={() => {
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+          selectedEvent={res => {
+            const info = Object.assign(this.state.info, res);
+            this.setState({
+              info,
+            });
+            TopviewGetInstance().remove(this.state.cityPickId);
+          }}
+        />,
+      )
+      .then(id => {
+        this.setState({
+          cityPickId: id,
         });
       });
   }
@@ -388,6 +421,24 @@ class ResumeInfo extends Component {
                 </TextInputLayout>
                 <Iconright color={iconRightFontColor} style={sty.Iconright} />
               </View>
+              <TouchableOpacity
+                onPress={() => {
+                  this.openCityPick();
+                }}
+                style={sty.inputBox}>
+                <TextInputLayout
+                  hintColor={hintColor}
+                  focusColor={iconRightFontColor}
+                  style={sty.inputLayout}>
+                  <TextInput
+                    value={info.cityName + info.regionName}
+                    style={sty.textInput}
+                    placeholder={'城市选择'}
+                    editable={false}
+                  />
+                </TextInputLayout>
+                <Iconright color={iconRightFontColor} style={sty.Iconright} />
+              </TouchableOpacity>
             </View>
           ) : (
             <View>

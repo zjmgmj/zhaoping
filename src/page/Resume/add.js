@@ -59,6 +59,8 @@ class Resume extends Component {
   }
   UNSAFE_componentWillMount() {
     const resumeId = this.props.navigation.getParam('id');
+    debugger;
+    console.log('resumeId-------', resumeId);
     if (resumeId) {
       this.setState({resumeId});
       this.getDetail(resumeId);
@@ -169,7 +171,7 @@ class Resume extends Component {
     const jobStatusItem = this.state.jobStatusList.find(item => {
       return item.value === jobStatus;
     });
-    return jobStatusItem[key];
+    return jobStatusItem ? jobStatusItem[key] : null;
   }
   getResumeStatus(key) {
     const resumeStatus = this.state.resume.resumeStatus;
@@ -280,8 +282,9 @@ class Resume extends Component {
                   data: resume,
                   callBack: res => {
                     console.log('ResumeInfo', res);
+                    this.getDetail(res.id);
                     this.setState({
-                      resume: Object.assign(resume, res),
+                      resumeId: res.id,
                     });
                   },
                 });
@@ -298,6 +301,9 @@ class Resume extends Component {
                     {resume.birthDate ? `  |  ${resume.age}岁` : null}
                     {resume.educationName
                       ? `  |  ${resume.educationName}`
+                      : null}
+                    {resume.cityName || resume.regionName
+                      ? `  |  ${resume.cityName}${resume.regionName}`
                       : null}
                   </Text>
                 </View>

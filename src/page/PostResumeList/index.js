@@ -81,9 +81,10 @@ class ResumeItem extends Component {
               <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
                 工作{item.workyear}年
               </Text>
-              {/* <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
-                上海长宁区
-              </Text> */}
+              <Text style={[sty.borderLeft, {marginLeft: 10, paddingLeft: 10}]}>
+                {item.cityName}
+                {item.regionName}
+              </Text>
             </View>
           </View>
         </View>

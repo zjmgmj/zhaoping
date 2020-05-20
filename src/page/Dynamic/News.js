@@ -47,34 +47,40 @@ class Item extends Component {
   }
   render() {
     const item = this.props.item;
-    const mainUrlList = item.mainUrl ? item.mainUrl.split() : [];
+    const mainUrlList = item.mainUrl ? item.mainUrl.split(',') : null;
+    console.log('mainUrlList-----', mainUrlList);
     return (
       <View style={sty.itemBox}>
         <View style={baseStyle.row}>
-          <Image source={{uri: item.userPic}} style={sty.authorImg} />
+          <View style={baseStyle.authorBox}>
+            <Image source={{uri: item.userPic}} style={baseStyle.authorImg} />
+          </View>
           <View style={baseStyle.paddingLeft}>
-            <Text style={baseStyle.textBlack}>
-              {item.userNickname || 'zhjm'}
+            <Text style={[baseStyle.textBlack, baseStyle.positionTitle]}>
+              {item.userNickname || '暂无'}
             </Text>
-            <Text style={[baseStyle.textGray, baseStyle.ft12]}>
+            <Text style={[baseStyle.textGray, baseStyle.ft14]}>
               {global.date2Str(new Date(item.createDate))}
             </Text>
           </View>
         </View>
-        <View style={baseStyle.paddingTop}>
-          <Text>{item.describess}</Text>
-          <View style={[baseStyle.row]}>
-            {mainUrlList.map((imgPath, idx) => {
-              return (
-                <Image
-                  key={idx}
-                  style={[sty.itemImg]}
-                  source={{uri: imgPath}}
-                />
-              );
-            })}
+        {mainUrlList ? (
+          <View style={baseStyle.paddingTop}>
+            <Text style={{color: '#333333'}}>{item.describess}</Text>
+            <View style={[baseStyle.row]}>
+              {mainUrlList.map((imgPath, idx) => {
+                return (
+                  <Image
+                    key={idx}
+                    style={[sty.itemImg]}
+                    source={{uri: imgPath}}
+                  />
+                );
+              })}
+            </View>
           </View>
-        </View>
+        ) : null}
+
         <View style={sty.optionSty}>
           <TouchableOpacity
             onPress={() => {
@@ -120,6 +126,7 @@ export default class News extends Component {
       list: [],
       total: 0,
       commentContent: '',
+      modalShow: false,
     };
   }
   UNSAFE_componentWillMount() {
@@ -230,6 +237,8 @@ export default class News extends Component {
         const page = this.state.page;
         let oldList = this.state.list;
         const resData = res.data;
+        console.log('resData', res);
+        console.log('resData.result', resData.result);
         if (page > 1) {
           oldList.push(...resData.result);
         } else {
@@ -288,16 +297,23 @@ export default class News extends Component {
   render() {
     const {total, list} = this.state;
     return (
-      <View>
+      <View style={{flex: 1}}>
         <Longlist
           ref={longList => {
             this.longList = longList;
           }}
+          style={{flex: 1}}
           total={total}
           data={list}
           renderItem={({item, index}) => {
             return (
-              <View key={index}>
+              <View
+                key={index}
+                style={
+                  index > 0
+                    ? {borderTopColor: '#FBFBFB', borderTopWidth: 5}
+                    : null
+                }>
                 <Item
                   item={item}
                   currentUser={this.state.currentUser}
@@ -354,6 +370,11 @@ export default class News extends Component {
 }
 
 const sty = StyleSheet.create({
+  describess: {
+    color: '#333',
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
   authorImg: {
     width: 40,
     height: 40,
@@ -364,10 +385,9 @@ const sty = StyleSheet.create({
     marginBottom: 10,
   },
   itemImg: {
-    // flex: 1,
     width: (baseStyle.screenWidth - 40) / 3,
     height: 75,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     margin: 5,
   },
   optionSty: {
@@ -377,6 +397,7 @@ const sty = StyleSheet.create({
   iconImg: {
     width: 24,
     height: 24,
+    resizeMode: 'cover',
   },
   iconNum: {
     position: 'absolute',

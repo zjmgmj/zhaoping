@@ -75,8 +75,18 @@ class ItemComp extends Component {
               justifyContent: 'space-between',
               alignItems: 'flex-end',
             }}>
-            {/* <Text style={[baseStyle.textRed, {paddingBottom: 5}]}>
-              {item.positionRecordstatus === 5
+            <Text style={[baseStyle.textRed, {paddingBottom: 5}]}>
+              {item.positionRecordstatus === 0
+                ? '已投递'
+                : item.positionRecordstatus === 1
+                ? '已邀约'
+                : item.positionRecordstatus === 2
+                ? '已面试'
+                : item.positionRecordstatus === 3
+                ? '未面试'
+                : item.positionRecordstatus === 4
+                ? '拒绝面试'
+                : item.positionRecordstatus === 5
                 ? '谈薪待入职'
                 : item.positionRecordstatus === 6
                 ? '已雇佣'
@@ -85,38 +95,31 @@ class ItemComp extends Component {
                 : item.positionRecordstatus === 8
                 ? '入职未过保'
                 : ''}
-            </Text> */}
+            </Text>
             <Iconright color="#D3CECE" />
           </View>
         </View>
-        <View
-          style={[baseStyle.row, {justifyContent: 'flex-end', marginTop: 10}]}>
-          {/* <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Feedback', {
-                positionRecordId: item.positionRecordId,
-                callBack: () => {
-                  this.props.refresh();
-                },
-              });
-            }}
-            style={sty.buttonSty}>
-            <Text style={baseStyle.textYellow}>上传面试反馈</Text>
-          </TouchableOpacity> */}
-          <TouchableOpacity
-            onPress={() => {
-              // this.props.datePickerRef();
-              navigation.navigate('OnboardingSet', {
-                positionRecordId: item.positionRecordId,
-                callBack: () => {
-                  this.props.refresh();
-                },
-              });
-            }}
-            style={sty.buttonSty}>
-            <Text style={baseStyle.textYellow}>设置入职时间</Text>
-          </TouchableOpacity>
-        </View>
+        {item.positionRecordstatus === 5 ? (
+          <View
+            style={[
+              baseStyle.row,
+              {justifyContent: 'flex-end', marginTop: 10},
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                // this.props.datePickerRef();
+                navigation.navigate('OnboardingSet', {
+                  positionRecordId: item.positionRecordId,
+                  callBack: () => {
+                    this.props.refresh();
+                  },
+                });
+              }}
+              style={sty.buttonSty}>
+              <Text style={baseStyle.textYellow}>设置入职时间</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
     );
   }
@@ -175,8 +178,8 @@ class SetOnboardTime extends Component {
       .httpGetPromise('positionrecord/list', {
         page: this.state.page,
         size: 10,
-        positionId: this.state.positionId,
-        userId: this.state.currentUser.userId,
+        recordStatus: 4,
+        hruserId: this.state.currentUser.userId,
       })
       .then(res => {
         console.log('res', res);

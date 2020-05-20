@@ -34,6 +34,7 @@ class Detail extends Component {
       detail: {
         currentUser: null,
       },
+      currentUser: null,
       company: null,
       headHeight: 0,
       getNum: 0,
@@ -41,14 +42,23 @@ class Detail extends Component {
   }
   UNSAFE_componentWillMount() {
     global.Loading.showLoading();
-    global.localStorage.get({key: 'currentUser'}).then(res => {
-      this.setState({
-        currentUser: res,
+    global.localStorage
+      .get({key: 'currentUser'})
+      .then(res => {
+        this.setState(
+          {
+            currentUser: res,
+          },
+          () => {
+            this.getDetail();
+            // this.getCompany();
+            // this.getintfeedbacklist();
+          },
+        );
+      })
+      .catch(err => {
+        console.log(err);
       });
-    });
-    this.getDetail();
-    this.getCompany();
-    this.getintfeedbacklist();
   }
   gettypelist(id, type, key) {
     global.gettypelist(type, res => {
@@ -71,10 +81,10 @@ class Detail extends Component {
       res => {
         if (res.code === 1) {
           const resData = res.data;
-          console.log('positionDetail', resData);
           this.setState({
             detail: resData,
-            getNum: this.state.getNum + 1,
+            feedbacklist: resData.interviewfeedback,
+            company: resData.company,
           });
         }
       },
@@ -111,6 +121,7 @@ class Detail extends Component {
     console.log('params', params);
     global.httpPost(
       'positionrecord/save',
+      // 'getResumeSubmittedList',
       params,
       res => {
         Alert.alert(res.data || '投递成功');
@@ -148,13 +159,13 @@ class Detail extends Component {
   onMessage() {}
   render() {
     const {detail, company, currentUser, feedbacklist, getNum} = this.state;
-    // if (!detail.id && !currentUser) {
-    //   return false;
-    // }
-    console.log('getNum', getNum);
-    if (getNum < 3) {
+    if (!detail.id && !currentUser) {
       return false;
     }
+    console.log('getNum', getNum);
+    // if (getNum < 3) {
+    //   return false;
+    // }
     global.Loading.dismissLoading();
     console.log('currentUser', currentUser.userType);
     const positionBenefits = detail.positionBenefits
@@ -188,7 +199,7 @@ class Detail extends Component {
           />
         </ImageBackground>
         <View style={{flex: 1}}>
-          <View style={[baseStyle.bgWhite, baseStyle.content]}>
+          <View style={[baseStyle.bgWhite, baseStyle.content, {height: 130}]}>
             <View style={[baseStyle.row, baseStyle.justifyBetween]}>
               <Text style={[{fontSize: 18, fontWeight: 'bold'}]}>
                 {detail.positionName || ''}
@@ -245,10 +256,12 @@ class Detail extends Component {
                 baseStyle.content,
                 baseStyle.row,
                 {
-                  marginTop: 5,
-                  paddingTop: 15,
+                  // marginTop: 5,
+                  paddingTop: 20,
+                  // borderTopColor: '#FBFBFB',
                   borderTopColor: '#FBFBFB',
                   borderTopWidth: 5,
+                  height: 80,
                 },
               ]}>
               <View style={[baseStyle.row]}>
@@ -288,17 +301,19 @@ class Detail extends Component {
               },
             ]}>
             <Text style={sty.positionTitle}>职位描述</Text>
-            <Text style={baseStyle.paddingTop}>
-              {detail.positionDesc || ''}
-            </Text>
-            <Text style={sty.positionTitleMin}>学历要求：</Text>
-            <Text style={baseStyle.paddingTop}>
-              {detail.educationName || ''}
-            </Text>
-            <Text style={sty.positionTitleMin}>经验要求：</Text>
-            <Text style={baseStyle.paddingTop}>
-              {detail.experienceName || ''}
-            </Text>
+            <View style={{minHeight: 100}}>
+              <Text style={baseStyle.paddingTop}>
+                {detail.positionDesc || ''}
+              </Text>
+              <Text style={sty.positionTitleMin}>学历要求：</Text>
+              <Text style={baseStyle.paddingTop}>
+                {detail.educationName || ''}
+              </Text>
+              <Text style={sty.positionTitleMin}>经验要求：</Text>
+              <Text style={baseStyle.paddingTop}>
+                {detail.experienceName || ''}
+              </Text>
+            </View>
             {detail.positionBenefits ? (
               <View>
                 <Text style={sty.positionTitle}>职位福利</Text>
@@ -370,7 +385,6 @@ class Detail extends Component {
               <Text style={{paddingTop: 10}}>暂无</Text>
             )}
           </View>
-          {/* ) : null} */}
 
           {company ? (
             <View
